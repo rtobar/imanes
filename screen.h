@@ -4,6 +4,7 @@
 /* Screen geometry */
 #define NES_SCREEN_WIDTH  256
 #define NES_SCREEN_HEIGHT 240
+#define NES_SCREEN_BPP    8
 
 /**
  * This method initializes the screen where everything is going to be drawn

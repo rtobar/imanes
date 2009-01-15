@@ -13,7 +13,7 @@ void init_screen() {
 		exit(EXIT_FAILURE);
 	}
 
-	screen = SDL_SetVideoMode(NES_SCREEN_WIDTH, NES_SCREEN_HEIGHT, 8, 0);
+	screen = SDL_SetVideoMode(NES_SCREEN_WIDTH, NES_SCREEN_HEIGHT, NES_SCREEN_BPP, 0);
 	if( screen == NULL ) {
 		fprintf(stderr,"Eror while setting vide mode: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
