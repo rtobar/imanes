@@ -1,8 +1,9 @@
 CC=gcc
-CFLAGS=-O3 -Wall
+CFLAGS=-O3 -Wall -g
+LDFLAGS=-lSDL
 
 EXE = tobyNes
-OBJS= main.o parse_file.o
+OBJS= main.o parse_file.o screen.o
 
 all: $(EXE)
 

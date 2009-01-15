@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define TOBYNES_VERSION 0.1
+
 typedef struct {
 	int fd;
 	uint8_t romBanks;
