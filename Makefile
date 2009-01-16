@@ -3,7 +3,7 @@ CFLAGS=-O3 -Wall -g
 LDFLAGS=-lSDL
 
 EXE = tobyNes
-OBJS= main.o mapper.o parse_file.o screen.o
+OBJS= cpu.o main.o mapper.o parse_file.o screen.o
 
 all: $(EXE)
 
