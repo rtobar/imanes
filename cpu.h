@@ -4,12 +4,23 @@
 #include <stdint.h>
 
 typedef struct {
-	uint8_t A;
-	uint8_t X;
-	uint8_t Y;
-	uint8_t S;
-	uint8_t P;
+	uint16_t PC;  /* Program counter */
+	uint8_t  A;   /* Accumulator */
+	uint8_t  X;   /* X register */
+	uint8_t  Y;   /* Y register */
+	uint8_t  SR;  /* Status register */
+	uint8_t  SP;  /* Stack pointer */
 } nes_cpu;
+
+/** SR flags */
+#define N_FLAG 0x80
+#define V_FLAG 0x40
+//ignored      0x20
+#define B_FLAG 0x10
+#define D_FLAG 0x08
+#define I_FLAG 0x04
+#define Z_FLAG 0x02
+#define C_FLAG 0x01
 
 extern nes_cpu *CPU;
 

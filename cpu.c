@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "cpu.h"
 
@@ -6,16 +7,19 @@ nes_cpu *CPU;
 
 void initialize_cpu() {
 	CPU = (nes_cpu *)malloc(sizeof(nes_cpu));
+
+	/* Initialize all the instructions/addressing modes */
 }
 
 void dump_cpu() {
 
 	printf("CPU Dumping:\n============\n\n");
-	printf("A: %02x\n", CPU->A);
-	printf("X: %02x\n", CPU->X);
-	printf("Y: %02x\n", CPU->Y);
-	printf("S: %02x\n", CPU->S);
-	printf("P: %02x\n", CPU->P);
+	printf("PC: %02x\n", CPU->PC);
+	printf("A:  %02x\n", CPU->A);
+	printf("X:  %02x\n", CPU->X);
+	printf("Y:  %02x\n", CPU->Y);
+	printf("SR: %02x\n", CPU->SR);
+	printf("SP: %02x\n", CPU->SP);
 
 	return;
 }
