@@ -64,7 +64,7 @@
 #define TYA 55
 
 /* Addressing modes */
-#define ADDR_MODES_NUMBER 12
+#define ADDR_MODES_NUMBER 13
 
 #define ADDR_IMMEDIATE 0  /* OPC #$BB    */
 #define ADDR_ABSOLUTE  1  /* OPC $HHLL   */
@@ -78,6 +78,7 @@
 #define ADDR_IND_INDIR 9  /* OPC ($BB,X) */
 #define ADDR_INDIR_IND 10 /* OPC ($LL),Y */
 #define ADDR_ACCUM     11 /* OPC A       */
+#define ADDR_RELATIVE  12 /* OPC $BB     */
 
 /** These are differences on the normal cycle number of a instruction */
 #define CYCLE_NORMAL  0
@@ -91,12 +92,12 @@ typedef struct {
 	uint8_t cycle_change;
 } _inst_per_addr;
 
-#define SET_FLAG_NOMODIF 0
-#define SET_FLAG_MODIF   1
-#define SET_FLAG_1       2
-#define SET_FLAG_0       3
-#define SET_FLAG_M6      4
-#define SET_FLAG_M7      5
+#define SET_FLAG_NOMOD 0
+#define SET_FLAG_MOD   1
+#define SET_FLAG_1     2
+#define SET_FLAG_0     3
+#define SET_FLAG_M6    4
+#define SET_FLAG_M7    5
 
 typedef struct {
 	int iid;                          /* One from above's instructions IDs */
