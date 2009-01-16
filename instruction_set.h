@@ -1,9 +1,11 @@
 #ifndef instruction_set_h
 #define instruction_set_h
 
-#define INSTRUCTION_NUMBER 56
+#include <stdint.h>
 
-/* 6502 instructions */
+/* 6502 instructions IDs */
+#define INSTRUCTIONS_NUMBER 56
+
 #define ADC 0
 #define AND 1
 #define ASL 2
@@ -34,7 +36,7 @@
 #define JMP 27
 #define JSR 28
 #define LDA 29
-#define LDY 30
+#define LDX 30
 #define LDY 31
 #define LSR 32
 #define NOP 33
@@ -60,5 +62,36 @@
 #define TXA 53
 #define TXS 54
 #define TYA 55
+
+/* Addressing modes */
+#define ADDR_MODES_NUMBER 12
+
+#define IMMEDIATE_MODE 0
+#define ABSOLUTE_MODE  1
+#define ZEROPAGE_MODE  2
+#define IMPLIED_MODE   3
+#define INDIR_ABS_MODE 4
+#define ABS_INDX_MODE  5
+#define ABS_INDY_MODE  6
+#define ZERO_INDX_MODE 7
+#define ZERO_INDY_MODE 8
+#define IND_INDIR_MODE 9
+#define INDIR_IND_MODE 10
+#define ACCUM_MODE     11
+
+typedef struct {
+	int aid;          /* Addressing ID */
+	uint8_t opcode;
+	short size;
+	short cycles;
+} _inst_per_addr;
+
+typedef struct {
+	int id;            /* One from above's instructions IDs */
+	uint8_t flags;     /* Flags set in the CPU->P register  */
+	_inst_per_addr modes[ADDR_MODES_NUMBER]; /* Addressing modes */
+} instruction;
+
+extern instruction instructions[INSTRUCTIONS_NUMBER];
 
 #endif /* instruction_set_h */
