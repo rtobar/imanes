@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "mapper.h"
 #include "parse_file.h"
 #include "screen.h"
 
@@ -16,6 +17,7 @@ int main(int args, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	initialize_mapper_list();
 	check_ines_file(argv[1]);
 	init_screen();
 

@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "parse_file.h"
+#include "mapper.h"
 
 void check_ines_file(char *file_path) {
 
@@ -47,5 +48,5 @@ void check_ines_file(char *file_path) {
 	buff = realloc(buff,2);
 	read(rom_file.fd, buff, 2);
 	rom_file.mapper_id = (buff[1] & 0xFF00) | ( (buff[0] >> 4) & 0xFFFF );
-	printf("File mapper ID is %hu\n",rom_file.mapper_id);
+	printf("File mapper is '%s'\n",mapper_list[rom_file.mapper_id]);
 }

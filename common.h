@@ -10,6 +10,8 @@ typedef struct {
 	uint8_t romBanks;
 	uint8_t vromBanks;
 	uint8_t mapper_id;
+	void *rom;
+	void *vrom;
 } ines_file;
 
 #endif /* common_h */
