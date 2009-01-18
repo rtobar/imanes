@@ -51,6 +51,11 @@ ines_file *check_ines_file(char *file_path) {
 	rom_file->mapper_id = (buff[1] & 0xFF00) | ( (buff[0] >> 4) & 0xFFFF );
 	printf("File mapper is '%s'\n",mapper_list[rom_file->mapper_id]);
 
+	/* The rest of the header is ignored until now... */
+	buff = realloc(buff,8);
+	read(rom_file->fd, buff, 8);
+	free(buff);
+
 	return rom_file;
 }
 

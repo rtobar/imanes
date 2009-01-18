@@ -8,12 +8,12 @@
 void main_loop(ines_file *file) {
 
 	uint8_t opcode;
-	CPU->PC = 0;
+	CPU->PC = file->rom;
 
 	/* This is the main loop */
 	while(1) {
 
-		opcode = file->rom + CPU->PC;
+		opcode = *(CPU->PC);
 		printf("opcode is 0x%02x\n", opcode);
 		CPU->PC++;
 	}

@@ -85,44 +85,27 @@
 #define CYCLE_PAGE    1
 #define CYCLE_BRANCH  2
 
-typedef struct {
-	uint8_t opcode;
-	short size;
-	short cycles;
-	uint8_t cycle_change;
-} _inst_per_addr;
-
-#define SET_FLAG_NOMOD 0
-#define SET_FLAG_MOD   1
-#define SET_FLAG_1     2
-#define SET_FLAG_0     3
-#define SET_FLAG_M6    4
-#define SET_FLAG_M7    5
+#define OPCODES_NUMBER  0x100
 
 typedef struct {
-	int iid;                          /* One from above's instructions IDs */
-	uint8_t flags_change[6];          /* Flags setting in the CPU->SR */
-	_inst_per_addr modes[ADDR_MODES_NUMBER]; /* Addressing modes */
+	uint8_t opcode;       /* 1 byte opcode */
+	uint8_t instr_id;     /* Which instruction corresponds */
+	uint8_t addr_mode;    /* Addressing mode to be used */
+	short size;           /* Instruction size / depends on addr_mode */
+	short cycles;         /* CPU cycles that it takes to run the instr */
+	uint8_t cycle_change; /* Cycle number is variable? */
 } instruction;
 
 extern instruction *instructions;
 
-#define SET_INSTRUCTION_DATA( INST, CHANGE_N, CHANGE_Z, CHANGE_C, \
-                                    CHANGE_I, CHANGE_D, CHANGE_V ) \
-   instructions[INST].iid = INST; \
-   instructions[INST].flags_change[0] = SET_FLAG_##CHANGE_N; \
-   instructions[INST].flags_change[1] = SET_FLAG_##CHANGE_Z; \
-   instructions[INST].flags_change[2] = SET_FLAG_##CHANGE_C; \
-   instructions[INST].flags_change[3] = SET_FLAG_##CHANGE_I; \
-   instructions[INST].flags_change[4] = SET_FLAG_##CHANGE_D; \
-   instructions[INST].flags_change[5] = SET_FLAG_##CHANGE_V;
-
 #define SET_INSTRUCTION_ADDR_DATA( INST, ADDR_MODE, OPCODE, SIZE, CYCLES, \
                                    CHANGE ) \
-   instructions[INST].modes[ADDR_##ADDR_MODE].opcode = OPCODE; \
-   instructions[INST].modes[ADDR_##ADDR_MODE].size   = SIZE;   \
-   instructions[INST].modes[ADDR_##ADDR_MODE].cycles = CYCLES; \
-   instructions[INST].modes[ADDR_##ADDR_MODE].cycle_change = CYCLE_##CHANGE;
+   instructions[OPCODE].opcode       = OPCODE; \
+   instructions[OPCODE].instr_id     = INST;   \
+   instructions[OPCODE].addr_mode    = ADDR_##ADDR_MODE;   \
+   instructions[OPCODE].size         = SIZE;   \
+   instructions[OPCODE].cycles       = CYCLES; \
+   instructions[OPCODE].cycle_change = CYCLE_##CHANGE;
 
 /**
  * Initializes the instruction set with the corresponding opcodes,
