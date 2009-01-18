@@ -70,7 +70,7 @@
 #define ADDR_ABSOLUTE  1  /* OPC $HHLL   */
 #define ADDR_ZEROPAGE  2  /* OPC $BB     */
 #define ADDR_IMPLIED   3  /* OPC         */
-#define ADDR_INDIR_ABS 4  /* OPC $(HHLL) */
+#define ADDR_INDIRECT  4  /* OPC $(HHLL) */
 #define ADDR_ABS_INDX  5  /* OPC $HHLL,X */
 #define ADDR_ABS_INDY  6  /* OPC $HHLL,Y */
 #define ADDR_ZERO_INDX 7  /* OPC $LL,X   */
