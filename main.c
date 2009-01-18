@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include "cpu.h"
+#include "loop.h"
 #include "mapper.h"
 #include "parse_file.h"
 #include "screen.h"
@@ -24,10 +25,10 @@ int main(int args, char *argv[]) {
 	initialize_cpu();
 	nes_rom = check_ines_file(argv[1]);
 	map_rom_memory(nes_rom);
-	init_screen();
+	//init_screen();
 
 	/* Main loop */
-	sleep(10);
+	main_loop(nes_rom);
 
 	return 0;
 }
