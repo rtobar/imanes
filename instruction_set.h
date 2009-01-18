@@ -85,6 +85,7 @@
 #define CYCLE_PAGE    1
 #define CYCLE_BRANCH  2
 
+/* Number of possible opcodes */
 #define OPCODES_NUMBER  0x100
 
 typedef struct {

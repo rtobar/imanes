@@ -7,7 +7,7 @@ instruction *instructions;
 void initialize_instruction_set() {
 
 	instructions = (instruction *)malloc(sizeof(instruction)*
-	                                     INSTRUCTIONS_NUMBER);
+	                                     OPCODES_NUMBER);
 
 	
 	/* ADC instruction */

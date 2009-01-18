@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include "cpu.h"
+#include "instruction_set.h"
 #include "loop.h"
 #include "mapper.h"
 #include "parse_file.h"
@@ -21,8 +22,11 @@ int main(int args, char *argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
+	/* Initialize static data */
 	initialize_mapper_list();
 	initialize_cpu();
+	initialize_instruction_set();
+
 	nes_rom = check_ines_file(argv[1]);
 	map_rom_memory(nes_rom);
 	//init_screen();

@@ -32,6 +32,6 @@ void initialize_cpu();
 /**
  * Dumps the current contents of the CPU to the stdout
  */
-void dump_CPU();
+void dump_cpu();
 
 #endif /* cpu_h */
