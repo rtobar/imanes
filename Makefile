@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-O3 -Wall -g
-LDFLAGS=-lSDL
+LDFLAGS=-lSDL -lpthread
 
 EXE = tobyNes
 OBJS= cpu.o instruction_set.o main.o mapper.o parse_file.o screen.o
