@@ -21,4 +21,6 @@ void init_screen() {
 
 	sprintf(window_title,"TobyNES emulator version %.1f",TOBYNES_VERSION);
 	SDL_WM_SetCaption(window_title,window_title);
+
+	/* Here comes the main event loop */
 }

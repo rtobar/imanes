@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#include "common.h"
+#include "instruction_set.h"
+
 typedef struct {
 	uint8_t *PC;  /* Program counter. 16 bits long, but points 8 bit code */
 	uint8_t  A;   /* Accumulator */
@@ -33,5 +36,10 @@ void initialize_cpu();
  * Dumps the current contents of the CPU to the stdout
  */
 void dump_cpu();
+
+/**
+ * Main loop for the emulated CPU
+ */
+void main_cpu_loop(ines_file *);
 
 #endif /* cpu_h */
