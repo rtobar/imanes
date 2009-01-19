@@ -85,3 +85,11 @@ void map_rom_memory(ines_file *nes_rom) {
 	
 	close(nes_rom->fd);
 }
+
+void free_ines_file(ines_file *file) {
+
+	free(file->rom);
+	free(file->vrom);
+	free(file);
+
+}

@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "cpu.h"
 #include "instruction_set.h"
@@ -8,18 +9,31 @@
 void main_loop(ines_file *file) {
 
 	uint8_t opcode;
-	uint8_t operand;
-	uint16_t abs_address;
+	uint16_t operand = 0;
 	instruction inst;
 	CPU->PC = file->rom;
 
 	/* This is the main loop */
 	while(1) {
 
+		/* Check if we are at the end of the ROM :O */
+		if( CPU->PC == file->rom + file->romBanks * 16*1024 ) {
+			fprintf(stderr,"Oops, we've reached the end of the instructions\n");
+			fprintf(stderr,"Weird, hah?\n");
+			exit(EXIT_FAILURE);
+		}
+
 		/* Read opcode and full instruction :) */
 		opcode = *(CPU->PC);
 		inst = instructions[opcode];
 
+		/* Undocumented instruction */
+		if( inst.size == 0 ) {
+			CPU->PC += 2;
+			continue;
+		}
+
+		/* Select operand depending on the addressing node */
 		switch( inst.addr_mode ) {
 
 			case ADDR_IMMEDIATE:
@@ -27,11 +41,11 @@ void main_loop(ines_file *file) {
 				break;
 
 			case ADDR_ABSOLUTE:
-				abs_address = (*(CPU->PC + 1) << 4) | *(CPU->PC + 2);
+				operand = (*(CPU->PC + 1) << 8) | *(CPU->PC + 2);
 				break;
 
 			case ADDR_ZEROPAGE:
-				abs_address = *(CPU->PC + 1);
+				operand = *(CPU->PC + 1);
 				break;
 
 			case ADDR_IMPLIED:
@@ -41,11 +55,11 @@ void main_loop(ines_file *file) {
 				break;
 
 			case ADDR_ABS_INDX:
-				abs_address = ((*(CPU->PC + 1) << 4) | *(CPU->PC + 2)) + CPU->X;
+				operand = ((*(CPU->PC + 1) << 8) | *(CPU->PC + 2)) + CPU->X;
 				break;
 
 			case ADDR_ABS_INDY:
-				abs_address = ((*(CPU->PC + 1) << 4) | *(CPU->PC + 2)) + CPU->Y;
+				operand = ((*(CPU->PC + 1) << 8) | *(CPU->PC + 2)) + CPU->Y;
 				break;
 
 			case ADDR_ZERO_INDX:
@@ -57,6 +71,7 @@ void main_loop(ines_file *file) {
 
 		}
 
+		printf("%02x: %s operand: %04x\n", opcode, inst.name, operand);
 		
 		CPU->PC += inst.size;
 	}

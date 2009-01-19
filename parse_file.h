@@ -18,4 +18,9 @@ ines_file *check_ines_file(char *);
  */
 void map_rom_memory(ines_file *);
 
+/**
+ * Frees all associated memory with a NES file
+ */
+void free_ines_file(ines_file *);
+
 #endif /* parse_file_h */

@@ -34,5 +34,6 @@ int main(int args, char *argv[]) {
 	/* Main loop */
 	main_loop(nes_rom);
 
+	free_ines_file(nes_rom);
 	return 0;
 }

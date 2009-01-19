@@ -2,6 +2,7 @@
 #define instruction_set_h
 
 #include <stdint.h>
+#include <string.h>
 
 /* 6502 instructions IDs */
 #define INSTRUCTIONS_NUMBER 56
@@ -91,6 +92,7 @@
 typedef struct {
 	uint8_t opcode;       /* 1 byte opcode */
 	uint8_t instr_id;     /* Which instruction corresponds */
+	char name[4];         /* Instruction name string */
 	uint8_t addr_mode;    /* Addressing mode to be used */
 	short size;           /* Instruction size / depends on addr_mode */
 	short cycles;         /* CPU cycles that it takes to run the instr */
@@ -106,7 +108,8 @@ extern instruction *instructions;
    instructions[OPCODE].addr_mode    = ADDR_##ADDR_MODE;   \
    instructions[OPCODE].size         = SIZE;   \
    instructions[OPCODE].cycles       = CYCLES; \
-   instructions[OPCODE].cycle_change = CYCLE_##CHANGE;
+   instructions[OPCODE].cycle_change = CYCLE_##CHANGE; \
+	strncpy(instructions[OPCODE].name,#INST,3); \
 
 /**
  * Initializes the instruction set with the corresponding opcodes,
