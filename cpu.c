@@ -66,12 +66,20 @@ void execute_instruction(instruction inst, uint16_t operand) {
 			CPU->X = (int8_t)operand;
 			break;
 
+		case LDY:
+			CPU->Y = (int8_t)operand;
+			break;
+
 		case SEI:
 			CPU->SR |= I_FLAG;
 			break;
 
 		case STX:
 			*(CPU->RAM + operand) = CPU->X;
+			break;
+
+		case STY:
+			*(CPU->RAM + operand) = CPU->Y;
 			break;
 
 		case TSX:

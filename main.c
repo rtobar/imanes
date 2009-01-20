@@ -28,7 +28,7 @@ int main(int args, char *argv[]) {
 
 	nes_rom = check_ines_file(argv[1]);
 	map_rom_memory(nes_rom);
-	init_screen();
+	//init_screen();
 
 	/* Main loop */
 	main_cpu_loop(nes_rom);
