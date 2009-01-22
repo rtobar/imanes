@@ -123,15 +123,19 @@ void main_cpu_loop(ines_file *file) {
 	/* This is the main loop */
 	while(1) {
 
+		/* inst_address saves the current process' memory
+		 * pointer for the NES CPU' PC. This way we can
+		 * debug easier the value of NES PC */
+		inst_address = CPU->RAM + CPU->PC;
+
 		/* Check if we are at the end of the ROM :O */
-		if( CPU->RAM + CPU->PC == file->rom + file->romBanks * 16*1024 ) {
+		if( inst_address == file->rom + file->romBanks * 16*1024 ) {
 			fprintf(stderr,"Oops, we've reached the end of the instructions\n");
 			fprintf(stderr,"Weird, hah?\n");
 			exit(EXIT_FAILURE);
 		}
 
 		/* Read opcode and full instruction :) */
-		inst_address = CPU->RAM + CPU->PC;
 		opcode = *(inst_address);
 		inst = instructions[opcode];
 
