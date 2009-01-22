@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "common.h"
 #include "cpu.h"
 
 nes_cpu *CPU;
@@ -12,7 +13,7 @@ void initialize_cpu() {
 	CPU->cycles = 0;
 
 	/* Size of NES' RAM */
-	CPU->RAM = malloc(0xFFFF);
+	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
 }
 
 void dump_cpu() {
@@ -99,14 +100,18 @@ void main_cpu_loop(ines_file *file) {
 	/* 1 ROM bank games load twice to ensure vector tables */
 	/* Free the file ROM (we don't need it anymore) */
 	if( file->romBanks == 1 ) {
-		CPU->RAM = memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
-		CPU->RAM = memcpy( CPU->RAM + 0xC000, file->rom, 0x4000);
+		printf("CPU->RAM  = 0x%08x\n",(unsigned int)CPU->RAM);
+		printf("file->rom = 0x%08x\n",(unsigned int)file->rom);
+		CPU->RAM = memmove( CPU->RAM + 0x8000, file->rom, 0x4000);
+		CPU->RAM = memcpy( CPU->RAM + 0xC000, CPU->RAM + 0x8000, 0x4000);
 	}
 	/* 2 ROM bank games load one in 0x8000 and other in 0xC000 */
 	/* Free the file ROM (we don't need it anymore) */
 	else if (file->romBanks == 2 ) {
-		CPU->RAM = memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
-		CPU->RAM = memcpy( CPU->RAM + 0xC000, file->rom + 0x4000, 0x4000);
+		printf("CPU->RAM  = 0x%08x\n",(unsigned int)CPU->RAM);
+		printf("file->rom = 0x%08x\n",(unsigned int)file->rom);
+		CPU->RAM = memmove( CPU->RAM + 0x8000, file->rom, 0x4000);
+		CPU->RAM = memmove( CPU->RAM + 0xC000, file->rom + 0x4000, 0x4000);
 	}
 
 	/* We first need to check out where the game begins... */

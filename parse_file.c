@@ -49,7 +49,7 @@ ines_file *check_ines_file(char *file_path) {
 	buff = realloc(buff,2);
 	read(rom_file->fd, buff, 2);
 	rom_file->mapper_id = (buff[1] & 0xFF00) | ( (buff[0] >> 4) & 0xFFFF );
-	printf("File mapper is '%s'\n",mapper_list[rom_file->mapper_id]);
+	printf("ROM mapper is '%s'\n",mapper_list[rom_file->mapper_id]);
 
 	/* The rest of the header is ignored until now... */
 	buff = realloc(buff,8);
@@ -63,11 +63,11 @@ void map_rom_memory(ines_file *nes_rom) {
 
 	int read_bytes;
 
-	nes_rom->rom  = malloc(nes_rom->romBanks * ROM_BANK_SIZE);
-	nes_rom->vrom = malloc(nes_rom->vromBanks*VROM_BANK_SIZE);
+	nes_rom->rom  = (uint8_t *)malloc(nes_rom->romBanks * ROM_BANK_SIZE);
+	nes_rom->vrom = (uint8_t *)malloc(nes_rom->vromBanks*VROM_BANK_SIZE);
 
 	/* Read and check */
-	read_bytes = read(nes_rom->fd, nes_rom->rom ,
+	read_bytes = read(nes_rom->fd, (void *)nes_rom->rom ,
 	                  nes_rom->romBanks * ROM_BANK_SIZE);
 	if( read_bytes != nes_rom->romBanks * ROM_BANK_SIZE ) {
 		fprintf(stderr,"Error: malformed file (ROM not complete)\n");
@@ -75,7 +75,7 @@ void map_rom_memory(ines_file *nes_rom) {
 		exit(EXIT_FAILURE);
 	}
 
-	read_bytes = read(nes_rom->fd, nes_rom->vrom,
+	read_bytes = read(nes_rom->fd, (void *)nes_rom->vrom,
 	                  nes_rom->vromBanks*VROM_BANK_SIZE);
 	if( read_bytes != nes_rom->vromBanks*VROM_BANK_SIZE ) {
 		fprintf(stderr,"Error: malformed file (VROM not complete)\n");
