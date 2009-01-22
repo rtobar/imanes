@@ -94,6 +94,7 @@ void main_cpu_loop(ines_file *file) {
 
 	uint8_t opcode;
 	uint16_t address;
+	uint8_t *inst_address;
 	uint16_t operand = 0;
 	instruction inst;
 
@@ -117,20 +118,21 @@ void main_cpu_loop(ines_file *file) {
 	/* We first need to check out where the game begins... */
 	/* For that, we see the address localted at the RESET vector */
 	/* Remember that NES CPU is little endian */
-	CPU->PC = CPU->RAM + (*(CPU->RAM + 0xFFFC) | ( *(CPU->RAM + 0xFFFD) << 8 ));
+	CPU->PC = *(CPU->RAM + 0xFFFC) | ( *(CPU->RAM + 0xFFFD) << 8 );
 
 	/* This is the main loop */
 	while(1) {
 
 		/* Check if we are at the end of the ROM :O */
-		if( CPU->PC == file->rom + file->romBanks * 16*1024 ) {
+		if( CPU->RAM + CPU->PC == file->rom + file->romBanks * 16*1024 ) {
 			fprintf(stderr,"Oops, we've reached the end of the instructions\n");
 			fprintf(stderr,"Weird, hah?\n");
 			exit(EXIT_FAILURE);
 		}
 
 		/* Read opcode and full instruction :) */
-		opcode = *(CPU->PC);
+		inst_address = CPU->RAM + CPU->PC;
+		opcode = *(inst_address);
 		inst = instructions[opcode];
 
 		/* Undocumented instruction */
@@ -143,16 +145,16 @@ void main_cpu_loop(ines_file *file) {
 		switch( inst.addr_mode ) {
 
 			case ADDR_IMMEDIATE:
-				operand = *(CPU->PC + 1);
+				operand = *(inst_address + 1);
 				break;
 
 			case ADDR_ABSOLUTE:
-				address = *(CPU->PC + 1) | (*(CPU->PC + 2)  << 8);
+				address = *(inst_address + 1) | (*(inst_address + 2)  << 8);
 				operand = *(CPU->RAM + address);
 				break;
 
 			case ADDR_ZEROPAGE:
-				address = *(CPU->PC + 1);
+				address = *(inst_address + 1);
 				operand = *(CPU->RAM + address);
 				break;
 
@@ -163,11 +165,11 @@ void main_cpu_loop(ines_file *file) {
 				break;
 
 			case ADDR_ABS_INDX:
-				operand = ( *(CPU->PC + 1) | (*(CPU->PC + 2) << 8) ) + CPU->X;
+				operand = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->X;
 				break;
 
 			case ADDR_ABS_INDY:
-				operand = ( *(CPU->PC + 1) | (*(CPU->PC + 2) << 8) ) + CPU->Y;
+				operand = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->Y;
 				break;
 
 			case ADDR_ZERO_INDX:
@@ -175,12 +177,12 @@ void main_cpu_loop(ines_file *file) {
 			case ADDR_IND_INDIR:
 			case ADDR_INDIR_IND:
 			case ADDR_RELATIVE:
-				operand = *(CPU->PC + 1);
+				operand = *(inst_address + 1);
 				break;
 
 		}
 
-		printf("%02x: %s operand: %04x\n", opcode, inst.name, operand);
+		printf("CPU->PC: 0x%04x - %02x: %s operand: %04x\n", CPU->PC, opcode, inst.name, operand);
 
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);

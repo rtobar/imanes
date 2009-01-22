@@ -7,7 +7,7 @@
 #include "instruction_set.h"
 
 typedef struct {
-	uint8_t *PC;  /* Program counter. 16 bits long, but points 8 bit code */
+	uint16_t PC;  /* Program counter. 16 bits long, but points 8 bit code */
 	uint8_t  A;   /* Accumulator */
 	uint8_t  X;   /* X register */
 	uint8_t  Y;   /* Y register */
