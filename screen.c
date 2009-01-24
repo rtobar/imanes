@@ -38,7 +38,7 @@ void *screen_loop(void *args) {
 
 void init_screen() {
 	
-	pthread_t screen_thread;
+	//pthread_t screen_thread;
 	SDL_Surface *screen;
 	char window_title[30];
 

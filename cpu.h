@@ -42,8 +42,8 @@ void initialize_cpu();
 void dump_cpu();
 
 /**
- * Main loop for the emulated CPU
+ * Given an operand, and an instruction, it executes it into the CPU
  */
-void main_cpu_loop(ines_file *);
+void execute_instruction(instruction inst, uint16_t operand); 
 
 #endif /* cpu_h */

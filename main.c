@@ -4,6 +4,7 @@
 
 #include "cpu.h"
 #include "instruction_set.h"
+#include "loop.h"
 #include "mapper.h"
 #include "parse_file.h"
 #include "ppu.h"
@@ -36,7 +37,7 @@ int main(int args, char *argv[]) {
 	//init_screen();
 
 	/* Main loop */
-	main_cpu_loop(nes_rom);
+	main_loop(nes_rom);
 
 	free_ines_file(nes_rom);
 	return 0;
