@@ -57,6 +57,6 @@ void init_screen() {
 	SDL_WM_SetCaption(window_title,window_title);
 
 	/* The event loop should go in a separate thread */
-	pthread_create(&screen_thread, NULL, screen_loop, NULL);
+	//pthread_create(&screen_thread, NULL, screen_loop, NULL);
 
 }

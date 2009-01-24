@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "cpu.h"
+#include "ppu.h"
 
 nes_cpu *CPU;
 
@@ -101,18 +102,19 @@ void main_cpu_loop(ines_file *file) {
 	/* 1 ROM bank games load twice to ensure vector tables */
 	/* Free the file ROM (we don't need it anymore) */
 	if( file->romBanks == 1 ) {
-		printf("CPU->RAM  = 0x%08x\n",(unsigned int)CPU->RAM);
-		printf("file->rom = 0x%08x\n",(unsigned int)file->rom);
 		memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
 		memcpy( CPU->RAM + 0xC000, CPU->RAM + 0x8000, 0x4000);
 	}
 	/* 2 ROM bank games load one in 0x8000 and other in 0xC000 */
 	/* Free the file ROM (we don't need it anymore) */
 	else if (file->romBanks == 2 ) {
-		printf("CPU->RAM  = 0x%08x\n",(unsigned int)CPU->RAM);
-		printf("file->rom = 0x%08x\n",(unsigned int)file->rom);
 		memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
 		memcpy( CPU->RAM + 0xC000, file->rom + 0x4000, 0x4000);
+	}
+
+	/* Dump the VROM into the PPU VRAM area */
+	if( file->romBanks == 1 ) {
+		memcpy( PPU->VRAM , file->vrom, 0x2000);
 	}
 
 	/* We first need to check out where the game begins... */
@@ -139,9 +141,11 @@ void main_cpu_loop(ines_file *file) {
 		opcode = *(inst_address);
 		inst = instructions[opcode];
 
+		printf("CPU->PC: 0x%04x - %02x: %s", CPU->PC, opcode, inst.name);
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
-			printf("Undocumented/Unimplemented instruction: %02x\n",inst.opcode);
+			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
+			fprintf(stderr,"I'm exiting now... sorry :(\n");
 			exit(EXIT_FAILURE);
 		}
 
@@ -186,8 +190,7 @@ void main_cpu_loop(ines_file *file) {
 
 		}
 
-		printf("CPU->PC: 0x%04x - %02x: %s operand: %04x\n", CPU->PC, opcode, inst.name, operand);
-
+		printf(" operand: %04x\n", operand);
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 		
