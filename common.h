@@ -11,6 +11,8 @@
 #define ROM_BANK_SIZE   (16*1024)
 #define VROM_BANK_SIZE  ( 8*1024)
 
+#define NES_PALETTE_COLORS (64)
+
 typedef struct {
 	int fd;
 	uint8_t romBanks;
