@@ -3,11 +3,11 @@
 #include "common.h"
 #include "palette.h"
 
-nes_palette *palette;
+nes_palette *system_palette;
 
 void initialize_palette() {
 
-	palette = (nes_palette *)malloc(sizeof(palette)*NES_PALETTE_COLORS);
+	system_palette = (nes_palette *)malloc(sizeof(nes_palette)*NES_PALETTE_COLORS);
 
 	FILL_NES_PALETTE(0x00, 0x75, 0x75, 0x75);
 	FILL_NES_PALETTE(0x01, 0x27, 0x1B, 0x8F);

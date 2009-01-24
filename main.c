@@ -6,6 +6,7 @@
 #include "instruction_set.h"
 #include "loop.h"
 #include "mapper.h"
+#include "palette.h"
 #include "parse_file.h"
 #include "ppu.h"
 #include "screen.h"
@@ -27,6 +28,7 @@ int main(int args, char *argv[]) {
 	setbuf(stderr,NULL);
 
 	/* Initialize static data */
+	initialize_palette();
 	initialize_mapper_list();
 	initialize_instruction_set();
 	initialize_cpu();
