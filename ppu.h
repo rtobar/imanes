@@ -17,4 +17,9 @@ extern nes_ppu *PPU;
  */
 void initialize_ppu();
 
+/**
+ * Function called every VBlank interrumpt
+ */
+void draw_screen();
+
 #endif /* ppu_h */

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "common.h"
 #include "cpu.h"
@@ -111,6 +112,11 @@ void main_loop(ines_file *file) {
 		
 		CPU->PC += inst.size;
 		CPU->cycles += inst.cycles;
+
+		/* Draw the screen */
+		draw_screen();
+
+		sleep(1);
 	}
 
 }

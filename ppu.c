@@ -1,7 +1,10 @@
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "common.h"
+#include "palette.h"
 #include "ppu.h"
+#include "screen.h"
 
 nes_ppu *PPU;
 
@@ -11,4 +14,41 @@ void initialize_ppu() {
 	PPU->VRAM = (uint8_t *)malloc(NES_VRAM_SIZE);
 	PPU->SPR_RAM = (uint8_t *)malloc(256);
 
+}
+
+void draw_screen() {
+	
+	/* Let's checkout the name tables */
+	int i;
+	int j;
+	int pix;
+	int piy;
+	int tile_number;
+	uint8_t col_index;
+	uint8_t byte;
+	uint8_t *name_table;
+	uint8_t tile;
+
+	name_table = PPU->VRAM + 0x2000;
+
+	for(j=0;j!=NES_SCREEN_HEIGHT/8;j++) {
+
+		for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
+
+			/* Get the 8x8 pixel to be drawn */
+			tile_number = *(name_table + i + j*NES_SCREEN_HEIGHT/8);
+			tile = *(name_table + tile_number*0x10);
+
+			for(piy=0;piy!=8;piy++)
+
+				byte = *(PPU->VRAM + tile + pix) || (*(PPU->VRAM + tile+pix+0x1) << 1);
+
+				for(pix=0;pix!=8;pix++) {
+					col_index = (byte >> (8-pix)) & 0x4;
+					draw_pixel(i,j,system_palette[col_index].red,system_palette[col_index].green,system_palette[col_index].blue);
+			}
+		}
+	}
+
+	redraw_screen();
 }

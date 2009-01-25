@@ -1,9 +1,12 @@
 #include <pthread.h>
 #include <SDL/SDL.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "common.h"
 #include "screen.h"
+
+static SDL_Surface *nes_screen;
 
 void *screen_loop(void *args) {
 
@@ -39,7 +42,7 @@ void *screen_loop(void *args) {
 void init_screen() {
 	
 	//pthread_t screen_thread;
-	SDL_Surface *screen;
+
 	char window_title[30];
 
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
@@ -47,16 +50,42 @@ void init_screen() {
 		exit(EXIT_FAILURE);
 	}
 
-	screen = SDL_SetVideoMode(NES_SCREEN_WIDTH, NES_SCREEN_HEIGHT, NES_SCREEN_BPP, 0);
-	if( screen == NULL ) {
+	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH, NES_SCREEN_HEIGHT, NES_SCREEN_BPP, 0);
+	if( nes_screen == NULL ) {
 		fprintf(stderr,"Eror while setting vide mode: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
 
 	sprintf(window_title,"TobyNES emulator version %.1f",TOBYNES_VERSION);
-	SDL_WM_SetCaption(window_title,window_title);
+	SDL_WM_SetCaption(window_title,NULL);
 
 	/* The event loop should go in a separate thread */
 	//pthread_create(&screen_thread, NULL, screen_loop, NULL);
+
+}
+
+void draw_pixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue) {
+
+	Uint32 colour;
+	Uint32 *pixmem32;
+
+	/* This is the colour that will be put in the pixel */
+	colour = SDL_MapRGB(nes_screen->format, red, green, blue);
+	
+	/* x = x*4 (32 bits per pixel); y = y*640*4 for the same reason */
+	x *= 4;
+	y *= NES_SCREEN_WIDTH*4;
+
+	pixmem32 = (Uint32*)nes_screen->pixels  + y + x;
+	*pixmem32 = colour;
+}
+
+void redraw_screen() {
+
+	if( SDL_Flip(nes_screen) == -1 ) {
+		fprintf(stderr,"Couldn't refresh screen :(\n");
+		fprintf(stderr,"I'm exiting now\n");
+		exit(EXIT_FAILURE);
+	}
 
 }
