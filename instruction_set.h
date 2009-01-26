@@ -117,4 +117,10 @@ extern instruction *instructions;
  */
 void initialize_instruction_set();
 
+/**
+ * When reading an instruction, the operand that should be used depends
+ * on the addressing mode. This function does this job
+ */
+uint16_t get_operand(instruction inst, uint8_t *inst_address);
+
 #endif /* instruction_set_h */

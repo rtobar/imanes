@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-O3 -Wall -g
 LDFLAGS=-lSDL -lpthread
 
-EXE = tobyNes
+EXE = imanes
 OBJS= cpu.o instruction_set.o loop.o main.o mapper.o palette.o parse_file.o ppu.o screen.o
 
 all: $(EXE)
@@ -17,4 +17,4 @@ clean:
 	-rm *.o
 
 distclean: clean
-	rm $(EXE)
+	-rm $(EXE)

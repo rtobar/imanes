@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "cpu.h"
 #include "instruction_set.h"
 
 instruction *instructions;
@@ -275,4 +276,52 @@ void initialize_instruction_set() {
 	SET_INSTRUCTION_ADDR_DATA( TYA, IMPLIED, 0x98, 1, 2, NORMAL);
 
 	return;
+}
+
+uint16_t get_operand(instruction inst, uint8_t *inst_address) {
+
+	uint16_t address;
+	uint16_t operand = -1;
+
+	switch( inst.addr_mode ) {
+
+		case ADDR_IMMEDIATE:
+			operand = *(inst_address + 1);
+			break;
+
+		case ADDR_ABSOLUTE:
+			address = *(inst_address + 1) | (*(inst_address + 2)  << 8);
+			operand = *(CPU->RAM + address);
+			break;
+
+		case ADDR_ZEROPAGE:
+			address = *(inst_address + 1);
+			operand = *(CPU->RAM + address);
+			break;
+
+		case ADDR_IMPLIED:
+			break;
+
+		case ADDR_INDIRECT:
+			break;
+
+		case ADDR_ABS_INDX:
+			operand = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->X;
+			break;
+
+		case ADDR_ABS_INDY:
+			operand = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->Y;
+			break;
+
+		case ADDR_ZERO_INDX:
+		case ADDR_ZERO_INDY:
+		case ADDR_IND_INDIR:
+		case ADDR_INDIR_IND:
+		case ADDR_RELATIVE:
+			operand = *(inst_address + 1);
+			break;
+
+	}
+
+	return operand;
 }

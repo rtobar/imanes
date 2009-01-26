@@ -4,13 +4,13 @@
 
 #include "common.h"
 #include "cpu.h"
+#include "instruction_set.h"
 #include "loop.h"
 #include "ppu.h"
 
 void main_loop(ines_file *file) {
 	
 	uint8_t opcode;
-	uint16_t address;
 	uint8_t *inst_address;
 	uint16_t operand = 0;
 	instruction inst;
@@ -29,7 +29,8 @@ void main_loop(ines_file *file) {
 	}
 
 	/* Dump the VROM into the PPU VRAM area */
-	if( file->romBanks == 1 ) {
+	if( file->vromBanks == 1 ) {
+		printf("Copying VROM to VRAM\n");
 		memcpy( PPU->VRAM , file->vrom, 0x2000);
 	}
 
@@ -66,45 +67,7 @@ void main_loop(ines_file *file) {
 		}
 
 		/* Select operand depending on the addressing node */
-		switch( inst.addr_mode ) {
-
-			case ADDR_IMMEDIATE:
-				operand = *(inst_address + 1);
-				break;
-
-			case ADDR_ABSOLUTE:
-				address = *(inst_address + 1) | (*(inst_address + 2)  << 8);
-				operand = *(CPU->RAM + address);
-				break;
-
-			case ADDR_ZEROPAGE:
-				address = *(inst_address + 1);
-				operand = *(CPU->RAM + address);
-				break;
-
-			case ADDR_IMPLIED:
-				break;
-
-			case ADDR_INDIRECT:
-				break;
-
-			case ADDR_ABS_INDX:
-				operand = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->X;
-				break;
-
-			case ADDR_ABS_INDY:
-				operand = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->Y;
-				break;
-
-			case ADDR_ZERO_INDX:
-			case ADDR_ZERO_INDY:
-			case ADDR_IND_INDIR:
-			case ADDR_INDIR_IND:
-			case ADDR_RELATIVE:
-				operand = *(inst_address + 1);
-				break;
-
-		}
+		operand = get_operand(inst, inst_address);
 
 		printf(" operand: %04x\n", operand);
 		/* Execute the given instruction */
@@ -115,8 +78,6 @@ void main_loop(ines_file *file) {
 
 		/* Draw the screen */
 		draw_screen();
-
-		sleep(1);
 	}
 
 }

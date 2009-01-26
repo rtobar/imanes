@@ -1,7 +1,9 @@
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "common.h"
+#include "debug.h"
 #include "palette.h"
 #include "ppu.h"
 #include "screen.h"
@@ -31,6 +33,12 @@ void draw_screen() {
 
 	name_table = PPU->VRAM + 0x2000;
 
+	DEBUG( for(i=0;i!=20;i++) {
+		for(j=0;j!=16;j++)
+			printf("%02x ",*(name_table+i*16+j));
+		printf("\n");
+	} );
+
 	for(j=0;j!=NES_SCREEN_HEIGHT/8;j++) {
 
 		for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
@@ -38,6 +46,8 @@ void draw_screen() {
 			/* Get the 8x8 pixel to be drawn */
 			tile_number = *(name_table + i + j*NES_SCREEN_HEIGHT/8);
 			tile = *(name_table + tile_number*0x10);
+			if( tile != 0 )
+				printf("Tile is %d\n",tile);
 
 			for(piy=0;piy!=8;piy++) {
 
