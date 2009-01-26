@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 #include "debug.h"
@@ -16,6 +17,16 @@ void initialize_ppu() {
 	PPU->VRAM = (uint8_t *)malloc(NES_VRAM_SIZE);
 	PPU->SPR_RAM = (uint8_t *)malloc(256);
 	PPU->SR = VBLANK_FLAG;
+
+}
+
+void init_ppu_vram(ines_file *file) {
+
+	/* Dump the VROM into the PPU VRAM area */
+	if( file->vromBanks == 1 ) {
+		printf("Copying VROM to VRAM\n");
+		memcpy( PPU->VRAM , file->vrom, 0x2000);
+	}
 
 }
 

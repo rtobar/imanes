@@ -24,6 +24,11 @@ extern nes_ppu *PPU;
 void initialize_ppu();
 
 /**
+ * Initializes PPU's VRAM with contents from iNES file VROM
+ */
+void init_ppu_vram(ines_file *);
+
+/**
  * Function called every VBlank interrumpt
  */
 void draw_screen();

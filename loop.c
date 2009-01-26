@@ -15,30 +15,6 @@ void main_loop(ines_file *file) {
 	operand operand = { 0, 0 };
 	instruction inst;
 
-	/* 1 ROM bank games load twice to ensure vector tables */
-	/* Free the file ROM (we don't need it anymore) */
-	if( file->romBanks == 1 ) {
-		memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
-		memcpy( CPU->RAM + 0xC000, CPU->RAM + 0x8000, 0x4000);
-	}
-	/* 2 ROM bank games load one in 0x8000 and other in 0xC000 */
-	/* Free the file ROM (we don't need it anymore) */
-	else if (file->romBanks == 2 ) {
-		memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
-		memcpy( CPU->RAM + 0xC000, file->rom + 0x4000, 0x4000);
-	}
-
-	/* Dump the VROM into the PPU VRAM area */
-	if( file->vromBanks == 1 ) {
-		printf("Copying VROM to VRAM\n");
-		memcpy( PPU->VRAM , file->vrom, 0x2000);
-	}
-
-	/* We first need to check out where the game begins... */
-	/* For that, we see the address localted at the RESET vector */
-	/* Remember that NES CPU is little endian */
-	CPU->PC = *(CPU->RAM + 0xFFFC) | ( *(CPU->RAM + 0xFFFD) << 8 );
-
 	/* This is the main loop */
 	while(1) {
 

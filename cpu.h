@@ -45,6 +45,11 @@ void initialize_cpu();
 void dump_cpu();
 
 /**
+ * Initializes CPU's RAM with contents from iNES file ROM
+ */
+void init_cpu_ram(ines_file *);
+
+/**
  * Given an operand, and an instruction, it executes it into the CPU
  */
 void execute_instruction(instruction inst, operand oper); 
