@@ -56,7 +56,7 @@ void init_screen() {
 		exit(EXIT_FAILURE);
 	}
 
-	sprintf(window_title,"TobyNES emulator version %.1f",TOBYNES_VERSION);
+	sprintf(window_title,"ImaNES emulator version %s",IMANES_VERSION);
 	SDL_WM_SetCaption(window_title,NULL);
 
 	/* The event loop should go in a separate thread */

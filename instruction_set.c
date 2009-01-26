@@ -281,7 +281,7 @@ void initialize_instruction_set() {
 uint16_t get_operand(instruction inst, uint8_t *inst_address) {
 
 	uint16_t address;
-	uint16_t operand = -1;
+	uint16_t operand = 0xBEEF;
 
 	switch( inst.addr_mode ) {
 
@@ -300,6 +300,7 @@ uint16_t get_operand(instruction inst, uint8_t *inst_address) {
 			break;
 
 		case ADDR_IMPLIED:
+			operand = -1;
 			break;
 
 		case ADDR_INDIRECT:

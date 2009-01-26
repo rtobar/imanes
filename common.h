@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define TOBYNES_VERSION 0.1
+#define IMANES_VERSION "0.1"
 
 #define NES_RAM_SIZE     (0xFFFF)
 #define NES_VRAM_SIZE    (0xFFFF)
