@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "cpu.h"
+#include "instruction_set.h"
 #include "ppu.h"
 
 nes_cpu *CPU;
@@ -10,11 +11,9 @@ nes_cpu *CPU;
 void initialize_cpu() {
 
 	CPU = (nes_cpu *)malloc(sizeof(nes_cpu));
-
 	CPU->cycles = 0;
-
-	/* Size of NES' RAM */
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
+	CPU->SP  = 0;
 }
 
 void dump_cpu() {
@@ -35,13 +34,40 @@ void execute_instruction(instruction inst, operand oper) {
 
 	switch(inst.instr_id) {
 
-		case BPL:
-			if( (CPU->SR & N_FLAG) )
+		case AND:
+			if( inst.addr_mode == ADDR_IMMEDIATE )
+				CPU->A &= oper.value;
+			else
+				CPU->A &= *(CPU->RAM + oper.address);
+			break;
+
+		case BCC:
+			if( ~CPU->SR & C_FLAG )
+				CPU->PC += (int8_t)oper.value;
+			break;
+
+		case BCS:
+			if( CPU->SR & C_FLAG )
+				CPU->PC +=(int8_t)oper.value;
+			break;
+
+		case BEQ:
+			if( CPU->SR & Z_FLAG )
+				CPU->PC += (int8_t)oper.value;
+			break;
+
+		case BMI:
+			if( CPU->SR & N_FLAG )
 				CPU->PC += (int8_t)oper.value;
 			break;
 
 		case BNE:
-			if( CPU->SR & Z_FLAG )
+			if( ~CPU->SR & Z_FLAG )
+				CPU->PC += (int8_t)oper.value;
+			break;
+
+		case BPL:
+			if( ~CPU->SR & N_FLAG )
 				CPU->PC += (int8_t)oper.value;
 			break;
 
@@ -74,18 +100,35 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->Y, N_FLAG | Z_FLAG);
 			break;
 
+		case JMP:
+			CPU->PC = oper.address;
+			break;
+
+		case JSR:
+			*(CPU->RAM + CPU->SP++) = CPU->PC+2;
+			*(CPU->RAM + CPU->SP++) = (CPU->PC+2) << 8;
+			CPU->PC = oper.address - inst.size;
+			break;
+
 		case LDA:
-			CPU->A = (int8_t)oper.value;
+			if( inst.addr_mode == ADDR_IMMEDIATE )
+				CPU->A = oper.value;
+			else {
+				check_read_mapped_io(oper.address);
+				CPU->A = *(CPU->RAM + oper.address);
+			}
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case LDX:
-			CPU->X = (int8_t)oper.value;
+			check_read_mapped_io(oper.address);
+			CPU->X = *(CPU->RAM + oper.address);
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
 		case LDY:
-			CPU->Y = (int8_t)oper.value;
+			check_read_mapped_io(oper.address);
+			CPU->Y = *(CPU->RAM + oper.address);
 			update_flags(CPU->Y, N_FLAG | Z_FLAG);
 			break;
 
@@ -96,14 +139,29 @@ void execute_instruction(instruction inst, operand oper) {
 			CPU->SR |= I_FLAG;
 			break;
 
+		case STA:
+			*(CPU->RAM + oper.address) = CPU->A;
+			check_write_mapped_io(oper.address);
+			break;
+
 		case STX:
 			*(CPU->RAM + oper.address) = CPU->X;
-			check_mapped_io(oper.address);
+			check_write_mapped_io(oper.address);
 			break;
 
 		case STY:
 			*(CPU->RAM + oper.address) = CPU->Y;
-			check_mapped_io(oper.address);
+			check_write_mapped_io(oper.address);
+			break;
+
+		case TAX:
+			CPU->X = CPU->A;
+			update_flags(CPU->X, N_FLAG | Z_FLAG);
+			break;
+
+		case TAY:
+			CPU->Y = CPU->A;
+			update_flags(CPU->Y, N_FLAG | Z_FLAG);
 			break;
 
 		case TSX:
@@ -111,9 +169,23 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
+		case TXA:
+			CPU->A = CPU->X;
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
+
 		case TXS:
 			CPU->SP = CPU->X;
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
+			break;
+
+		case TYA:
+			CPU->A = CPU->Y;
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
+
+		default:
+			fprintf(stderr,"%02x: Still unimplemented\n", inst.opcode);
 			break;
 	}
 
@@ -121,19 +193,20 @@ void execute_instruction(instruction inst, operand oper) {
 
 void update_flags(int8_t value, uint8_t flags) {
 
+	/* 7th bit is set (negative number) */
 	if( flags & N_FLAG ) {
-		if( value < 0 )   CPU->SR |= N_FLAG;
-		else              CPU->SR &= ~N_FLAG;
+		if( (value >> 7) )   CPU->SR |= N_FLAG;
+		else                 CPU->SR &= ~N_FLAG;
 	}
 
 	if( flags & Z_FLAG ) {
-		if( value < 0 )   CPU->SR |= Z_FLAG;
-		else              CPU->SR &= ~Z_FLAG;
+		if( value == 0 )   CPU->SR |= Z_FLAG;
+		else               CPU->SR &= ~Z_FLAG;
 	}
 
 }
 
-void check_mapped_io(uint16_t address) {
+void check_write_mapped_io(uint16_t address) {
 
 	switch( address ) {
 
@@ -153,6 +226,16 @@ void check_mapped_io(uint16_t address) {
 		case 0x2004:
 			*(PPU->SPR_RAM + PPU->spr_addr) = *(CPU->RAM + 0x2004);
 			break;
+	}
+
+}
+
+void check_read_mapped_io(uint16_t address) {
+
+	/* PPU Status Register */
+	if( address == 0x2002 ) {
+		*(CPU->RAM + 0x2002) = PPU->SR;
+		PPU->SR &= ~VBLANK_FLAG;
 	}
 
 }

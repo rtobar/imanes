@@ -29,6 +29,9 @@ typedef struct {
 #define Z_FLAG 0x02
 #define C_FLAG 0x01
 
+#define BEGIN_STACK (0x100)
+#define STACK_SIZE  (0x100)
+
 extern nes_cpu *CPU;
 
 /**
@@ -53,8 +56,14 @@ void update_flags(int8_t value, uint8_t flags);
 
 /**
  * For special memory location where IO is mapped, we update the
- * corresponding information
+ * corresponding information when writing to it
  */
-void check_mapped_io(uint16_t address);
+void check_write_mapped_io(uint16_t address);
+
+/**
+ * For special memory location where IO is mapped, we update the
+ * corresponding information when reading it
+ */
+void check_read_mapped_io(uint16_t address);
 
 #endif /* cpu_h */

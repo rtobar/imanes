@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#define HIT_FLAG     (0x40)
+#define VBLANK_FLAG  (0x80)
+
 typedef struct _ppu {
 	uint8_t CR1;      /* Control Register 1 */
 	uint8_t CR2;      /* Control Register 2 */
