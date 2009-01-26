@@ -12,7 +12,7 @@ void main_loop(ines_file *file) {
 	
 	uint8_t opcode;
 	uint8_t *inst_address;
-	uint16_t operand = 0;
+	operand operand = { 0, 0 };
 	instruction inst;
 
 	/* 1 ROM bank games load twice to ensure vector tables */
@@ -69,7 +69,7 @@ void main_loop(ines_file *file) {
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, inst_address);
 
-		printf(" operand: %04x\n", operand);
+		printf(" operand: %04x / 0x%02x\n", operand.address, operand.value);
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 		

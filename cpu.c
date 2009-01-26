@@ -31,45 +31,62 @@ void dump_cpu() {
 	return;
 }
 
-void execute_instruction(instruction inst, uint16_t operand) {
+void execute_instruction(instruction inst, operand oper) {
 
 	switch(inst.instr_id) {
 
 		case BPL:
 			if( (CPU->SR & N_FLAG) )
-				CPU->PC += (int8_t)operand;
+				CPU->PC += (int8_t)oper.value;
+			break;
+
+		case BNE:
+			if( CPU->SR & Z_FLAG )
+				CPU->PC += (int8_t)oper.value;
 			break;
 
 		case CLD:
 			CPU->SR &= ~D_FLAG;
 			break;
 
+		case DEC:
+			*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) + 1;
+			break;
+
 		case DEX:
 			CPU->X--;
+			if( CPU->X == 0)  CPU->SR |= Z_FLAG;
+			if( (int8_t)CPU->X < 0 )  CPU->SR |= N_FLAG;
 			break;
 
 		case DEY:
 			CPU->Y--;
+			if( CPU->Y == 0)  CPU->SR |= Z_FLAG;
+			if( (int8_t)CPU->Y < 0 )  CPU->SR |= N_FLAG;
 			break;
 
 		case INX:
 			CPU->X++;
+			if( CPU->X == 0)  CPU->SR |= Z_FLAG;
+			if( (int8_t)CPU->X < 0 )  CPU->SR |= N_FLAG;
 			break;
 
 		case INY:
 			CPU->Y++;
+			if( CPU->Y == 0)  CPU->SR |= Z_FLAG;
+			if( (int8_t)CPU->Y < 0 )  CPU->SR |= N_FLAG;
 			break;
 
 		case LDA:
-			CPU->A = (int8_t)operand;
+			CPU->A = (int8_t)oper.value;
 			break;
 
 		case LDX:
-			CPU->X = (int8_t)operand;
+			CPU->X = (int8_t)oper.value;
 			break;
 
 		case LDY:
-			CPU->Y = (int8_t)operand;
+			CPU->Y = (int8_t)oper.value;
 			break;
 
 		case SEI:
@@ -77,15 +94,19 @@ void execute_instruction(instruction inst, uint16_t operand) {
 			break;
 
 		case STX:
-			*(CPU->RAM + operand) = CPU->X;
+			*(CPU->RAM + oper.address) = CPU->X;
 			break;
 
 		case STY:
-			*(CPU->RAM + operand) = CPU->Y;
+			*(CPU->RAM + oper.address) = CPU->Y;
 			break;
 
 		case TSX:
 			CPU->X = CPU->SP;
+			break;
+
+		case TXS:
+			CPU->SP = CPU->X;
 			break;
 	}
 

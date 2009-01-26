@@ -101,6 +101,17 @@ typedef struct {
 
 extern instruction *instructions;
 
+
+/**
+ * An instruction may need the value in memory of a given address,
+ * or maybe the address itself. Therefore, we store both values in this
+ * structure, so they can be used as needed
+ */
+typedef struct _operand {
+	uint16_t address;   /* Store the address if needed */
+	uint8_t  value;     /* Store the value of the operand if needed */
+} operand;
+
 #define SET_INSTRUCTION_ADDR_DATA( INST, ADDR_MODE, OPCODE, SIZE, CYCLES, \
                                    CHANGE ) \
    instructions[OPCODE].opcode       = OPCODE; \
@@ -121,6 +132,6 @@ void initialize_instruction_set();
  * When reading an instruction, the operand that should be used depends
  * on the addressing mode. This function does this job
  */
-uint16_t get_operand(instruction inst, uint8_t *inst_address);
+operand get_operand(instruction inst, uint8_t *inst_address);
 
 #endif /* instruction_set_h */

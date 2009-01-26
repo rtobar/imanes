@@ -33,11 +33,11 @@ void draw_screen() {
 
 	name_table = PPU->VRAM + 0x2000;
 
-	DEBUG( for(i=0;i!=20;i++) {
+	/*DEBUG( for(i=0;i!=20;i++) {
 		for(j=0;j!=16;j++)
-			printf("%02x ",*(name_table+i*16+j));
+			printf("%02x ",*(PPU->VRAM+i*16+j));
 		printf("\n");
-	} );
+	} ); */
 
 	for(j=0;j!=NES_SCREEN_HEIGHT/8;j++) {
 

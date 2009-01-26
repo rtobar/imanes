@@ -44,6 +44,6 @@ void dump_cpu();
 /**
  * Given an operand, and an instruction, it executes it into the CPU
  */
-void execute_instruction(instruction inst, uint16_t operand); 
+void execute_instruction(instruction inst, operand oper); 
 
 #endif /* cpu_h */
