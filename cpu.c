@@ -93,8 +93,30 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->PC += (int8_t)oper.value;
 			break;
 
+		case BVC:
+			if( ~CPU->SR & V_FLAG )
+				CPU->PC += (int8_t)oper.value;
+			break;
+
+		case BVS:
+			if( CPU->SR & V_FLAG )
+				CPU->PC += (int8_t)oper.value;
+			break;
+
+		case CLC:
+			CPU->SR &= ~C_FLAG;
+			break;
+
 		case CLD:
 			CPU->SR &= ~D_FLAG;
+			break;
+
+		case CLI:
+			CPU->SR &= ~I_FLAG;
+			break;
+
+		case CLV:
+			CPU->SR &= ~V_FLAG;
 			break;
 
 		case DEC:
