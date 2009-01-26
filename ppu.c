@@ -39,13 +39,16 @@ void draw_screen() {
 			tile_number = *(name_table + i + j*NES_SCREEN_HEIGHT/8);
 			tile = *(name_table + tile_number*0x10);
 
-			for(piy=0;piy!=8;piy++)
+			for(piy=0;piy!=8;piy++) {
 
-				byte = *(PPU->VRAM + tile + pix) || (*(PPU->VRAM + tile+pix+0x1) << 1);
-
+				byte = *(PPU->VRAM + tile + piy) || (*(PPU->VRAM + tile+piy+1) << 1);
 				for(pix=0;pix!=8;pix++) {
 					col_index = (byte >> (8-pix)) & 0x4;
-					draw_pixel(i,j,system_palette[col_index].red,system_palette[col_index].green,system_palette[col_index].blue);
+					draw_pixel(i*8+pix, j*8+piy,
+					           system_palette[col_index].red, 
+					           system_palette[col_index].green,
+					           system_palette[col_index].blue);
+				}
 			}
 		}
 	}
