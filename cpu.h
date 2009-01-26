@@ -46,4 +46,15 @@ void dump_cpu();
  */
 void execute_instruction(instruction inst, operand oper); 
 
+/**
+ * Given a value and a set of flags, check and update them if necessary
+ */
+void update_flags(int8_t value, uint8_t flags);
+
+/**
+ * For special memory location where IO is mapped, we update the
+ * corresponding information
+ */
+void check_mapped_io(uint16_t address);
+
 #endif /* cpu_h */
