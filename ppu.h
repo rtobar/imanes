@@ -44,4 +44,9 @@ void init_ppu_vram(ines_file *);
  */
 void draw_screen();
 
+/**
+ * Function called every time that we need to draw a scanline
+ */
+void draw_line();
+
 #endif /* ppu_h */

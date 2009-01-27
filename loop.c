@@ -8,14 +8,19 @@
 #include "instruction_set.h"
 #include "loop.h"
 #include "ppu.h"
+#include "screen.h"
 
 void main_loop(ines_file *file) {
 
 	uint8_t opcode;
 	uint8_t *inst_address;
+	int scanline_timeout = CYCLES_PER_SCANLINE;
+	int lines, standard_lines;
 	operand operand = { 0, 0 };
 	instruction inst;
 
+	lines = 0;
+	standard_lines = 0;
 	/* This is the main loop */
 	for(;;) {
 
@@ -52,6 +57,36 @@ void main_loop(ines_file *file) {
 
 		CPU->PC += inst.size;
 		CPU->cycles += inst.cycles;
+		scanline_timeout -= inst.cycles;
+
+		/* A line has ended its scanning, draw it */
+		if( scanline_timeout <= 0 ) {
+
+			if( lines < NES_SCREEN_HEIGHT + 3 ) {
+				printf("Haciendo nueva linea :D\n");
+				draw_line();
+				lines++;
+			}
+			/* Start VBLANK period */
+			else if( lines == NES_SCREEN_HEIGHT + 3) {
+				PPU->SR |= VBLANK_FLAG;
+				lines++;
+				standard_lines = 0;
+			}
+			/* VBLANK period */
+			else {
+				standard_lines++;
+
+				if( standard_lines == 20 ) {
+					standard_lines = 0;
+					lines = 0;
+					PPU->SR &= ~VBLANK_FLAG;
+				}
+			}
+
+			/* Finally, we set again the timeout to check the scanline */
+			scanline_timeout = CYCLES_PER_SCANLINE;
+		}
 
 		/* Draw the screen */
 		//draw_screen();

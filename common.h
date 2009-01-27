@@ -13,6 +13,8 @@
 
 #define NES_PALETTE_COLORS (64)
 
+#define CYCLES_PER_SCANLINE (114)
+
 typedef struct {
 	int fd;
 	uint8_t romBanks;

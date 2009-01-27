@@ -78,3 +78,46 @@ void draw_screen() {
 
 	redraw_screen();
 }
+
+void draw_line() {
+
+	static unsigned int line = 0;
+
+	int i;
+	int j;
+	int pix;
+	int piy;
+	int tile_number;
+	uint8_t col_index;
+	uint8_t byte;
+	uint8_t *name_table;
+	uint8_t tile;
+
+	/* Name table depends on the 1st and 2nd bit of PPY CR1 */
+	name_table = PPU->VRAM + 0x2000 + 0x400*(PPU->CR1 & 0x03);
+
+	j = line >> 3; /* line/8 */
+	for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
+
+		/* Get the 8x8 pixel to be drawn */
+		tile_number = *(name_table + i + j*NES_SCREEN_HEIGHT/8);
+		tile = *(name_table + tile_number*0x10);
+
+		piy = line & 0x07; /* piy = line % 8 */
+
+		byte = *(PPU->VRAM + tile + piy) || (*(PPU->VRAM + tile+piy+1) << 1);
+		for(pix=0;pix!=8;pix++) {
+			col_index = (byte >> (7-pix)) & 0x4;
+			draw_pixel(i*8+pix, j*8+piy,
+			           system_palette[col_index].red, 
+			           system_palette[col_index].green,
+			           system_palette[col_index].blue);
+		}
+	}
+
+	redraw_screen();
+
+	line++;
+	if( line >= NES_SCREEN_HEIGHT )
+		line = 0;
+}
