@@ -73,6 +73,16 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->A &= *(CPU->RAM + oper.address);
 			break;
 
+		case ASL:
+			if( inst.addr_mode == ADDR_ACCUM ) {
+				CPU->A <<= 1;
+				update_flags(CPU->A, N_FLAG | Z_FLAG | C_FLAG );
+			}
+			else {
+				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
+				update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG | C_FLAG);
+			}
+
 		case BCC:
 			if( ~CPU->SR & C_FLAG )
 				CPU->PC += (int8_t)oper.value;
@@ -253,7 +263,7 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		default:
-			fprintf(stderr,"%02x: Still unimplemented\n", inst.opcode);
+			fprintf(stderr,"%s: Still unimplemented\n", inst.name);
 			break;
 	}
 
