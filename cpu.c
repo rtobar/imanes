@@ -276,6 +276,8 @@ void update_flags(int8_t value, uint8_t flags) {
 
 void check_write_mapped_io(uint16_t address) {
 
+	static unsigned int which_byte = 0;
+
 	switch( address ) {
 
 		/* PPU control registers */
@@ -293,6 +295,27 @@ void check_write_mapped_io(uint16_t address) {
 
 		case 0x2004:
 			*(PPU->SPR_RAM + PPU->spr_addr) = *(CPU->RAM + 0x2004);
+			break;
+
+
+		/* PPU VRAM address */
+		case 0x2006:
+			if( which_byte & 0x1 ) {
+				PPU->vram_addr = 0;
+				PPU->vram_addr = *(CPU->RAM + 0x2006);
+			} else {
+				PPU->vram_addr |= (*(CPU->RAM + 0x2006) << 8);
+			}
+			which_byte++;
+			break;
+
+		/* Data written into PPU->vram_address */
+		case 0x2007:
+			*(PPU->VRAM + PPU->vram_addr) = *(CPU->RAM + 0x2007);
+			if(1) /* TODO: Check PPU flags */
+				PPU->vram_addr++;
+			else
+				PPU->vram += 0x32;
 			break;
 	}
 
