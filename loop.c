@@ -54,7 +54,7 @@ void main_loop(ines_file *file) {
 		CPU->cycles += inst.cycles;
 
 		/* Draw the screen */
-		draw_screen();
+		//draw_screen();
 	}
 
 }

@@ -183,8 +183,11 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case JSR:
-			*(CPU->RAM + CPU->SP++) = CPU->PC+2;
-			*(CPU->RAM + CPU->SP++) = (CPU->PC+2) << 8;
+			printf("\n\nBefore jumping...");
+			dump_cpu();
+			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
+			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+			printf("%02x%02x\n", *(CPU->RAM + CPU->SP - 2), *(CPU->RAM + CPU->SP - 1));
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -211,6 +214,13 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case NOP:
+			break;
+
+		case RTS:
+			CPU->PC =  *(CPU->RAM + --CPU->SP) << 8;
+			CPU->PC |= *(CPU->RAM + --CPU->SP);
+			printf("\n\nAfter coming back...");
+			dump_cpu();
 			break;
 
 		case SEI:
