@@ -63,7 +63,6 @@ void main_loop(ines_file *file) {
 		if( scanline_timeout <= 0 ) {
 
 			if( lines < NES_SCREEN_HEIGHT + 3 ) {
-				printf("Haciendo nueva linea :D\n");
 				draw_line();
 				lines++;
 			}

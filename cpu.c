@@ -381,10 +381,22 @@ void check_write_mapped_io(uint16_t address) {
 
 void check_read_mapped_io(uint16_t address) {
 
+	/* PPU Control Register 1 */
+	if( address == 0x2000 )
+		*(CPU->RAM + 0x2000) = PPU->CR1;
+	
+	/* PPU Control Register 1 */
+	if( address == 0x2001 )
+		*(CPU->RAM + 0x2000) = PPU->CR2;
+
 	/* PPU Status Register */
-	if( address == 0x2002 ) {
+	else if( address == 0x2002 ) {
 		*(CPU->RAM + 0x2002) = PPU->SR;
 		PPU->SR &= ~VBLANK_FLAG;
 	}
+
+	/* PPU VRAM */
+	else if( address == 0x2007 )
+		*(CPU->RAM + 0x2007) = *(PPU->VRAM + PPU->vram_addr);
 
 }
