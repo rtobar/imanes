@@ -43,13 +43,14 @@ void draw_screen() {
 	uint8_t *name_table;
 	uint8_t tile;
 
-	name_table = PPU->VRAM + 0x2000;
+	name_table = PPU->VRAM + 0x2000 + 0x400*(PPU->CR1 & 0x03);
 
-	/*DEBUG( for(i=0;i!=20;i++) {
-		for(j=0;j!=16;j++)
-			printf("%02x ",*(PPU->VRAM+i*16+j));
-		printf("\n");
-	} ); */
+	//INFO( printf("\nStarting dumping of nametable at 0x%04x\n", name_table - PPU->VRAM) );
+	//INFO( for(i=0;i!=20;i++) {
+	//	for(j=0;j!=16;j++)
+	//		printf("%02x ",*(name_table+i*16+j));
+	//	printf("\n");
+	//} );
 
 	for(j=0;j!=NES_SCREEN_HEIGHT/8;j++) {
 

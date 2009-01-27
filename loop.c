@@ -10,14 +10,14 @@
 #include "ppu.h"
 
 void main_loop(ines_file *file) {
-	
+
 	uint8_t opcode;
 	uint8_t *inst_address;
 	operand operand = { 0, 0 };
 	instruction inst;
 
 	/* This is the main loop */
-	while(1) {
+	for(;;) {
 
 		/* inst_address saves the current process' memory
 		 * pointer for the NES CPU' PC. This way we can
@@ -49,7 +49,7 @@ void main_loop(ines_file *file) {
 		DEBUG( printf(" operand: %04x / 0x%02x\n", operand.address, operand.value) );
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
-		
+
 		CPU->PC += inst.size;
 		CPU->cycles += inst.cycles;
 
