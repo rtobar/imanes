@@ -56,6 +56,16 @@ void execute_instruction(instruction inst, operand oper) {
 
 	switch(inst.instr_id) {
 
+		case ADC:
+			if( inst.addr_mode == ADDR_IMMEDIATE )
+				CPU->A += oper.value;
+			else
+				CPU->A += *(CPU->RAM + oper.address);
+
+			CPU->A += (CPU->SR & C_FLAG);
+			update_flags(CPU->A, N_FLAG | Z_FLAG | C_FLAG | V_FLAG);
+			break;
+
 		case AND:
 			if( inst.addr_mode == ADDR_IMMEDIATE )
 				CPU->A &= oper.value;
