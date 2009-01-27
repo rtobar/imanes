@@ -144,7 +144,7 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case DEC:
-			*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) + 1;
+			*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) - 1;
 			update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
 			break;
 
