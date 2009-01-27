@@ -87,25 +87,25 @@ void draw_line() {
 	int j;
 	int pix;
 	int piy;
-	int tile_number;
 	uint8_t col_index;
 	uint8_t byte;
 	uint8_t *name_table;
+	uint8_t *pattern_table;
 	uint8_t tile;
 
-	/* Name table depends on the 1st and 2nd bit of PPY CR1 */
-	name_table = PPU->VRAM + 0x2000 + 0x400*(PPU->CR1 & 0x03);
+	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
+	name_table   = PPU->VRAM + 0x2000 + 0x400*(PPU->CR1 & 0x03);
+	pattern_table = PPU->VRAM + ((PPU->CR1 & SCR_PATTERN_ADDRESS) ? 0x1000: 0x0000);
 
 	j = line >> 3; /* line/8 */
 	for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
 
-		/* Get the 8x8 pixel to be drawn */
-		tile_number = *(name_table + i + j*NES_SCREEN_HEIGHT/8);
-		tile = *(name_table + tile_number*0x10);
+		/* Get the 8x8 pixel table where the line is present */
+		tile = *(name_table + i + j*NES_SCREEN_HEIGHT/8);
 
 		piy = line & 0x07; /* piy = line % 8 */
 
-		byte = *(PPU->VRAM + tile + piy) || (*(PPU->VRAM + tile+piy+1) << 1);
+		byte = *(pattern_table + tile*2 + piy) | (*(pattern_table + tile*2 + piy + 1) << 1);
 		for(pix=0;pix!=8;pix++) {
 			col_index = (byte >> (7-pix)) & 0x4;
 			draw_pixel(i*8+pix, j*8+piy,

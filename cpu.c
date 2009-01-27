@@ -264,8 +264,20 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
+		case PHA:
+			*(CPU->RAM + CPU->SP++) = CPU->A;
+			break;
+
 		case PLA:
 			CPU->A = *(CPU->RAM + --CPU->SP);
+			break;
+
+		case PHP:
+			CPU->A = *(CPU->RAM + --CPU->SR);
+			break;
+
+		case PLP:
+			CPU->SR = *(CPU->RAM + --CPU->SP);
 			break;
 
 		case RTS:
@@ -352,10 +364,10 @@ void check_write_mapped_io(uint16_t address) {
 
 		/* PPU control registers */
 		case 0x2000:
-			PPU->CR1 = *(CPU->RAM + address);
+			PPU->CR1 = *(CPU->RAM + 0x2000);
 			break;
 		case 0x2001:
-			PPU->CR2 = *(CPU->RAM + address);
+			PPU->CR2 = *(CPU->RAM + 0x2001);
 			break;
 
 		/* SPR-RAM Address */
@@ -366,7 +378,6 @@ void check_write_mapped_io(uint16_t address) {
 		case 0x2004:
 			*(PPU->SPR_RAM + PPU->spr_addr) = *(CPU->RAM + 0x2004);
 			break;
-
 
 		/* PPU VRAM address */
 		case 0x2006:
