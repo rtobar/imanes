@@ -300,11 +300,11 @@ void check_write_mapped_io(uint16_t address) {
 
 		/* PPU VRAM address */
 		case 0x2006:
-			if( which_byte & 0x1 ) {
+			if( !(which_byte & 0x1) ) {
 				PPU->vram_addr = 0;
-				PPU->vram_addr = *(CPU->RAM + 0x2006);
+				PPU->vram_addr = (*(CPU->RAM + 0x2006) << 8);
 			} else {
-				PPU->vram_addr |= (*(CPU->RAM + 0x2006) << 8);
+				PPU->vram_addr |= *(CPU->RAM + 0x2006);
 			}
 			which_byte++;
 			break;
@@ -312,10 +312,10 @@ void check_write_mapped_io(uint16_t address) {
 		/* Data written into PPU->vram_address */
 		case 0x2007:
 			*(PPU->VRAM + PPU->vram_addr) = *(CPU->RAM + 0x2007);
-			if(1) /* TODO: Check PPU flags */
-				PPU->vram_addr++;
+			if( PPU->CR1 & VERTICAL_WRITE)
+				PPU->vram_addr += 32;
 			else
-				PPU->vram_addr += 0x32;
+				PPU->vram_addr++;
 			break;
 	}
 

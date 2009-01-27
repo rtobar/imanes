@@ -3,6 +3,15 @@
 
 #include <stdint.h>
 
+/* Flags for PPU CR1 */
+#define VERTICAL_WRITE       (0x04)
+#define SPR_PATTERN_ADDRESS  (0x08)
+#define SCR_PATTERN_ADDRESS  (0x10)
+#define SPRITE_SIZE_8x16     (0x20)
+#define PPU_MASTER_SLAVE     (0x40)
+#define VBLANK_ENABLE        (0x80)
+
+/* Flags for the PPU Status Register */
 #define HIT_FLAG     (0x40)
 #define VBLANK_FLAG  (0x80)
 
