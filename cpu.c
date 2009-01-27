@@ -82,6 +82,7 @@ void execute_instruction(instruction inst, operand oper) {
 				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
 				update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG | C_FLAG);
 			}
+			break;
 
 		case BCC:
 			if( ~CPU->SR & C_FLAG )
@@ -113,6 +114,16 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->PC += (int8_t)oper.value;
 			break;
 
+		case BRK:
+			/* Set the interrupt flag, push the PC and the SR */
+			/* Finally, jump to the interrump vector */
+			CPU->SR |= I_FLAG;
+			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
+			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+			*(CPU->RAM + CPU->SP++) = CPU->SR;
+			CPU->PC = (*(CPU->RAM + 0xFFFE) | (*(CPU->RAM + 0xFFFF)<<8) ) - 1;
+			break;
+
 		case BVC:
 			if( ~CPU->SR & V_FLAG )
 				CPU->PC += (int8_t)oper.value;
@@ -137,6 +148,13 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case CLV:
 			CPU->SR &= ~V_FLAG;
+			break;
+
+		case CMP:
+			if( inst.addr_mode == ADDR_IMMEDIATE )
+				update_flags(CPU->A - oper.value, N_FLAG | Z_FLAG | C_FLAG);
+			else
+				update_flags(CPU->A - *(CPU->RAM + oper.address), N_FLAG | Z_FLAG | C_FLAG);
 			break;
 
 		case CPX:
@@ -183,11 +201,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case JSR:
-			printf("\n\nBefore jumping...");
-			dump_cpu();
 			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
 			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
-			printf("%02x%02x\n", *(CPU->RAM + CPU->SP - 2), *(CPU->RAM + CPU->SP - 1));
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -213,14 +228,35 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->Y, N_FLAG | Z_FLAG);
 			break;
 
+		case LSR:
+			if( inst.addr_mode == ADDR_ACCUM ) {
+				if( CPU->A  & 0x1 )	
+					CPU->SR |= C_FLAG;
+				else
+					CPU->SR &= ~C_FLAG;
+				CPU->A >>= 1;
+				update_flags(CPU->A, Z_FLAG | C_FLAG );
+			}
+			else {
+				if( *(CPU->RAM + oper.address)  & 0x1 )	
+					CPU->SR |= C_FLAG;
+				else
+					CPU->SR &= ~C_FLAG;
+				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
+				update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG | C_FLAG);
+			}
+			break;
+
 		case NOP:
+			break;
+
+		case PLA:
+			CPU->A = *(CPU->RAM + --CPU->SP);
 			break;
 
 		case RTS:
 			CPU->PC =  *(CPU->RAM + --CPU->SP) << 8;
 			CPU->PC |= *(CPU->RAM + --CPU->SP);
-			printf("\n\nAfter coming back...");
-			dump_cpu();
 			break;
 
 		case SEI:
