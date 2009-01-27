@@ -152,8 +152,11 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case CMP:
-			if( inst.addr_mode == ADDR_IMMEDIATE )
-				update_flags(CPU->A - oper.value, N_FLAG | Z_FLAG | C_FLAG);
+			if( inst.addr_mode == ADDR_IMMEDIATE ) {
+				if( CPU->A >= oper.value)
+					CPU->SR |= C_FLAG;
+				update_flags(CPU->A - oper.value, N_FLAG | Z_FLAG);
+			}
 			else
 				update_flags(CPU->A - *(CPU->RAM + oper.address), N_FLAG | Z_FLAG | C_FLAG);
 			break;
@@ -244,11 +247,21 @@ void execute_instruction(instruction inst, operand oper) {
 				else
 					CPU->SR &= ~C_FLAG;
 				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
-				update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG | C_FLAG);
+				update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
 			}
 			break;
 
 		case NOP:
+			break;
+
+		case ORA:
+			if( inst.addr_mode == ADDR_IMMEDIATE )
+				CPU->A |= oper.value;
+			else {
+				check_read_mapped_io(oper.address);
+				CPU->A |= *(CPU->RAM + oper.address);
+			}
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case PLA:
