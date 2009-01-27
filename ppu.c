@@ -65,7 +65,7 @@ void draw_screen() {
 
 				byte = *(PPU->VRAM + tile + piy) || (*(PPU->VRAM + tile+piy+1) << 1);
 				for(pix=0;pix!=8;pix++) {
-					col_index = (byte >> (8-pix)) & 0x4;
+					col_index = (byte >> (7-pix)) & 0x4;
 					draw_pixel(i*8+pix, j*8+piy,
 					           system_palette[col_index].red, 
 					           system_palette[col_index].green,
