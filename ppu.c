@@ -101,7 +101,7 @@ void draw_line() {
 	for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
 
 		/* Get the 8x8 pixel table where the line is present */
-		tile = *(name_table + i + j*NES_SCREEN_HEIGHT/8);
+		tile = *(name_table + i + j*NES_SCREEN_WIDTH/8);
 
 		piy = line & 0x07; /* piy = line % 8 */
 

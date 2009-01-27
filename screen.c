@@ -73,11 +73,9 @@ void draw_pixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue) {
 	colour = SDL_MapRGB(nes_screen->format, red, green, blue);
 	
 	/* x = x*4 (32 bits per pixel); y = y*WIDTH*4 for the same reason */
-	x *= 4;
-	y *= NES_SCREEN_WIDTH*4;
 
-	pixmem32 = (void*)nes_screen->pixels  + y + x;
-	*pixmem32 = colour;
+	pixmem32 = (Uint32*)nes_screen->pixels;
+	pixmem32[x+y*NES_SCREEN_WIDTH] = colour;
 }
 
 void redraw_screen() {

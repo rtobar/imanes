@@ -51,6 +51,13 @@ ines_file *check_ines_file(char *file_path) {
 	rom_file->mapper_id = (buff[1] & 0xFF00) | ( (buff[0] >> 4) & 0xFFFF );
 	printf("ROM mapper is '%s'\n",mapper_list[rom_file->mapper_id]);
 
+	/* We currently support only No-mapper ROMs :P */
+	if( rom_file->mapper_id != 0 ) {
+		fprintf(stderr,"Sorry, but we currently suppor catridges using the '%s' Mapper\n",mapper_list[0]);
+		fprintf(stderr,"I'm exiting now.\n\n");
+		exit(EXIT_FAILURE);
+	}
+
 	/* The rest of the header is ignored until now... */
 	buff = realloc(buff,8);
 	read(rom_file->fd, buff, 8);
