@@ -119,6 +119,20 @@ void execute_instruction(instruction inst, operand oper) {
 			CPU->SR &= ~V_FLAG;
 			break;
 
+		case CPX:
+			if( inst.addr_mode == ADDR_IMMEDIATE )
+				update_flags(CPU->X - oper.value, N_FLAG | Z_FLAG | C_FLAG);
+			else
+				update_flags(CPU->X - *(CPU->RAM + oper.address), N_FLAG | Z_FLAG | C_FLAG);
+			break;
+
+		case CPY:
+			if( inst.addr_mode == ADDR_IMMEDIATE )
+				update_flags(CPU->Y - oper.value, N_FLAG | Z_FLAG | C_FLAG);
+			else
+				update_flags(CPU->Y - *(CPU->RAM + oper.address), N_FLAG | Z_FLAG | C_FLAG);
+			break;
+
 		case DEC:
 			*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) + 1;
 			update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
