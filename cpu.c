@@ -315,7 +315,7 @@ void check_write_mapped_io(uint16_t address) {
 			if(1) /* TODO: Check PPU flags */
 				PPU->vram_addr++;
 			else
-				PPU->vram += 0x32;
+				PPU->vram_addr += 0x32;
 			break;
 	}
 
