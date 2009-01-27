@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "cpu.h"
+#include "debug.h"
 #include "instruction_set.h"
 #include "ppu.h"
 
@@ -361,6 +362,7 @@ void check_write_mapped_io(uint16_t address) {
 				PPU->vram_addr = (*(CPU->RAM + 0x2006) << 8);
 			} else {
 				PPU->vram_addr |= *(CPU->RAM + 0x2006);
+				NORMAL( printf("About to read/write in address 0x%04x\n", PPU->vram_addr) );
 			}
 			which_byte++;
 			break;

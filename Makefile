@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-O3 -Wall -g
+CFLAGS=-O3 -Wall -g -fomit-frame-pointer
 LDFLAGS=-lSDL -lpthread
 
 EXE = imanes
