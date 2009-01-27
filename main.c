@@ -3,6 +3,7 @@
 #include <unistd.h>
 
 #include "cpu.h"
+#include "debug.h"
 #include "instruction_set.h"
 #include "loop.h"
 #include "mapper.h"
@@ -10,6 +11,8 @@
 #include "parse_file.h"
 #include "ppu.h"
 #include "screen.h"
+
+int verbosity;
 
 void usage(char *argv[]) {
 	fprintf(stderr,"Usage: %s <rom file>\n",argv[0]);
@@ -26,6 +29,7 @@ int main(int args, char *argv[]) {
 
 	setbuf(stdout,NULL);
 	setbuf(stderr,NULL);
+	verbosity = 0;
 
 	/* Initialize static data */
 	initialize_palette();

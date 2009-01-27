@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "cpu.h"
+#include "debug.h"
 #include "instruction_set.h"
 #include "loop.h"
 #include "ppu.h"
@@ -34,7 +35,7 @@ void main_loop(ines_file *file) {
 		opcode = *(inst_address);
 		inst = instructions[opcode];
 
-		printf("CPU->PC: 0x%04x - %02x: %s", CPU->PC, opcode, inst.name);
+		DEBUG( printf("CPU->PC: 0x%04x - %02x: %s", CPU->PC, opcode, inst.name) );
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
 			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
@@ -45,7 +46,7 @@ void main_loop(ines_file *file) {
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, inst_address);
 
-		printf(" operand: %04x / 0x%02x\n", operand.address, operand.value);
+		DEBUG( printf(" operand: %04x / 0x%02x\n", operand.address, operand.value) );
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 		
