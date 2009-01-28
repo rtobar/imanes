@@ -24,7 +24,7 @@ void init_ppu_vram(ines_file *file) {
 
 	/* Dump the VROM into the PPU VRAM area */
 	if( file->vromBanks == 1 ) {
-		printf("Copying VROM to VRAM\n");
+		INFO( printf("Copying VROM to VRAM\n") );
 		memcpy( PPU->VRAM , file->vrom, 0x2000);
 	}
 
@@ -84,31 +84,38 @@ void draw_line() {
 	static unsigned int line = 0;
 
 	int i;
-	int j;
 	int pix;
 	int piy;
 	uint8_t col_index;
 	uint8_t byte;
 	uint8_t *name_table;
+	uint8_t *attr_table;
 	uint8_t *pattern_table;
 	uint8_t tile;
 
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
-	name_table   = PPU->VRAM + 0x2000 + 0x400*(PPU->CR1 & 0x03);
+	name_table    = PPU->VRAM + 0x2000 + 0x400*(PPU->CR1 & 0x03);
+	attr_table    = name_table + 0x3C0;
 	pattern_table = PPU->VRAM + ((PPU->CR1 & SCR_PATTERN_ADDRESS) ? 0x1000: 0x0000);
 
-	j = line >> 3; /* line/8 */
+	piy = line & 0x07; /* piy = line % 8 */
+
 	for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
 
 		/* Get the 8x8 pixel table where the line is present */
-		tile = *(name_table + i + j*NES_SCREEN_WIDTH/8);
+		tile = *(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
+		byte = *(pattern_table + tile*0x10 + piy) | (*(pattern_table + tile*0x10 + piy + 0x08) << 1);
+		if(tile*0x10 == 0x240)
+		{
+			//printf("Tile %d. %02x is the byte when y is %d. It is formed by %02x and %02x\n", tile, byte, line, *(pattern_table + tile*0x10 + piy), *(pattern_table + tile*0x10 + piy + 1));
+			//for(pix=0;pix!=16;pix++)
+			//	printf("%02x ", *(pattern_table + tile*0x10 + pix));
+			//printf("\n");
+		}
 
-		piy = line & 0x07; /* piy = line % 8 */
-
-		byte = *(pattern_table + tile*2 + piy) | (*(pattern_table + tile*2 + piy + 1) << 1);
 		for(pix=0;pix!=8;pix++) {
 			col_index = (byte >> (7-pix)) & 0x4;
-			draw_pixel(i*8+pix, j*8+piy,
+			draw_pixel(i*8+pix, line,
 			           system_palette[col_index].red, 
 			           system_palette[col_index].green,
 			           system_palette[col_index].blue);
