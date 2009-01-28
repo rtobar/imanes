@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "cpu.h"
@@ -335,8 +336,20 @@ operand get_operand(instruction inst, uint8_t *inst_address) {
 			oper.value = *(inst_address + 1);
 			break;
 
+		case ADDR_ACCUM:
+			oper.value = CPU->A;
+			break;
+
+		case ADDR_ZERO_INDX:
+			oper.address = *(inst_address + 1) + CPU->X;
+			break;
+
+		case ADDR_ZERO_INDY:
+			oper.address = *(inst_address + 1) + CPU->Y;
+			break;
+
 		default:
-			printf("Hey!!! You haven't written the %d addressing mode!!!\n", inst.addr_mode);
+			fprintf(stderr,"Hey!!! You haven't written the %d addressing mode!!!\n", inst.addr_mode);
 	}
 
 	return oper;

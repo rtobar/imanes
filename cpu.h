@@ -45,6 +45,11 @@ void initialize_cpu();
 void dump_cpu();
 
 /**
+ * Dumps the current contents of the CPU stack
+ */
+void dump_stack();
+
+/**
  * Initializes CPU's RAM with contents from iNES file ROM
  */
 void init_cpu_ram(ines_file *);

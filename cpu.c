@@ -25,10 +25,21 @@ void dump_cpu() {
 	printf("X:  %02x\n", CPU->X);
 	printf("Y:  %02x\n", CPU->Y);
 	printf("SR: %02x\n", CPU->SR);
-	printf("SP: %02x\n", CPU->SP);
+	printf("SP: %02u\n", CPU->SP);
 	printf("Cycles: %lld\n", CPU->cycles);
 
 	return;
+}
+
+void dump_stack() {
+
+	int i;
+
+	printf("CPU Stack:\n==========\n\n");
+	for( i=0; i!=CPU->SP;i++) {
+		printf("%02x ", *(CPU->RAM + BEGIN_STACK + i));
+	}
+	printf("\n");
 }
 
 void init_cpu_ram(ines_file *file) {
@@ -129,9 +140,10 @@ void execute_instruction(instruction inst, operand oper) {
 			/* Set the interrupt flag, push the PC and the SR */
 			/* Finally, jump to the interrump vector */
 			CPU->SR |= I_FLAG;
-			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
-			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
-			*(CPU->RAM + CPU->SP++) = CPU->SR;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
+			dump_stack();
 			CPU->PC = (*(CPU->RAM + 0xFFFE) | (*(CPU->RAM + 0xFFFF)<<8) ) - 1;
 			break;
 
@@ -221,8 +233,9 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case JSR:
-			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
-			*(CPU->RAM + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+			dump_stack();
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -285,24 +298,30 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case PHA:
-			*(CPU->RAM + CPU->SP++) = CPU->A;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->A;
+			dump_stack();
 			break;
 
 		case PLA:
-			CPU->A = *(CPU->RAM + --CPU->SP);
+			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			dump_stack();
 			break;
 
 		case PHP:
-			CPU->A = *(CPU->RAM + --CPU->SR);
+			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SR);
+			dump_stack();
 			break;
 
 		case PLP:
-			CPU->SR = *(CPU->RAM + --CPU->SP);
+			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			dump_stack();
 			break;
 
 		case RTS:
-			CPU->PC =  *(CPU->RAM + --CPU->SP) << 8;
-			CPU->PC |= *(CPU->RAM + --CPU->SP);
+			dump_stack();
+			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
+			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			//CPU->PC -= inst.size;
 			break;
 
 		case SEI:
@@ -335,7 +354,7 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case TSX:
-			CPU->X = CPU->SP;
+			CPU->X = BEGIN_STACK + CPU->SP;
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
@@ -346,6 +365,7 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case TXS:
 			CPU->SP = CPU->X;
+			CPU->SP -= BEGIN_STACK;
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
