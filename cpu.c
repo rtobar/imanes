@@ -221,14 +221,22 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case LDX:
-			check_read_mapped_io(oper.address);
-			CPU->X = *(CPU->RAM + oper.address);
+			if( inst.addr_mode == ADDR_IMMEDIATE )
+				CPU->X = oper.value;
+			else {
+				check_read_mapped_io(oper.address);
+				CPU->X = *(CPU->RAM + oper.address);
+			}
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
 		case LDY:
-			check_read_mapped_io(oper.address);
-			CPU->Y = *(CPU->RAM + oper.address);
+			if( inst.addr_mode == ADDR_IMMEDIATE )
+				CPU->Y = oper.value;
+			else {
+				check_read_mapped_io(oper.address);
+				CPU->Y = *(CPU->RAM + oper.address);
+			}
 			update_flags(CPU->Y, N_FLAG | Z_FLAG);
 			break;
 
