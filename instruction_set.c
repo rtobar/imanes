@@ -319,8 +319,6 @@ operand get_operand(instruction inst, uint8_t *inst_address) {
 			oper.value   = *(CPU->RAM + oper.address);
 			break;
 
-		case ADDR_ZERO_INDX:
-		case ADDR_ZERO_INDY:
 		case ADDR_IND_INDIR:
 			address = (*(inst_address + 1) | (*(inst_address + 2) << 8)) + CPU->X;
 			oper.address = *(CPU->RAM + address) | (*(CPU->RAM + address + 1) << 8);
@@ -337,6 +335,8 @@ operand get_operand(instruction inst, uint8_t *inst_address) {
 			oper.value = *(inst_address + 1);
 			break;
 
+		default:
+			printf("Hey!!! You haven't written the %d addressing mode!!!\n", inst.addr_mode);
 	}
 
 	return oper;
