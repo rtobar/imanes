@@ -366,7 +366,7 @@ void update_flags(int8_t value, uint8_t flags) {
 
 void check_write_mapped_io(uint16_t address) {
 
-	static unsigned int which_byte = 0;
+	static unsigned int first_write = 1;
 
 	switch( address ) {
 
@@ -389,14 +389,15 @@ void check_write_mapped_io(uint16_t address) {
 
 		/* PPU VRAM address */
 		case 0x2006:
-			if( !(which_byte & 0x1) ) {
+			if( first_write ) {
 				PPU->vram_addr = 0;
 				PPU->vram_addr = (*(CPU->RAM + 0x2006) << 8);
+				first_write = 0;
 			} else {
 				PPU->vram_addr |= *(CPU->RAM + 0x2006);
 				NORMAL( printf("About to read/write in address 0x%04x\n", PPU->vram_addr) );
+				first_write = 1;
 			}
-			which_byte++;
 			break;
 
 		/* Data written into PPU->vram_address */
