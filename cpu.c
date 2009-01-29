@@ -227,6 +227,12 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->Y, N_FLAG | Z_FLAG);
 			break;
 
+		case INC:
+			check_read_mapped_io(oper.address);
+			*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address)+1; 
+			check_write_mapped_io(oper.address);
+			break;
+
 		case INX:
 			CPU->X++;
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
@@ -331,6 +337,10 @@ void execute_instruction(instruction inst, operand oper) {
 			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
 			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
 			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+
+		case SEC:
+			CPU->SR |= C_FLAG;
+			break;
 
 		case SEI:
 			CPU->SR |= I_FLAG;
