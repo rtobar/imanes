@@ -66,6 +66,8 @@ void init_cpu_ram(ines_file *file) {
 
 void execute_instruction(instruction inst, operand oper) {
 
+	uint8_t tmp;
+
 	switch(inst.instr_id) {
 
 		case ADC: /* TODO: check C and V flags */
@@ -119,6 +121,14 @@ void execute_instruction(instruction inst, operand oper) {
 		case BEQ:
 			if( CPU->SR & Z_FLAG )
 				CPU->PC += (int8_t)oper.value;
+			break;
+
+		case BIT:
+			check_read_mapped_io(oper.address);
+			tmp = CPU->A & *(CPU->RAM + oper.address);
+			if( (tmp >> 6)  & 0x01 )
+				CPU->SR |= V_FLAG;
+			update_flags(tmp, N_FLAG | Z_FLAG);
 			break;
 
 		case BMI:
