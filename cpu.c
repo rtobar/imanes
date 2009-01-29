@@ -397,6 +397,7 @@ void update_flags(int8_t value, uint8_t flags) {
 void check_write_mapped_io(uint16_t address) {
 
 	static unsigned int first_write = 1;
+	int i;
 
 	switch( address ) {
 
@@ -456,6 +457,14 @@ void check_write_mapped_io(uint16_t address) {
 			else
 				PPU->vram_addr++;
 			break;
+
+		/* Sprite DMA */
+		case 0x4014:
+			address = *(CPU->RAM + 0x4014)*0x100;
+			for(i=0;i!=256;i++)
+				*(PPU->SPR_RAM + i) = *(CPU->RAM + address + i);
+
+			CPU->cycles += 512;
 	}
 
 }
