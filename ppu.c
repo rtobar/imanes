@@ -87,7 +87,8 @@ void draw_line() {
 	int pix;
 	int piy;
 	uint8_t col_index;
-	uint8_t byte;
+	uint8_t byte1;
+	uint8_t byte2;
 	uint8_t *name_table;
 	uint8_t *attr_table;
 	uint8_t *pattern_table;
@@ -104,17 +105,10 @@ void draw_line() {
 
 		/* Get the 8x8 pixel table where the line is present */
 		tile = *(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
-		byte = *(pattern_table + tile*0x10 + piy) | (*(pattern_table + tile*0x10 + piy + 0x08) << 1);
-		if(tile*0x10 == 0x240)
-		{
-			//printf("Tile %d. %02x is the byte when y is %d. It is formed by %02x and %02x\n", tile, byte, line, *(pattern_table + tile*0x10 + piy), *(pattern_table + tile*0x10 + piy + 1));
-			//for(pix=0;pix!=16;pix++)
-			//	printf("%02x ", *(pattern_table + tile*0x10 + pix));
-			//printf("\n");
-		}
-
+		byte1 = *(pattern_table + tile*0x10 + piy);
+		byte2 = *(pattern_table + tile*0x10 + piy + 0x08);
 		for(pix=0;pix!=8;pix++) {
-			col_index = (byte >> (7-pix)) & 0x4;
+			col_index = ((byte1>>(7-pix))&0x1) | (((byte2>>(7-pix))&0x1)<<1);
 			draw_pixel(i*8+pix, line,
 			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].red, 
 			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].green,
