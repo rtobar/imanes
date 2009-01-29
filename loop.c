@@ -71,7 +71,6 @@ void main_loop(ines_file *file) {
 				PPU->SR |= VBLANK_FLAG;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					CPU->cycles += 7;
-					printf("Executing NMI!\n");
 					execute_nmi();
 				}
 				lines++;
