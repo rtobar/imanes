@@ -69,6 +69,11 @@ void main_loop(ines_file *file) {
 			/* Start VBLANK period */
 			else if( lines == NES_SCREEN_HEIGHT + 3) {
 				PPU->SR |= VBLANK_FLAG;
+				if( PPU->CR1 & VBLANK_ENABLE ) {
+					CPU->cycles += 7;
+					printf("Executing NMI!\n");
+					execute_nmi();
+				}
 				lines++;
 				standard_lines = 0;
 			}

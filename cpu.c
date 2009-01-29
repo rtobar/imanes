@@ -140,10 +140,9 @@ void execute_instruction(instruction inst, operand oper) {
 			/* Set the interrupt flag, push the PC and the SR */
 			/* Finally, jump to the interrump vector */
 			CPU->SR |= I_FLAG;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
-			dump_stack();
 			CPU->PC = (*(CPU->RAM + 0xFFFE) | (*(CPU->RAM + 0xFFFF)<<8) ) - 1;
 			break;
 
@@ -235,7 +234,6 @@ void execute_instruction(instruction inst, operand oper) {
 		case JSR:
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
-			dump_stack();
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -299,30 +297,30 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case PHA:
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->A;
-			dump_stack();
 			break;
 
 		case PLA:
 			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
-			dump_stack();
 			break;
 
 		case PHP:
 			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SR);
-			dump_stack();
 			break;
 
 		case PLP:
 			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
-			dump_stack();
 			break;
 
 		case RTS:
-			dump_stack();
 			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
 			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
 			//CPU->PC -= inst.size;
 			break;
+
+		case RTI:
+			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
+			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
 
 		case SEI:
 			CPU->SR |= I_FLAG;
@@ -408,6 +406,24 @@ void check_write_mapped_io(uint16_t address) {
 			break;
 		case 0x2001:
 			PPU->CR2 = *(CPU->RAM + 0x2001);
+			switch( (PPU->CR2 & 0x0E0) >> 5 ) {
+
+				case 0:
+					*(PPU->VRAM + 0x3F00) = 0x1D;
+					break;
+				case 1:
+					*(PPU->VRAM + 0x3F00) = 0x12;
+					break;
+				case 2:
+					*(PPU->VRAM + 0x3F00) = 0x1A;
+					break;
+				case 3:
+					*(PPU->VRAM + 0x3F00) = 0x16;
+					break;
+
+				default:
+					fprintf(stderr,"Oops, bad background color? %02x\n", PPU->CR2);
+			}
 			break;
 
 		/* SPR-RAM Address */
@@ -463,5 +479,16 @@ void check_read_mapped_io(uint16_t address) {
 	/* PPU VRAM */
 	else if( address == 0x2007 )
 		*(CPU->RAM + 0x2007) = *(PPU->VRAM + PPU->vram_addr);
+
+}
+
+void execute_nmi() {
+
+	/* Push the PC and the SR */
+	/* Finally, jump to the interrump vector */
+	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
+	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
+	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
 }

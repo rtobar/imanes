@@ -116,9 +116,9 @@ void draw_line() {
 		for(pix=0;pix!=8;pix++) {
 			col_index = (byte >> (7-pix)) & 0x4;
 			draw_pixel(i*8+pix, line,
-			           system_palette[col_index].red, 
-			           system_palette[col_index].green,
-			           system_palette[col_index].blue);
+			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].red, 
+			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].green,
+			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].blue);
 		}
 	}
 

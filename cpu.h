@@ -76,4 +76,9 @@ void check_write_mapped_io(uint16_t address);
  */
 void check_read_mapped_io(uint16_t address);
 
+/**
+ * Executes an NMI interrupt
+ */
+void execute_nmi();
+
 #endif /* cpu_h */
