@@ -64,13 +64,13 @@ void init_screen() {
 
 }
 
-void draw_pixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue) {
+void draw_pixel(int x, int y, nes_palette color) {
 
 	Uint32 colour;
 	Uint32 *pixmem32;
 
 	/* This is the colour that will be put in the pixel */
-	colour = SDL_MapRGB(nes_screen->format, red, green, blue);
+	colour = SDL_MapRGB(nes_screen->format, color.red, color.green, color.blue);
 	
 	/* x = x*4 (32 bits per pixel); y = y*WIDTH*4 for the same reason */
 

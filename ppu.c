@@ -67,10 +67,7 @@ void draw_screen() {
 				byte = *(PPU->VRAM + tile + piy) || (*(PPU->VRAM + tile+piy+1) << 1);
 				for(pix=0;pix!=8;pix++) {
 					col_index = (byte >> (7-pix)) & 0x4;
-					draw_pixel(i*8+pix, j*8+piy,
-					           system_palette[col_index].red, 
-					           system_palette[col_index].green,
-					           system_palette[col_index].blue);
+					draw_pixel(i*8+pix, j*8+piy, system_palette[col_index]);
 				}
 			}
 		}
@@ -122,10 +119,11 @@ void draw_line() {
 			tmp = 2*((line >> 4)&0x1) + ((i >> 1)&0x1);
 			col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
-			draw_pixel(i*8+pix, line,
-			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].red, 
-			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].green,
-			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].blue);
+			draw_pixel(i*8+pix, line, system_palette[*(PPU->VRAM + 0x3F00 + col_index)]);
+
+			/* After that, we draw the sprites! */
+			/* TODO: This should not be like this, has to be fixed */
+			
 		}
 	}
 

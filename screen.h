@@ -1,6 +1,8 @@
 #ifndef screen_h
 #define screen_h
 
+#include "palette.h"
+
 /* Screen geometry */
 #define NES_SCREEN_WIDTH  256
 #define NES_SCREEN_HEIGHT 240
@@ -14,7 +16,7 @@ void init_screen(void);
 /**
  * Draw a pixel on the screen.
  */
-void draw_pixel(int x, int y, uint8_t red, uint8_t green, uint8_t blue);
+void draw_pixel(int x, int y, nes_palette color);
 
 /**
  * Redraw screen
