@@ -195,7 +195,7 @@ void initialize_instruction_set() {
 	SET_INSTRUCTION_ADDR_DATA( PHP, IMPLIED, 0x08, 1, 3, NORMAL);
 
 	/* PLA instruction */
-	SET_INSTRUCTION_ADDR_DATA( PLA, IMPLIED, 0x68, 1, 3, NORMAL);
+	SET_INSTRUCTION_ADDR_DATA( PLA, IMPLIED, 0x68, 1, 4, NORMAL);
 
 	/* PLP instruction */
 	SET_INSTRUCTION_ADDR_DATA( PLP, IMPLIED, 0x28, 1, 4, NORMAL);
@@ -292,12 +292,10 @@ operand get_operand(instruction inst, uint8_t *inst_address) {
 
 		case ADDR_ABSOLUTE:
 			oper.address = *(inst_address + 1) | (*(inst_address + 2)  << 8);
-			oper.value   = *(CPU->RAM + oper.address);
 			break;
 
 		case ADDR_ZEROPAGE:
 			oper.address = *(inst_address + 1);
-			oper.value   = *(CPU->RAM + oper.address);
 			break;
 
 		case ADDR_IMPLIED:
@@ -307,29 +305,24 @@ operand get_operand(instruction inst, uint8_t *inst_address) {
 		case ADDR_INDIRECT:
 			address = *(inst_address + 1) | (*(inst_address + 2) << 8);
 			oper.address = *(CPU->RAM + address) | (*(CPU->RAM + address + 1) << 8);
-			oper.value = *(CPU->RAM + oper.address);
 			break;
 
 		case ADDR_ABS_INDX:
 			oper.address = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->X;
-			oper.value   = *(CPU->RAM + oper.address);
 			break;
 
 		case ADDR_ABS_INDY:
 			oper.address = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->Y;
-			oper.value   = *(CPU->RAM + oper.address);
 			break;
 
 		case ADDR_IND_INDIR:
 			address = *(inst_address + 1) + CPU->X;
 			oper.address = *(CPU->RAM + address) | (*(CPU->RAM + address + 1) << 8);
-			oper.value = *(CPU->RAM + oper.address);
 			break;
 
 		case ADDR_INDIR_IND:
 			address = *(inst_address + 1);
 			oper.address = (*(CPU->RAM + address) | (*(CPU->RAM + address + 1) << 8) ) + CPU->Y;
-			oper.value = *(CPU->RAM + oper.address);
 			break;
 
 		case ADDR_RELATIVE:
