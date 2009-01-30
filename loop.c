@@ -53,7 +53,7 @@ void main_loop(ines_file *file) {
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, inst_address);
 
-		DEBUG( printf(" operand: %04x / 0x%02x\n", operand.address, operand.value) );
+		DEBUG( printf(" operand: %04x\n", operand.address) );
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 

@@ -526,10 +526,13 @@ void check_write_mapped_io(uint16_t address) {
 		/* Sprite DMA */
 		case 0x4014:
 			address = *(CPU->RAM + 0x4014)*0x100;
-			for(i=0;i!=256;i++)
+			for(i=0;i!=256;i++) {
 				*(PPU->SPR_RAM + i) = *(CPU->RAM + address + i);
-
+				printf("%02x ", *(CPU->RAM + address + i));
+			}
+			printf("\n");
 			CPU->cycles += 512;
+			break;
 	}
 
 }
