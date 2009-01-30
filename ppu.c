@@ -103,7 +103,7 @@ void draw_line() {
 	sprites = 0;
 	for(i=0;i!=64/(big_sprite+1);i++) {
 		tmp = *(PPU->SPR_RAM + 4*i*(big_sprite+1));
-		if( tmp <= line || line <= tmp+8*(big_sprite+1) ) {
+		if( tmp <= line && line <= tmp+8*(big_sprite+1) ) {
 			drawable_sprites[sprites++] = i;
 			if( sprites == 8 ) {
 				PPU->SR |= MAX_SPRITES_DRAWN;
