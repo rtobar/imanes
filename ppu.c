@@ -120,7 +120,7 @@ void draw_line() {
 
 			/* And this from the attribute table */
 			tmp = 2*((line >> 4)&0x1) + ((i >> 1)&0x1);
-			col_index |=  ((byte3 >> tmp)&0x03) << 2;
+			col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
 			draw_pixel(i*8+pix, line,
 			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].red, 
