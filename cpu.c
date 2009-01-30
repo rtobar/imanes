@@ -227,6 +227,15 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->Y, N_FLAG | Z_FLAG);
 			break;
 
+		case EOR:
+			if( inst.addr_mode != ADDR_IMMEDIATE ) {
+				check_read_mapped_io(oper.address);
+				oper.value = *(CPU->RAM + oper.address);
+			}
+			CPU->A ^= oper.value;
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
+
 		case INC:
 			check_read_mapped_io(oper.address);
 			*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address)+1; 
@@ -325,6 +334,42 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case PLP:
 			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			break;
+
+		case ROL:
+			if( inst.addr_mode == ADDR_ACCUM ) {
+				tmp = CPU->A >> 7;
+				CPU->A <<= 1;
+				CPU->A |= (CPU->SR & C_FLAG);
+				CPU->SR |= tmp;
+				update_flags( CPU->A, N_FLAG | Z_FLAG);
+			} else {
+				check_read_mapped_io(oper.address);
+				tmp = *(CPU->RAM + oper.address) >> 7;
+				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
+				*(CPU->RAM + oper.address) |= (CPU->SR & C_FLAG);
+				check_write_mapped_io(oper.address);
+				CPU->SR |= tmp;
+				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
+			}
+			break;
+
+		case ROR:
+			if( inst.addr_mode == ADDR_ACCUM ) {
+				tmp = CPU->A & 0x1;
+				CPU->A >>= 1;
+				CPU->A |= (CPU->SR & C_FLAG) << 7;
+				CPU->SR |= tmp;
+				update_flags( CPU->A, N_FLAG | Z_FLAG);
+			} else {
+				check_read_mapped_io(oper.address);
+				tmp = *(CPU->RAM + oper.address) & 0x1;
+				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) >> 1;
+				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) | ((CPU->SR & C_FLAG) << 7);
+				check_write_mapped_io(oper.address);
+				CPU->SR |= tmp;
+				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
+			}
 			break;
 
 		case RTS:
