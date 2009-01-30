@@ -505,6 +505,10 @@ void check_read_mapped_io(uint16_t address) {
 		PPU->SR &= ~VBLANK_FLAG;
 	}
 
+	/* SPR-RAM access */
+	else if( address == 0x2004 ) 
+		*(CPU->RAM + 0x2003) = *(PPU->SPR_RAM + PPU->spr_addr);
+
 	/* PPU VRAM */
 	else if( address == 0x2007 )
 		*(CPU->RAM + 0x2007) = *(PPU->VRAM + PPU->vram_addr);
