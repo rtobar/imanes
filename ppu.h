@@ -19,8 +19,10 @@
 #define SHOW_SPRITES         (0x10)
 
 /* Flags for the PPU Status Register */
-#define HIT_FLAG     (0x40)
-#define VBLANK_FLAG  (0x80)
+#define IGNORE_VRAM_WRITE    (0x10)
+#define MAX_SPRITES_DRAWN    (0x20)
+#define HIT_FLAG             (0x40)
+#define VBLANK_FLAG          (0x80)
 
 typedef struct _ppu {
 	uint8_t CR1;        /* Control Register 1 */
