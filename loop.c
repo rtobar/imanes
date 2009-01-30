@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "common.h"
@@ -16,6 +17,7 @@ void main_loop(ines_file *file) {
 	uint8_t *inst_address;
 	int scanline_timeout = CYCLES_PER_SCANLINE;
 	int lines, standard_lines;
+	struct timespec sleepTime = { 0, 10000000 };
 	operand operand = { 0, 0 };
 	instruction inst;
 
@@ -80,10 +82,12 @@ void main_loop(ines_file *file) {
 			else {
 				standard_lines++;
 
+				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
 					standard_lines = 0;
 					lines = 0;
 					PPU->SR &= ~VBLANK_FLAG;
+					nanosleep(&sleepTime, NULL);
 				}
 			}
 
