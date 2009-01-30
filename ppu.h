@@ -11,6 +11,13 @@
 #define PPU_MASTER_SLAVE     (0x40)
 #define VBLANK_ENABLE        (0x80)
 
+/* Flags for the PPU CR2 */
+#define MONOCHROME_MODE      (0x01)
+#define DONTCLIP_BACKGROUND  (0x02)
+#define DONTCLIP_SPRITES     (0x04)
+#define SHOW_BACKGROUND      (0x08)
+#define SHOW_SPRITES         (0x10)
+
 /* Flags for the PPU Status Register */
 #define HIT_FLAG     (0x40)
 #define VBLANK_FLAG  (0x80)
