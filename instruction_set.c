@@ -321,13 +321,13 @@ operand get_operand(instruction inst, uint8_t *inst_address) {
 			break;
 
 		case ADDR_IND_INDIR:
-			address = (*(inst_address + 1) | (*(inst_address + 2) << 8)) + CPU->X;
+			address = *(inst_address + 1) + CPU->X;
 			oper.address = *(CPU->RAM + address) | (*(CPU->RAM + address + 1) << 8);
 			oper.value = *(CPU->RAM + oper.address);
 			break;
 
 		case ADDR_INDIR_IND:
-			address = *(inst_address + 1) | (*(inst_address + 2) << 8);
+			address = *(inst_address + 1);
 			oper.address = (*(CPU->RAM + address) | (*(CPU->RAM + address + 1) << 8) ) + CPU->Y;
 			oper.value = *(CPU->RAM + oper.address);
 			break;
