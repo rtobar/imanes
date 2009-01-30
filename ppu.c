@@ -86,9 +86,11 @@ void draw_line() {
 	int i;
 	int pix;
 	int piy;
+	int tmp;
 	uint8_t col_index;
 	uint8_t byte1;
 	uint8_t byte2;
+	uint8_t byte3;
 	uint8_t *name_table;
 	uint8_t *attr_table;
 	uint8_t *pattern_table;
@@ -105,10 +107,21 @@ void draw_line() {
 
 		/* Get the 8x8 pixel table where the line is present */
 		tile = *(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
+
+		/* Bytes that participate on the lower bits for the color */
 		byte1 = *(pattern_table + tile*0x10 + piy);
 		byte2 = *(pattern_table + tile*0x10 + piy + 0x08);
+		/* Byte participating on the higher bits for the color */
+		byte3 = *(attr_table + (i >> 2) + (line >> 5)*NES_SCREEN_WIDTH/8);
+
 		for(pix=0;pix!=8;pix++) {
+			/* This is from the pattern table */
 			col_index = ((byte1>>(7-pix))&0x1) | (((byte2>>(7-pix))&0x1)<<1);
+
+			/* And this from the attribute table */
+			tmp = 2*((line >> 4)&0x1) + ((i >> 1)&0x1);
+			col_index |=  ((byte3 >> tmp)&0x03) << 2;
+
 			draw_pixel(i*8+pix, line,
 			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].red, 
 			           system_palette[*(PPU->VRAM + 0x3F00 + col_index)].green,
