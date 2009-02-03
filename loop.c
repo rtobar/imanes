@@ -64,11 +64,11 @@ void main_loop(ines_file *file) {
 		/* A line has ended its scanning, draw it */
 		if( scanline_timeout <= 0 ) {
 
-			if( lines < NES_SCREEN_HEIGHT + 3 ) {
+			if( lines < NES_SCREEN_HEIGHT ) {
 				draw_line(lines++);
 			}
 			/* Start VBLANK period */
-			else if( lines == NES_SCREEN_HEIGHT + 3) {
+			else if( lines == NES_SCREEN_HEIGHT ) {
 				PPU->SR |= VBLANK_FLAG;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					CPU->cycles += 7;
@@ -94,8 +94,6 @@ void main_loop(ines_file *file) {
 			scanline_timeout = CYCLES_PER_SCANLINE;
 		}
 
-		/* Draw the screen */
-		//draw_screen();
 	}
 
 }

@@ -525,7 +525,7 @@ void check_write_mapped_io(uint16_t address) {
 			} else {
 				PPU->vram_addr |= *(CPU->RAM + 0x2006);
 				first_write = 1;
-				DEBUG( printf("About to write to PPU VRAM %04x\n", PPU->vram_addr) );
+				XTREME( printf("About to write to PPU VRAM %04x\n", PPU->vram_addr) );
 			}
 			break;
 
@@ -541,12 +541,12 @@ void check_write_mapped_io(uint16_t address) {
 		/* Sprite DMA */
 		case 0x4014:
 			address = *(CPU->RAM + 0x4014)*0x100;
-			printf("DMA!!!\n");
+			XTREME( printf("DMA!!!\n") );
 			for(i=0;i!=256;i++) {
 				*(PPU->SPR_RAM + i) = *(CPU->RAM + address + i);
-				printf("%02x ", *(CPU->RAM + address + i));
+				XTREME( printf("%02x ", *(CPU->RAM + address + i)) );
 			}
-			printf("\n");
+			XTREME( printf("\n") );
 			CPU->cycles += 512;
 			break;
 

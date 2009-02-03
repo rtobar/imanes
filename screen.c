@@ -7,7 +7,7 @@
 #include "pad.h"
 #include "screen.h"
 
-#define AMPLIFICATION (2)
+#define AMPLIFICATION (3)
 
 static SDL_Surface *nes_screen;
 
@@ -82,8 +82,9 @@ void draw_pixel(int x, int y, nes_palette color) {
 	pixmem32 = (Uint32*)nes_screen->pixels;
 
 	for(i=0;i!=AMPLIFICATION;i++)
-		for(j=0;j!=AMPLIFICATION;j++)
-			pixmem32[AMPLIFICATION*x+i+AMPLIFICATION*AMPLIFICATION*y*NES_SCREEN_WIDTH+j] = colour;
+		for(j=0;j!=AMPLIFICATION;j++) 
+			pixmem32[AMPLIFICATION*x+i+NES_SCREEN_WIDTH*AMPLIFICATION*(y*AMPLIFICATION+j)] = colour;
+
 }
 
 void redraw_screen() {
@@ -91,6 +92,7 @@ void redraw_screen() {
 	if( SDL_Flip(nes_screen) == -1 ) {
 		fprintf(stderr,"Couldn't refresh screen :(\n");
 		fprintf(stderr,"I'm exiting now\n");
+		SDL_Quit();
 		exit(EXIT_FAILURE);
 	}
 
