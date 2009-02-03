@@ -11,6 +11,7 @@
 
 ines_file *check_ines_file(char *file_path) {
 
+	int read_bytes;
 	char *buff;
 	struct stat stat_buf;
 	ines_file *rom_file;
@@ -33,21 +34,36 @@ ines_file *check_ines_file(char *file_path) {
 
 	/* Read the iNES magic bytes */
 	buff = (char *)malloc(4);
-	read(rom_file->fd, buff, 4);
-	if( strncmp(buff,"NES\032",4) ) {
+	read_bytes = read(rom_file->fd, buff, 4);
+	if( strncmp(buff,"NES\032",4) || read_bytes != 4 ) {
 		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
 		exit(EXIT_FAILURE);
 	}
 
 	/* ROM and VROM blocks */
-	read(rom_file->fd, &(rom_file->romBanks), 1);
-	read(rom_file->fd, &(rom_file->vromBanks), 1);
+	read_bytes = read(rom_file->fd, &(rom_file->romBanks), 1);
+	if( read_bytes != 1 ) {
+		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
+		exit(EXIT_FAILURE);
+	}
+
+	read_bytes = read(rom_file->fd, &(rom_file->vromBanks), 1);
+	if( read_bytes != 1 ) {
+		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
+		exit(EXIT_FAILURE);
+	}
+
 	printf("File contains %hu 16kb ROM banks and %hu 8kb VROM banks\n",
           rom_file->romBanks, rom_file->vromBanks);
 
 	/* Mapper and other stuff */
 	buff = realloc(buff,2);
-	read(rom_file->fd, buff, 2);
+	read_bytes = read(rom_file->fd, buff, 2);
+	if( read_bytes != 2 ) {
+		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
+		exit(EXIT_FAILURE);
+	}
+
 	rom_file->mapper_id = (buff[1] & 0xFF00) | ( (buff[0] >> 4) & 0xFFFF );
 	printf("ROM mapper is '%s'\n",mapper_list[rom_file->mapper_id]);
 
@@ -60,7 +76,12 @@ ines_file *check_ines_file(char *file_path) {
 
 	/* The rest of the header is ignored until now... */
 	buff = realloc(buff,8);
-	read(rom_file->fd, buff, 8);
+	read_bytes = read(rom_file->fd, buff, 8);
+	if( read_bytes != 8 ) {
+		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
+		exit(EXIT_FAILURE);
+	}
+
 	free(buff);
 
 	return rom_file;
