@@ -31,6 +31,22 @@ void nes_keydown(SDL_keysym keysym) {
 		case SDLK_d:
 			break;
 
+		/* A button */
+		case SDLK_j:
+			break;
+
+		/* B button */
+		case SDLK_k:
+			break;
+
+		/* Start button */
+		case SDLK_RETURN:
+			break;
+
+		/* Select button */
+		case SDLK_RCTRL:
+			break;
+
 		default:
 			break;
 	}
@@ -56,6 +72,22 @@ void nes_keyup(SDL_keysym keysym) {
 
 		/* Right */
 		case SDLK_d:
+			break;
+
+		/* A button */
+		case SDLK_j:
+			break;
+
+		/* B button */
+		case SDLK_k:
+			break;
+
+		/* Start button */
+		case SDLK_RETURN:
+			break;
+
+		/* Select button */
+		case SDLK_RCTRL:
 			break;
 
 		default:
