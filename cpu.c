@@ -510,7 +510,8 @@ void check_write_mapped_io(uint16_t address) {
 			break;
 
 		case 0x2004:
-			*(PPU->SPR_RAM + PPU->spr_addr) = *(CPU->RAM + 0x2004);
+			printf("Writing into SPR RAM at address %02x\n", PPU->spr_addr);
+			*(PPU->SPR_RAM + PPU->spr_addr++) = *(CPU->RAM + 0x2004);
 			break;
 
 		/* PPU VRAM address */
@@ -538,6 +539,7 @@ void check_write_mapped_io(uint16_t address) {
 		/* Sprite DMA */
 		case 0x4014:
 			address = *(CPU->RAM + 0x4014)*0x100;
+			printf("DMA!!!\n");
 			for(i=0;i!=256;i++) {
 				*(PPU->SPR_RAM + i) = *(CPU->RAM + address + i);
 				printf("%02x ", *(CPU->RAM + address + i));

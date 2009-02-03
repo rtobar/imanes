@@ -69,9 +69,7 @@ void draw_screen() {
 	redraw_screen();
 }
 
-void draw_line() {
-
-	static unsigned int line = 0;
+void draw_line(int line) {
 
 	int i;
 	int tx; /* X coord inside a tile */
@@ -104,6 +102,7 @@ void draw_line() {
 	for(i=0;i!=64/(big_sprite+1);i++) {
 		tmp = *(PPU->SPR_RAM + 4*i*(big_sprite+1));
 		if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
+			printf("Sprite %d set to be drawn (%d,%d) in line %d\n",i,*(PPU->SPR_RAM + 4*i*(big_sprite+1)), *(PPU->SPR_RAM + 4*i*(big_sprite+1) + 3), line);
 			drawable_sprites[sprites++] = i;
 			if( sprites == 8 ) {
 				PPU->SR |= MAX_SPRITES_DRAWN;
@@ -167,7 +166,4 @@ void draw_line() {
 
 	redraw_screen();
 
-	line++;
-	if( line >= NES_SCREEN_HEIGHT )
-		line = 0;
 }
