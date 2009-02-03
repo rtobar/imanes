@@ -3,7 +3,7 @@ CFLAGS=-O3 -Wall -g -fomit-frame-pointer
 LDFLAGS=-lSDL -lpthread
 
 EXE = imanes
-OBJS= cpu.o instruction_set.o loop.o main.o mapper.o palette.o parse_file.o ppu.o screen.o
+OBJS= cpu.o instruction_set.o loop.o main.o mapper.o pad.o palette.o parse_file.o ppu.o screen.o
 
 all: $(EXE)
 

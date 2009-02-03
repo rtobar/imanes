@@ -4,97 +4,12 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "pad.h"
 #include "screen.h"
 
 #define AMPLIFICATION (2)
 
 static SDL_Surface *nes_screen;
-
-void nes_keydown(SDL_keysym keysym) {
-
-	printf("Pressing a button...\n");
-	switch( keysym.sym ) {
-
-		/* Up */
-		case SDLK_w:
-			break;
-
-		/* Down */
-		case SDLK_s:
-			break;
-
-		/* Left */
-		case SDLK_a:
-			break;
-
-		/* Right */
-		case SDLK_d:
-			break;
-
-		/* A button */
-		case SDLK_j:
-			break;
-
-		/* B button */
-		case SDLK_k:
-			break;
-
-		/* Start button */
-		case SDLK_RETURN:
-			break;
-
-		/* Select button */
-		case SDLK_RCTRL:
-			break;
-
-		default:
-			break;
-	}
-
-}
-
-void nes_keyup(SDL_keysym keysym) {
-
-	printf("Releasing a button...\n");
-	switch( keysym.sym ) {
-
-		/* Up */
-		case SDLK_w:
-			break;
-
-		/* Down */
-		case SDLK_s:
-			break;
-
-		/* Left */
-		case SDLK_a:
-			break;
-
-		/* Right */
-		case SDLK_d:
-			break;
-
-		/* A button */
-		case SDLK_j:
-			break;
-
-		/* B button */
-		case SDLK_k:
-			break;
-
-		/* Start button */
-		case SDLK_RETURN:
-			break;
-
-		/* Select button */
-		case SDLK_RCTRL:
-			break;
-
-		default:
-			break;
-	}
-
-}
 
 void *screen_loop(void *args) {
 

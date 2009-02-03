@@ -1,0 +1,30 @@
+#ifndef pad_h
+#define pad_h
+
+#include <SDL/SDL.h>
+#include <stdint.h>
+
+/* Joypad buttons */
+#define NES_UP     (0x01)
+#define NES_DOWN   (0x02)
+#define NES_LEFT   (0x04)
+#define NES_RIGHT  (0x08)
+#define NES_A      (0x10)
+#define NES_B      (0x20)
+#define NES_START  (0x40)
+#define NES_SELECT (0x80)
+
+typedef struct _pad {
+	uint8_t plugged;      /* The pad is plugged or not */
+	uint8_t pressed_keys; /* Keys that are actually pressed, or'ed */
+} nes_pad;
+
+extern nes_pad pads[2];
+
+/* Update pads information for pressed keys */
+void nes_keydown(SDL_keysym keysym);
+
+/* Update pads information for released keys */
+void nes_keyup(SDL_keysym keysym);
+
+#endif /* pad_h */
