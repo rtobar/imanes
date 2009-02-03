@@ -475,6 +475,7 @@ void update_flags(int8_t value, uint8_t flags) {
 void check_write_mapped_io(uint16_t address) {
 
 	static unsigned int first_write = 1;
+	static unsigned int strobe_pad = 0;
 	int i;
 
 	switch( address ) {
@@ -548,6 +549,17 @@ void check_write_mapped_io(uint16_t address) {
 			printf("\n");
 			CPU->cycles += 512;
 			break;
+
+		/* 1st joystick */			
+		case 0x4016:
+			if( *(CPU->RAM + 0x4016) == 0x01 ) {
+				strobe_pad = 1;
+			}
+			else if( *(CPU->RAM + 0x4016) == 0x00 && strobe_pad ) {
+				pads[0].reads = 0;
+				strobe_pad = 0;
+			}
+			break;
 	}
 
 }
@@ -587,6 +599,9 @@ void check_read_mapped_io(uint16_t address) {
 		if( pads[0].reads <= 8 ) {
 			*(CPU->RAM + 0x4016) |= ((pads[0].pressed_keys >> (pads[0].reads-1)) & 0x1); 
 		}
+
+		if( pads[0].reads == 32 )
+			pads[0].reads = 0;
 	}
 }
 
