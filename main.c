@@ -30,7 +30,7 @@ int main(int args, char *argv[]) {
 
 	setbuf(stdout,NULL);
 	setbuf(stderr,NULL);
-	verbosity = INFO_LEVEL;
+	verbosity = DEBUG_LEVEL;
 
 	/* Initialize static data */
 	initialize_palette();

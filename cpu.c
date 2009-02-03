@@ -343,7 +343,6 @@ void execute_instruction(instruction inst, operand oper) {
 				tmp = CPU->A >> 7;
 				CPU->A <<= 1;
 				CPU->A |= (CPU->SR & C_FLAG);
-				CPU->SR |= tmp;
 				update_flags( CPU->A, N_FLAG | Z_FLAG);
 			} else {
 				check_read_mapped_io(oper.address);
@@ -351,9 +350,12 @@ void execute_instruction(instruction inst, operand oper) {
 				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
 				*(CPU->RAM + oper.address) |= (CPU->SR & C_FLAG);
 				check_write_mapped_io(oper.address);
-				CPU->SR |= tmp;
 				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
 			}
+			if( tmp )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			break;
 
 		case ROR:
@@ -361,7 +363,6 @@ void execute_instruction(instruction inst, operand oper) {
 				tmp = CPU->A & 0x1;
 				CPU->A >>= 1;
 				CPU->A |= (CPU->SR & C_FLAG) << 7;
-				CPU->SR |= tmp;
 				update_flags( CPU->A, N_FLAG | Z_FLAG);
 			} else {
 				check_read_mapped_io(oper.address);
@@ -372,6 +373,10 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->SR |= tmp;
 				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
 			}
+			if( tmp )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			break;
 
 		case RTS:
