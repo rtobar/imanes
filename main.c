@@ -7,6 +7,7 @@
 #include "instruction_set.h"
 #include "loop.h"
 #include "mapper.h"
+#include "pad.h"
 #include "palette.h"
 #include "parse_file.h"
 #include "ppu.h"
@@ -37,6 +38,7 @@ int main(int args, char *argv[]) {
 	initialize_instruction_set();
 	initialize_cpu();
 	initialize_ppu();
+	initialize_pads();
 
 	nes_rom = check_ines_file(argv[1]);
 	map_rom_memory(nes_rom);

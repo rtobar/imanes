@@ -2,6 +2,14 @@
 
 nes_pad pads[2];
 
+void initialize_pads() {
+
+	/* TODO: Support 2nd pad */
+	pads[0].plugged = 1;
+	pads[0].pressed_keys = 0;
+	pads[0].reads = 0;
+}
+
 void nes_keydown(SDL_keysym keysym) {
 
 	printf("Pressing a button...\n");

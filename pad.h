@@ -17,9 +17,13 @@
 typedef struct _pad {
 	uint8_t plugged;      /* The pad is plugged or not */
 	uint8_t pressed_keys; /* Keys that are actually pressed, or'ed */
+	uint8_t reads;
 } nes_pad;
 
 extern nes_pad pads[2];
+
+/* Initializes the pads */
+void initialize_pads();
 
 /* Update pads information for pressed keys */
 void nes_keydown(SDL_keysym keysym);

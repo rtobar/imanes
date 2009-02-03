@@ -1,9 +1,9 @@
  * Change the way that the CPU addresses are read/written. For this I should
    have  a separate (inline?) method to do this.
    * Handle the mirroring this way, also for the PPU VRAM
-
- * Draw first sprites / background / last sprites in separate layers, and do a
-   merge after that.
+ * Draw first sprites / background / last sprites in separate layers, and do
+   a merge after that.
  * Add initial support for user input through (configurable?) keys
+  * Support second pad
  * Fix *once for all* the background drawing
  * Fix the ADC/SBC instructions (recognize the C flag change)

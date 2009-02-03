@@ -5,6 +5,7 @@
 #include "cpu.h"
 #include "debug.h"
 #include "instruction_set.h"
+#include "pad.h"
 #include "ppu.h"
 
 nes_cpu *CPU;
@@ -575,6 +576,18 @@ void check_read_mapped_io(uint16_t address) {
 	else if( address == 0x2007 )
 		*(CPU->RAM + 0x2007) = *(PPU->VRAM + PPU->vram_addr);
 
+	/* 1st Joystick */
+	else if( address == 0x4016 ) {
+		pads[0].reads++;
+		*(CPU->RAM + 0x4016) = 0;
+		if( !pads[0].plugged )
+			*(CPU->RAM + 0x4016) = 2; // bit 1 set if not plugged
+
+		/* If we should return a key state... */
+		if( pads[0].reads <= 8 ) {
+			*(CPU->RAM + 0x4016) |= ((pads[0].pressed_keys >> (pads[0].reads-1)) & 0x1); 
+		}
+	}
 }
 
 /* Note: NMI is executed after inscreasing the PC! */
