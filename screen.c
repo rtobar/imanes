@@ -6,6 +6,8 @@
 #include "common.h"
 #include "screen.h"
 
+#define AMPLIFICATION (2)
+
 static SDL_Surface *nes_screen;
 
 void *screen_loop(void *args) {
@@ -50,7 +52,7 @@ void init_screen() {
 		exit(EXIT_FAILURE);
 	}
 
-	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH, NES_SCREEN_HEIGHT, NES_SCREEN_BPP, 0);
+	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*AMPLIFICATION, NES_SCREEN_HEIGHT*AMPLIFICATION, NES_SCREEN_BPP, 0);
 	if( nes_screen == NULL ) {
 		fprintf(stderr,"Eror while setting vide mode: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
@@ -66,6 +68,8 @@ void init_screen() {
 
 void draw_pixel(int x, int y, nes_palette color) {
 
+	int i;
+	int j;
 	Uint32 colour;
 	Uint32 *pixmem32;
 
@@ -75,7 +79,10 @@ void draw_pixel(int x, int y, nes_palette color) {
 	/* x = x*4 (32 bits per pixel); y = y*WIDTH*4 for the same reason */
 
 	pixmem32 = (Uint32*)nes_screen->pixels;
-	pixmem32[x+y*NES_SCREEN_WIDTH] = colour;
+
+	for(i=0;i!=AMPLIFICATION;i++)
+		for(j=0;j!=AMPLIFICATION;j++)
+			pixmem32[AMPLIFICATION*x+i+AMPLIFICATION*AMPLIFICATION*y*NES_SCREEN_WIDTH+j] = colour;
 }
 
 void redraw_screen() {
