@@ -10,6 +10,60 @@
 
 static SDL_Surface *nes_screen;
 
+void nes_keydown(SDL_keysym keysym) {
+
+	printf("Pressing a button...\n");
+	switch( keysym.sym ) {
+
+		/* Up */
+		case SDLK_w:
+			break;
+
+		/* Down */
+		case SDLK_s:
+			break;
+
+		/* Left */
+		case SDLK_a:
+			break;
+
+		/* Right */
+		case SDLK_d:
+			break;
+
+		default:
+			break;
+	}
+
+}
+
+void nes_keyup(SDL_keysym keysym) {
+
+	printf("Releasing a button...\n");
+	switch( keysym.sym ) {
+
+		/* Up */
+		case SDLK_w:
+			break;
+
+		/* Down */
+		case SDLK_s:
+			break;
+
+		/* Left */
+		case SDLK_a:
+			break;
+
+		/* Right */
+		case SDLK_d:
+			break;
+
+		default:
+			break;
+	}
+
+}
+
 void *screen_loop(void *args) {
 
 	SDL_Event event;
@@ -25,11 +79,11 @@ void *screen_loop(void *args) {
 		switch(event.type) {
 
 			case SDL_KEYDOWN:
-				printf("A key has been pressed, thanks :')\n");
-				printf("The keysym is %u\n", event.key.keysym.sym);
+				nes_keydown(event.key.keysym);
 				break;
 
 			case SDL_KEYUP:
+				nes_keyup(event.key.keysym);
 				break;
 
 			case SDL_QUIT:
