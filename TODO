@@ -1,0 +1,2 @@
+Change the way that the CPU addresses are read/written. For this I hsould have
+a separate (inline?) method to do this.
