@@ -7,7 +7,7 @@
 #include "pad.h"
 #include "screen.h"
 
-#define AMPLIFICATION (3)
+#define AMPLIFICATION (2)
 
 static SDL_Surface *nes_screen;
 
