@@ -154,6 +154,7 @@ void draw_line(int line) {
 				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 				col_index |=  (byte3&0x03) << 2;
 
+			if( col_index & 0x3 )
 				draw_pixel( tmp + tx , line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
 			}
 			
