@@ -26,7 +26,7 @@ void *screen_loop(void *args) {
 
 			case SDL_KEYDOWN:
 				printf("A key has been pressed, thanks :')\n");
-				printf("The keysym is %u", event.key.keysym.sym);
+				printf("The keysym is %u\n", event.key.keysym.sym);
 				break;
 
 			case SDL_KEYUP:
@@ -43,7 +43,7 @@ void *screen_loop(void *args) {
 
 void init_screen() {
 	
-	//pthread_t screen_thread;
+	pthread_t screen_thread;
 
 	char window_title[30];
 
@@ -51,7 +51,6 @@ void init_screen() {
 		fprintf(stderr,"Error when initializing screen: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
-	atexit(SDL_Quit);
 
 	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*AMPLIFICATION, NES_SCREEN_HEIGHT*AMPLIFICATION, NES_SCREEN_BPP, 0);
 	if( nes_screen == NULL ) {
@@ -63,7 +62,7 @@ void init_screen() {
 	SDL_WM_SetCaption(window_title,NULL);
 
 	/* The event loop should go in a separate thread */
-	//pthread_create(&screen_thread, NULL, screen_loop, NULL);
+	pthread_create(&screen_thread, NULL, screen_loop, NULL);
 
 }
 
