@@ -12,7 +12,6 @@ void initialize_pads() {
 
 void nes_keydown(SDL_keysym keysym) {
 
-	printf("Pressing a button...\n");
 	switch( keysym.sym ) {
 
 		/* Up */
@@ -63,7 +62,6 @@ void nes_keydown(SDL_keysym keysym) {
 
 void nes_keyup(SDL_keysym keysym) {
 
-	printf("Releasing a button...\n");
 	switch( keysym.sym ) {
 
 		/* Up */

@@ -65,8 +65,7 @@ void main_loop(ines_file *file) {
 		if( scanline_timeout <= 0 ) {
 
 			if( lines < NES_SCREEN_HEIGHT + 3 ) {
-				draw_line(lines);
-				lines++;
+				draw_line(lines++);
 			}
 			/* Start VBLANK period */
 			else if( lines == NES_SCREEN_HEIGHT + 3) {
