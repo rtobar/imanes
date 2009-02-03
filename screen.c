@@ -51,6 +51,7 @@ void init_screen() {
 		fprintf(stderr,"Error when initializing screen: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
+	atexit(SDL_Quit);
 
 	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*AMPLIFICATION, NES_SCREEN_HEIGHT*AMPLIFICATION, NES_SCREEN_BPP, 0);
 	if( nes_screen == NULL ) {

@@ -510,7 +510,7 @@ void check_write_mapped_io(uint16_t address) {
 			break;
 
 		case 0x2004:
-			printf("Writing into SPR RAM at address %02x\n", PPU->spr_addr);
+			XTREME( printf("Writing into SPR RAM at address %02x\n", PPU->spr_addr) );
 			*(PPU->SPR_RAM + PPU->spr_addr++) = *(CPU->RAM + 0x2004);
 			break;
 
