@@ -147,13 +147,14 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case BRK:
-			/* Set the interrupt flag, push the PC and the SR */
+			/* Set the interrupt flag, push the PC+2 (not a bug) and the SR */
 			/* Finally, jump to the interrump vector */
 			CPU->SR |= I_FLAG;
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
-			CPU->PC = (*(CPU->RAM + 0xFFFE) | (*(CPU->RAM + 0xFFFF)<<8) ) - 1;
+			CPU->PC = (*(CPU->RAM + 0xFFFE) | (*(CPU->RAM + 0xFFFF)<<8) );
+			CPU->PC -= inst.size;
 			break;
 
 		case BVC:
@@ -257,8 +258,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case JSR:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+inst.size) & 0xFF);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+inst.size) >> 8);
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -324,12 +325,12 @@ void execute_instruction(instruction inst, operand oper) {
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->A;
 			break;
 
-		case PLA:
-			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+		case PHP:
+			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
 			break;
 
-		case PHP:
-			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SR);
+		case PLA:
+			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
 			break;
 
 		case PLP:
@@ -375,13 +376,24 @@ void execute_instruction(instruction inst, operand oper) {
 		case RTS:
 			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
 			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
-			//CPU->PC -= inst.size;
+			CPU->PC -= inst.size;
 			break;
 
 		case RTI:
 			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
 			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
 			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			CPU->PC -= inst.size;
+			break;
+
+		case SBC:
+			if( inst.addr_mode != ADDR_IMMEDIATE ) {
+				check_read_mapped_io(oper.address);
+				oper.value = *(CPU->RAM + oper.address);
+			}
+			CPU->A = CPU->A - oper.value - (CPU->SR & C_FLAG);
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
 
 		case SEC:
 			CPU->SR |= C_FLAG;
@@ -563,13 +575,15 @@ void check_read_mapped_io(uint16_t address) {
 
 }
 
+/* Note: NMI is executed after inscreasing the PC! */
 void execute_nmi() {
 
+	DEBUG( printf("Executing NMI!\n") );
 	/* Push the PC and the SR */
 	/* Finally, jump to the interrump vector */
 	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
-	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
-	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC) & 0xFF);
+	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC) >> 8);
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
 }
