@@ -11,13 +11,17 @@
 #include "ppu.h"
 #include "screen.h"
 
+#define DUMPS   2
+
 void main_loop(ines_file *file) {
 
 	uint8_t opcode;
 	uint8_t *inst_address;
 	int scanline_timeout = CYCLES_PER_SCANLINE;
 	int lines, standard_lines;
+	int i;
 	struct timespec sleepTime = { 0, 10000000 };
+	uint16_t pc_dumps[DUMPS] = { 0xc068, 0xc08c };
 	operand operand = { 0, 0 };
 	instruction inst;
 
@@ -53,9 +57,14 @@ void main_loop(ines_file *file) {
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, inst_address);
 
-		DEBUG( printf(" operand: %04x\n", operand.address) );
+		DEBUG( printf(" operand: %04x / %02x\n", operand.address, operand.value) );
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
+
+		for(i=0;i!=DUMPS;i++) {
+			if(CPU->PC == pc_dumps[i] )
+				dump_cpu();
+		}
 
 		CPU->PC += inst.size;
 		CPU->cycles += inst.cycles;

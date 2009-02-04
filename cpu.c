@@ -483,6 +483,10 @@ void check_write_mapped_io(uint16_t address) {
 	static unsigned int strobe_pad = 0;
 	int i;
 
+	if( 0x2000 <= address && address <= 0x2006 ) {
+		printf("PPU: Write to PPU[%d]=$%02X PC=%04X\n", address - 0x2000, *(CPU->RAM + address), CPU->PC);
+	}
+
 	switch( address ) {
 
 		/* PPU control registers */
@@ -530,7 +534,6 @@ void check_write_mapped_io(uint16_t address) {
 			} else {
 				PPU->vram_addr |= *(CPU->RAM + 0x2006);
 				first_write = 1;
-				XTREME( printf("About to write to PPU VRAM %04x\n", PPU->vram_addr) );
 			}
 			break;
 
@@ -546,12 +549,8 @@ void check_write_mapped_io(uint16_t address) {
 		/* Sprite DMA */
 		case 0x4014:
 			address = *(CPU->RAM + 0x4014)*0x100;
-			XTREME( printf("DMA!!!\n") );
-			for(i=0;i!=256;i++) {
+			for(i=0;i!=256;i++) 
 				*(PPU->SPR_RAM + i) = *(CPU->RAM + address + i);
-				XTREME( printf("%02x ", *(CPU->RAM + address + i)) );
-			}
-			XTREME( printf("\n") );
 			CPU->cycles += 512;
 			break;
 
