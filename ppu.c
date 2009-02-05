@@ -167,6 +167,4 @@ void draw_line(int line) {
 		}
 	}
 
-	redraw_screen();
-
 }

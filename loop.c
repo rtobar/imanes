@@ -83,6 +83,7 @@ void main_loop(ines_file *file) {
 					CPU->cycles += 7;
 					execute_nmi();
 				}
+				redraw_screen();
 				lines++;
 				standard_lines = 0;
 			}
