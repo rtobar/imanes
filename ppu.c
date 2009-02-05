@@ -125,8 +125,9 @@ void draw_line(int line) {
 		/* Byte participating on the higher bits for the color */
 		byte3 = *(attr_table + (i >> 2) + (line >> 5)*NES_SCREEN_WIDTH/32);
 
-		if( !ty && byte3 )
+		XTREME( if( !ty && byte3 )
 			printf("Tile %d in (%d,%d), with attr (%d,%d). Attr is %02x, so corresponding is (%d,%d)\n", tile, i*8, line, (i >> 2), (line >> 5), byte3, ((i >> 1)&0x1), (line >> 4)&0x1);
+		);
 
 		for(tx=0;tx!=8;tx++) {
 			/* This is from the pattern table */

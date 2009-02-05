@@ -11,7 +11,7 @@
 #include "ppu.h"
 #include "screen.h"
 
-#define DUMPS   2
+#define DUMPS   1
 
 void main_loop(ines_file *file) {
 
@@ -20,13 +20,19 @@ void main_loop(ines_file *file) {
 	int scanline_timeout = CYCLES_PER_SCANLINE;
 	int lines, standard_lines;
 	int i;
-	struct timespec sleepTime = { 0, 10000000 };
-	uint16_t pc_dumps[DUMPS] = { 0xc068, 0xc08c };
+	struct timespec sleepTime = { 0, 2e7 };
+	struct timespec startTime;
+	struct timespec endTime;
+	uint16_t pc_dumps[DUMPS] = { 0xffff };
 	operand operand = { 0, 0 };
 	instruction inst;
 
 	lines = 0;
 	standard_lines = 0;
+
+	/* Get the initial time for the first screen drawing */
+	clock_gettime(CLOCK_REALTIME, &startTime);
+
 	/* This is the main loop */
 	for(;;) {
 
@@ -96,6 +102,23 @@ void main_loop(ines_file *file) {
 					standard_lines = 0;
 					lines = 0;
 					PPU->SR &= ~VBLANK_FLAG;
+
+					/* Calculate how much we should sleep for 50/60 FPS */
+					/* For this, we calculate the next "start" time,    */
+					/* and then we calculate the different between it   */
+					/* the actual time                                  */
+					clock_gettime(CLOCK_REALTIME, &endTime);
+					startTime.tv_nsec += 2e7;
+					if( startTime.tv_nsec > 1e9 ) {
+						startTime.tv_sec++;
+						startTime.tv_nsec -= 1e9;
+					}
+					sleepTime.tv_nsec = startTime.tv_nsec - endTime.tv_nsec;
+					sleepTime.tv_sec  = startTime.tv_sec  - endTime.tv_sec;
+					if( sleepTime.tv_nsec < 0 ) {
+						sleepTime.tv_sec--;
+						sleepTime.tv_nsec += 1e9;
+					}
 					nanosleep(&sleepTime, NULL);
 				}
 			}
