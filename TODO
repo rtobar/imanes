@@ -3,7 +3,11 @@
    * Handle the mirroring this way, also for the PPU VRAM
  * Draw first sprites / background / last sprites in separate layers, and do
    a merge after that.
- * Add initial support for user input through (configurable?) keys
+ * [DONE] Add initial support for user input through keyboard
   * Support second pad
+ * Support user configuration for several things
+  * Keys
+  * Video scaling
+  * Verbosity
  * Fix *once for all* the background drawing
  * Fix the ADC/SBC instructions (recognize the C flag change)
