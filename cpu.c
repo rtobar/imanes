@@ -495,18 +495,18 @@ void check_write_mapped_io(uint16_t address) {
 			break;
 		case 0x2001:
 			PPU->CR2 = *(CPU->RAM + 0x2001);
-			switch( (PPU->CR2 & 0x0E0) >> 5 ) {
+			switch( (PPU->CR2 & 0xE0) >> 5 ) {
 
-				case 0:
+				case 0: /* Black */
 					*(PPU->VRAM + 0x3F00) = 0x1D;
 					break;
-				case 1:
+				case 1: /* Green */
 					*(PPU->VRAM + 0x3F00) = 0x12;
 					break;
-				case 2:
+				case 2: /* Blue */
 					*(PPU->VRAM + 0x3F00) = 0x1A;
 					break;
-				case 3:
+				case 4: /* Green */
 					*(PPU->VRAM + 0x3F00) = 0x16;
 					break;
 
