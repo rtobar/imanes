@@ -65,6 +65,16 @@ void nes_keydown(SDL_keysym keysym) {
 			config.show_bg  = (config.show_bg  ? 0 : 1);
 			break;
 
+		/* Show pattern table */
+		case SDLK_F3:
+			config.show_patter_tables = (config.show_patter_tables ? 0 : 1);
+			break;
+
+		/* Show name table */
+		case SDLK_F4:
+			config.show_name_tables = (config.show_name_tables ? 0 : 1);
+			break;
+
 		default:
 			break;
 	}

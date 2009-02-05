@@ -4,8 +4,10 @@
 #include <stdint.h>
 
 typedef struct _config {
-	uint8_t show_spr;    /* Should we display sprites? */
-	uint8_t show_bg;     /* Should we display the background */
+	uint8_t show_spr;           /* Should we display sprites? */
+	uint8_t show_bg;            /* Should we display the background */
+	uint8_t show_patter_tables; /* Should we display PT in separate window */
+	uint8_t show_name_tables;   /* Should we display NT in separate window */
 } imanes_config;
 
 /* This is the global configuration */
