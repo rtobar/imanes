@@ -59,7 +59,7 @@ void init_cpu_ram(ines_file *file) {
 	}
 
 	/* We first need to check out where the game begins... */
-	/* For that, we see the address localted at the RESET vector */
+	/* For that, we see the address located at the RESET vector */
 	/* Remember that NES CPU is little endian */
 	CPU->PC = *(CPU->RAM + 0xFFFC) | ( *(CPU->RAM + 0xFFFD) << 8 );
 
@@ -149,7 +149,7 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case BRK:
 			/* Set the interrupt flag, push the PC+2 (not a bug) and the SR */
-			/* Finally, jump to the interrump vector */
+			/* Finally, jump to the interrupt vector */
 			CPU->SR |= I_FLAG;
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
@@ -310,7 +310,7 @@ void execute_instruction(instruction inst, operand oper) {
 			}
 			break;
 
-		case NOP: /* Perfect implemenation 8-) */
+		case NOP: /* Perfect implementation 8-) */
 			break;
 
 		case ORA:
@@ -614,7 +614,7 @@ void execute_nmi() {
 
 	DEBUG( printf("Executing NMI!\n") );
 	/* Push the PC and the SR */
-	/* Finally, jump to the interrump vector */
+	/* Finally, jump to the interrupt vector */
 	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
 	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC) & 0xFF);
 	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC) >> 8);

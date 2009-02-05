@@ -69,7 +69,7 @@ ines_file *check_ines_file(char *file_path) {
 
 	/* We currently support only No-mapper ROMs :P */
 	if( rom_file->mapper_id != 0 ) {
-		fprintf(stderr,"Sorry, but we currently suppor catridges using the '%s' Mapper\n",mapper_list[0]);
+		fprintf(stderr,"Sorry, but we currently support cartridges using the '%s' Mapper\n",mapper_list[0]);
 		fprintf(stderr,"I'm exiting now.\n\n");
 		exit(EXIT_FAILURE);
 	}

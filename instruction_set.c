@@ -64,10 +64,10 @@ void initialize_instruction_set() {
 	/* BRK instruction */
 	SET_INSTRUCTION_ADDR_DATA( BRK, IMPLIED, 0x00, 1, 7, NORMAL);
 
-	/* BVC nstruction */
+	/* BVC instruction */
 	SET_INSTRUCTION_ADDR_DATA( BVC, RELATIVE, 0x50, 2, 2, BRANCH);
 
-	/* BVS nstruction */
+	/* BVS instruction */
 	SET_INSTRUCTION_ADDR_DATA( BVS, RELATIVE, 0x70, 2, 2, BRANCH);
 
 	/* CLC instruction */ 

@@ -3,6 +3,6 @@ imaNES
 
 
 Well, welcome to the imaNES project. This project has started recently in an
-effort to add some inteligence to the emulation of a NES game. The idea is, that
+effort to add some intelligence to the emulation of a NES game. The idea is, that
 through the training of the machine, it could be capable of self-play the game,
 in order to win without problems.

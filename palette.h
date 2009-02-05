@@ -22,7 +22,7 @@ typedef struct _palette {
 extern nes_palette *system_palette;
 
 /**
- * This function initializes the pallete
+ * This function initializes the palette
  */
 void initialize_palette();
 
