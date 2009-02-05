@@ -49,11 +49,6 @@ void initialize_ppu();
 void init_ppu_vram(ines_file *);
 
 /**
- * Function called every VBlank interrumpt
- */
-void draw_screen();
-
-/**
  * Function called every time that we need to draw a scanline
  */
 void draw_line(int line);
