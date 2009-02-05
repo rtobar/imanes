@@ -113,7 +113,7 @@ void draw_line(int line) {
 		}
 	}
 
-	/* Draw the sprites */
+	/* Draw the front sprites */
 	if( config.show_spr ) {
 		for(i=sprites;i>=0;i--) {
 
