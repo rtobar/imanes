@@ -31,7 +31,7 @@ int main(int args, char *argv[]) {
 
 	setbuf(stdout,NULL);
 	setbuf(stderr,NULL);
-	verbosity = XTREME_LEVEL;
+	verbosity = INFO_LEVEL;
 
 	/* Initialize static data */
 	initialize_configuration();
