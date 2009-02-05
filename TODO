@@ -10,4 +10,5 @@
   * Video scaling
   * Verbosity
  * Fix *once for all* the background drawing
+ * Fix sprite drawing (they seem to be 1 pixel above where they should be)
  * Fix the ADC/SBC instructions (recognize the C flag change)
