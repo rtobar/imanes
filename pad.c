@@ -1,3 +1,4 @@
+#include "config.h"
 #include "pad.h"
 
 nes_pad pads[2];
@@ -52,6 +53,16 @@ void nes_keydown(SDL_keysym keysym) {
 		/* Select button */
 		case SDLK_RCTRL:
 			pads[0].pressed_keys |= NES_SELECT;
+			break;
+
+		/* Show sprites */
+		case SDLK_F1:
+			config.show_spr = (config.show_spr ? 0 : 1);
+			break;
+
+		/* Show background */
+		case SDLK_F2:
+			config.show_bg  = (config.show_bg  ? 0 : 1);
 			break;
 
 		default:

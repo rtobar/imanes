@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "config.h"
 #include "cpu.h"
 #include "debug.h"
 #include "instruction_set.h"
@@ -33,6 +34,7 @@ int main(int args, char *argv[]) {
 	verbosity = INFO_LEVEL;
 
 	/* Initialize static data */
+	initialize_configuration();
 	initialize_palette();
 	initialize_mapper_list();
 	initialize_instruction_set();
