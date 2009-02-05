@@ -483,9 +483,9 @@ void check_write_mapped_io(uint16_t address) {
 	static unsigned int strobe_pad = 0;
 	int i;
 
-	if( 0x2000 <= address && address <= 0x2006 ) {
+	XTREME( if( 0x2000 <= address && address <= 0x2006 ) {
 		printf("PPU: Write to PPU[%d]=$%02X PC=%04X\n", address - 0x2000, *(CPU->RAM + address), CPU->PC);
-	}
+	} );
 
 	switch( address ) {
 
