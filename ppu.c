@@ -65,12 +65,14 @@ void draw_line(int line) {
 		tmp = *(PPU->SPR_RAM + 4*i*(big_sprite+1));
 		if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
 			drawable_sprites[sprites++] = i;
-			if( sprites == 8 ) {
-				PPU->SR |= MAX_SPRITES_DRAWN;
+			if( sprites == 8 )
 				break;
-			}
 		}
 	}
+	if( sprites != 8 )
+		PPU->SR &= ~MAX_SPRITES_DRAWN;
+	else
+		PPU->SR |= MAX_SPRITES_DRAWN;
 	sprites--;
 
 
@@ -83,28 +85,28 @@ void draw_line(int line) {
 	/* Draw the background tiles */
 	if( config.show_bg ) {
 		for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
-	
+
 			/* Get the 8x8 pixel table where the line is present */
 			tile = *(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
-	
+
 			/* Bytes that participate on the lower bits for the color */
 			byte1 = *(scr_patt_table + tile*0x10 + ty);
 			byte2 = *(scr_patt_table + tile*0x10 + ty + 0x08);
 			/* Byte participating on the higher bits for the color */
 			byte3 = *(attr_table + (i >> 2) + (line >> 5)*NES_SCREEN_WIDTH/32);
-	
+
 			XTREME( if( !ty && byte3 )
 				printf("Tile %d in (%d,%d), with attr (%d,%d). Attr is %02x, so corresponding is (%d,%d)\n", tile, i*8, line, (i >> 2), (line >> 5), byte3, ((i >> 1)&0x1), (line >> 4)&0x1);
 			);
-	
+
 			for(tx=0;tx!=8;tx++) {
 				/* This is from the pattern table */
 				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
-	
+
 				/* And this from the attribute table */
 				tmp = (((line >> 4)&0x1)<<1) + ((i >> 1)&0x1);
 				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
-	
+
 				if( col_index & 0x3 )
 					draw_pixel(i*8+tx, line, system_palette[*(PPU->VRAM + 0x3F00 + col_index)]);
 			}
@@ -114,7 +116,7 @@ void draw_line(int line) {
 	/* Draw the sprites */
 	if( config.show_spr ) {
 		for(i=sprites;i>=0;i--) {
-	
+
 			/* 8x8 sprites */
 			if(!big_sprite) {
 				ty = line - *(PPU->SPR_RAM + 4*drawable_sprites[i]);
@@ -126,13 +128,13 @@ void draw_line(int line) {
 				for(tx=0;tx!=8;tx++) {
 					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 					col_index |=  (byte3&0x03) << 2;
-	
+
 					if( col_index & 0x3 )
 						draw_pixel( tmp + tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
 				}
 				
 			}
-	
+
 			else {
 				fprintf(stderr,"Still not implemented :(\n");
 			}
