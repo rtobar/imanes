@@ -19,7 +19,9 @@ void main_loop(ines_file *file) {
 	uint8_t *inst_address;
 	int scanline_timeout = CYCLES_PER_SCANLINE;
 	int lines, standard_lines;
+	int frames;
 	int i;
+	long tmp;
 	struct timespec sleepTime = { 0, 2e7 };
 	struct timespec startTime;
 	struct timespec endTime;
@@ -27,6 +29,7 @@ void main_loop(ines_file *file) {
 	operand operand = { 0, 0 };
 	instruction inst;
 
+	frames = 0;
 	lines = 0;
 	standard_lines = 0;
 
@@ -91,6 +94,7 @@ void main_loop(ines_file *file) {
 				}
 				redraw_screen();
 				lines++;
+				frames++;
 				standard_lines = 0;
 			}
 			/* VBLANK period */
@@ -107,19 +111,27 @@ void main_loop(ines_file *file) {
 					/* For this, we calculate the next "start" time,    */
 					/* and then we calculate the different between it   */
 					/* the actual time                                  */
+					tmp = endTime.tv_sec;
 					clock_gettime(CLOCK_REALTIME, &endTime);
 					startTime.tv_nsec += 2e7;
 					if( startTime.tv_nsec > 1e9 ) {
 						startTime.tv_sec++;
 						startTime.tv_nsec -= 1e9;
 					}
+
+					if( endTime.tv_sec != tmp ) {
+						fprintf(stderr,"Running at %d fps\n",frames);
+						frames = 0;
+					}
+
 					sleepTime.tv_nsec = startTime.tv_nsec - endTime.tv_nsec;
 					sleepTime.tv_sec  = startTime.tv_sec  - endTime.tv_sec;
 					if( sleepTime.tv_nsec < 0 ) {
 						sleepTime.tv_sec--;
 						sleepTime.tv_nsec += 1e9;
 					}
-					nanosleep(&sleepTime, NULL);
+					if( sleepTime.tv_sec >= 0 )
+						nanosleep(&sleepTime, NULL);
 				}
 			}
 
