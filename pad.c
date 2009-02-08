@@ -1,4 +1,5 @@
 #include "config.h"
+#include "debug.h"
 #include "pad.h"
 
 nes_pad pads[2];
@@ -57,11 +58,13 @@ void nes_keydown(SDL_keysym keysym) {
 
 		/* Show sprites */
 		case SDLK_F1:
+			INFO( printf("Sprites %s\n", (config.show_spr ? "OFF": "ON")) );
 			config.show_spr = (config.show_spr ? 0 : 1);
 			break;
 
 		/* Show background */
 		case SDLK_F2:
+			INFO( printf("Background %s\n", (config.show_bg  ? "OFF" : "ON")) );
 			config.show_bg  = (config.show_bg  ? 0 : 1);
 			break;
 
