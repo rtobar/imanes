@@ -17,7 +17,6 @@ void initialize_ppu() {
 	PPU = (nes_ppu *)malloc(sizeof(nes_ppu));
 	PPU->VRAM = (uint8_t *)malloc(NES_VRAM_SIZE);
 	PPU->SPR_RAM = (uint8_t *)malloc(256);
-	//PPU->SR = VBLANK_FLAG;
 
 }
 
@@ -53,8 +52,8 @@ void draw_line(int line) {
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
 	name_table     = PPU->VRAM + 0x2000 + 0x400*(PPU->CR1 & 0x03);
 	attr_table     = name_table + 0x3C0;
-	scr_patt_table = PPU->VRAM + ((PPU->CR1&SCR_PATTERN_ADDRESS)>>3)*0x1000;
-	spr_patt_table = PPU->VRAM + ((PPU->CR1&SPR_PATTERN_ADDRESS)>>4)*0x1000;
+	spr_patt_table = PPU->VRAM + ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
+	scr_patt_table = PPU->VRAM + ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
 
 
 	/* Identify which sprites have to be drawn */
