@@ -13,6 +13,8 @@
 
 #define DUMPS   1
 
+pthread_mutex_t pause_mutex;
+
 void main_loop(ines_file *file) {
 
 	uint8_t opcode;
@@ -33,11 +35,20 @@ void main_loop(ines_file *file) {
 	lines = 0;
 	standard_lines = 0;
 
+	pthread_mutex_init(&pause_mutex, NULL);
+
 	/* Get the initial time for the first screen drawing */
 	clock_gettime(CLOCK_REALTIME, &startTime);
 
 	/* This is the main loop */
 	for(;;) {
+
+		/* First, of all, we check if we should pause the emulation 
+		   We do so until the mutex has been released by the user
+		   Anyways, we don't hold it locked, so the user can pause the
+		   emulation again */
+		pthread_mutex_lock(&pause_mutex);
+		pthread_mutex_unlock(&pause_mutex);
 
 		/* Whenever we do a reset, we first need to check out where the game
  		 * begins. For that, we see the address located at the RESET vector

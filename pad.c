@@ -1,6 +1,7 @@
 #include "config.h"
 #include "cpu.h"
 #include "debug.h"
+#include "loop.h"
 #include "pad.h"
 
 nes_pad pads[2];
@@ -83,6 +84,15 @@ void nes_keydown(SDL_keysym keysym) {
 		case SDLK_F5:
 			INFO( printf("Reseting NES\n") );
 			CPU->reset = 1;
+			break;
+
+		/* Pause */
+		case SDLK_F6:
+			INFO( printf("Pausing emulation\n") );
+			if( !config.pause )
+				pthread_mutex_lock(&pause_mutex);
+			else
+				pthread_mutex_unlock(&pause_mutex);
 			break;
 
 		default:

@@ -11,4 +11,7 @@ void initialize_configuration() {
 	/* Separate windows */
 	config.show_patter_tables = 0;
 	config.show_name_tables   = 0;
+
+	/* Start on non-pause */
+	config.pause = 0;
 }

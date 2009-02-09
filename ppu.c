@@ -106,7 +106,7 @@ void draw_line(int line) {
 				tmp = (((line >> 4)&0x1)<<1) + ((i >> 1)&0x1);
 				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
-				if( col_index )
+				//if( col_index )
 					draw_pixel(i*8+tx, line, system_palette[*(PPU->VRAM + 0x3F00 + col_index)]);
 			}
 		}
