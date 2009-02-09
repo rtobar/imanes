@@ -1,4 +1,5 @@
 #include "config.h"
+#include "cpu.h"
 #include "debug.h"
 #include "pad.h"
 
@@ -76,6 +77,12 @@ void nes_keydown(SDL_keysym keysym) {
 		/* Show name table */
 		case SDLK_F4:
 			config.show_name_tables = (config.show_name_tables ? 0 : 1);
+			break;
+
+		/* Reset */
+		case SDLK_F5:
+			INFO( printf("Reseting NES\n") );
+			CPU->reset = 1;
 			break;
 
 		default:

@@ -39,6 +39,14 @@ void main_loop(ines_file *file) {
 	/* This is the main loop */
 	for(;;) {
 
+		/* Whenever we do a reset, we first need to check out where the game
+ 		 * begins. For that, we see the address located at the RESET vector
+ 		 */
+		if( CPU->reset ) {
+			CPU->PC = *(CPU->RAM + 0xFFFC) | ( *(CPU->RAM + 0xFFFD) << 8 );
+			CPU->reset = 0;
+		}
+
 		/* inst_address saves the current process' memory
 		 * pointer for the NES CPU' PC. This way we can
 		 * debug easier the value of NES PC */

@@ -17,6 +17,9 @@ typedef struct {
 
 	/* Memory */
 	uint8_t *RAM;
+
+	/* Reset button pressed */
+	uint8_t reset;
 } nes_cpu;
 
 /** SR flags */

@@ -16,6 +16,9 @@ void initialize_cpu() {
 	CPU->cycles = 0;
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
 	CPU->SP  = 0;
+	CPU->reset = 1;
+
+	return;
 }
 
 void dump_cpu() {
@@ -57,11 +60,6 @@ void init_cpu_ram(ines_file *file) {
 		memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
 		memcpy( CPU->RAM + 0xC000, file->rom + 0x4000, 0x4000);
 	}
-
-	/* We first need to check out where the game begins... */
-	/* For that, we see the address located at the RESET vector */
-	/* Remember that NES CPU is little endian */
-	CPU->PC = *(CPU->RAM + 0xFFFC) | ( *(CPU->RAM + 0xFFFD) << 8 );
 
 }
 
