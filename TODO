@@ -1,6 +1,9 @@
  * Change the way that the CPU addresses are read/written. For this I should
    have a separate (inline?) method to do this.
    * Handle the mirroring this way, also for the PPU VRAM
+   * This could not be a good idea. For example, the PPU->SR is updated when
+     you read on CPU's RAM 0x2000, so it could be a good idea to leave them
+     totally separated.
  * Draw first sprites / background / last sprites in separate layers, and do
    a merge after that.
  * [DONE] Add initial support for user input through keyboard
@@ -9,7 +12,7 @@
   * Keys
   * Video scaling
   * Verbosity
- * Fix *once for all* the background drawing
+ * [TESTING] Fix *once for all* the background drawing
  * [TESTING] Fix sprite drawing (they seem to be 1 pixel above)
  * Fix the ADC/SBC instructions (recognize the C flag change)
  * Add a pause option (using pthread_mutex I think...)
