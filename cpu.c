@@ -403,6 +403,10 @@ void execute_instruction(instruction inst, operand oper) {
 			CPU->SR |= C_FLAG;
 			break;
 
+		case SED:
+			CPU->SR |= D_FLAG;
+			break;
+
 		case SEI:
 			CPU->SR |= I_FLAG;
 			break;
@@ -537,11 +541,13 @@ void check_write_mapped_io(uint16_t address) {
 
 		/* Data written into PPU->vram_address */
 		case 0x2007:
-			*(PPU->VRAM + PPU->vram_addr) = *(CPU->RAM + 0x2007);
-			if( PPU->CR1 & VERTICAL_WRITE)
-				PPU->vram_addr += 32;
-			else
-				PPU->vram_addr++;
+			if( !(PPU->SR & IGNORE_VRAM_WRITE) ) {
+				*(PPU->VRAM + PPU->vram_addr) = *(CPU->RAM + 0x2007);
+				if( PPU->CR1 & VERTICAL_WRITE)
+					PPU->vram_addr += 32;
+				else
+					PPU->vram_addr++;
+			}
 			break;
 
 		/* Sprite DMA */
