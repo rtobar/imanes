@@ -61,7 +61,7 @@ void draw_line(int line) {
 	big_sprite = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
 	sprites = 0;
 	for(i=0;i!=64/(big_sprite+1);i++) {
-		tmp = *(PPU->SPR_RAM + 4*i*(big_sprite+1));
+		tmp = *(PPU->SPR_RAM + 4*i*(big_sprite+1)) + 1;
 		if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
 			drawable_sprites[sprites++] = i;
 			if( sprites == 8 )
@@ -106,7 +106,7 @@ void draw_line(int line) {
 				tmp = (((line >> 4)&0x1)<<1) + ((i >> 1)&0x1);
 				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
-				if( col_index & 0x3 )
+				if( col_index )
 					draw_pixel(i*8+tx, line, system_palette[*(PPU->VRAM + 0x3F00 + col_index)]);
 			}
 		}
@@ -118,7 +118,7 @@ void draw_line(int line) {
 
 			/* 8x8 sprites */
 			if(!big_sprite) {
-				ty = line - *(PPU->SPR_RAM + 4*drawable_sprites[i]);
+				ty = line - *(PPU->SPR_RAM + 4*drawable_sprites[i]) - 1;
 				tile = *(PPU->SPR_RAM + 4*drawable_sprites[i] + 1);
 				tmp  = *(PPU->SPR_RAM + 4*drawable_sprites[i] + 3); /* X origin */
 				byte1 = *(spr_patt_table + tile*0x10 + ty);
@@ -128,7 +128,7 @@ void draw_line(int line) {
 					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 					col_index |=  (byte3&0x03) << 2;
 
-					if( col_index & 0x3 )
+					if( col_index & 0x03 )
 						draw_pixel( tmp + tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
 				}
 				
