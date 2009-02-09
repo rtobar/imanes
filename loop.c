@@ -120,7 +120,7 @@ void main_loop(ines_file *file) {
 					}
 
 					if( endTime.tv_sec != tmp ) {
-						fprintf(stderr,"Running at %d fps\n",frames);
+						DEBUG( fprintf(stderr,"Running at %d fps\n",frames) );
 						frames = 0;
 					}
 
