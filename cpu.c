@@ -15,7 +15,7 @@ void initialize_cpu() {
 	CPU = (nes_cpu *)malloc(sizeof(nes_cpu));
 	CPU->cycles = 0;
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
-	CPU->SP  = 0;
+	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
 	CPU->reset = 1;
 
 	return;
@@ -39,11 +39,13 @@ void dump_stack() {
 
 	int i;
 
-	printf("CPU Stack:\n==========\n\n");
-	for( i=0; i!=CPU->SP;i++) {
+	printf("CPU Stack:\n==========\nStart: ");
+	for( i=255; i!=(uint8_t)CPU->SP;i--) {
 		printf("%02x ", *(CPU->RAM + BEGIN_STACK + i));
 	}
 	printf("\n");
+
+	return;
 }
 
 void init_cpu_ram(ines_file *file) {
@@ -51,14 +53,14 @@ void init_cpu_ram(ines_file *file) {
 	/* 1 ROM bank games load twice to ensure vector tables */
 	/* Free the file ROM (we don't need it anymore) */
 	if( file->romBanks == 1 ) {
-		memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
-		memcpy( CPU->RAM + 0xC000, CPU->RAM + 0x8000, 0x4000);
+		memcpy( CPU->RAM + 0x8000, file->rom, ROM_BANK_SIZE);
+		memcpy( CPU->RAM + 0xC000, CPU->RAM + 0x8000, ROM_BANK_SIZE);
 	}
 	/* 2 ROM bank games load one in 0x8000 and other in 0xC000 */
 	/* Free the file ROM (we don't need it anymore) */
 	else if (file->romBanks == 2 ) {
-		memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
-		memcpy( CPU->RAM + 0xC000, file->rom + 0x4000, 0x4000);
+		memcpy( CPU->RAM + 0x8000, file->rom, ROM_BANK_SIZE);
+		memcpy( CPU->RAM + 0xC000, file->rom + ROM_BANK_SIZE, ROM_BANK_SIZE);
 	}
 
 }
@@ -150,9 +152,9 @@ void execute_instruction(instruction inst, operand oper) {
 			/* Set the interrupt flag, push the PC+2 (not a bug) and the SR */
 			/* Finally, jump to the interrupt vector */
 			CPU->SR |= B_FLAG;
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+2) & 0xFF);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+2) >> 8);
 			CPU->PC = (*(CPU->RAM + 0xFFFE) | (*(CPU->RAM + 0xFFFF)<<8) );
 			CPU->PC -= inst.size;
 			break;
@@ -264,8 +266,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case JSR:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+inst.size) & 0xFF);
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+inst.size) >> 8);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+inst.size) & 0xFF);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+inst.size) >> 8);
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -326,20 +328,20 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case PHA:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->A;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->A;
 			break;
 
 		case PHP:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
 			break;
 
 		case PLA:
-			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			CPU->A = *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case PLP:
-			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			CPU->SR = *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
 			break;
 
 		case ROL:
@@ -383,15 +385,15 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case RTI:
-			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
-			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
-			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			CPU->SR =  *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
+			CPU->PC =  *(CPU->RAM + BEGIN_STACK + ++CPU->SP) << 8;
+			CPU->PC |= *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
 			CPU->PC -= inst.size;
 			break;
 
 		case RTS:
-			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
-			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			CPU->PC =  *(CPU->RAM + BEGIN_STACK + ++CPU->SP) << 8;
+			CPU->PC |= *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
 			CPU->PC -= inst.size;
 			break;
 
@@ -442,7 +444,7 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case TSX:
-			CPU->X = BEGIN_STACK + CPU->SP;
+			CPU->X = CPU->SP;
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
@@ -453,7 +455,6 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case TXS:
 			CPU->SP = CPU->X;
-			CPU->SP -= BEGIN_STACK;
 			break;
 
 		case TYA:
@@ -623,9 +624,9 @@ void execute_nmi() {
 	DEBUG( printf("Executing NMI!\n") );
 	/* Push the PC and the SR */
 	/* Finally, jump to the interrupt vector */
-	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
-	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC) & 0xFF);
-	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC) >> 8);
+	*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC) & 0xFF);
+	*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC) >> 8);
+	*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
 }

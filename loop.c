@@ -89,10 +89,9 @@ void main_loop(ines_file *file) {
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 
-		for(i=0;i!=DUMPS;i++) {
-			if(CPU->PC == pc_dumps[i] )
+		for(i=0;i!=DUMPS;i++)
+			if(CPU->PC == pc_dumps[i])
 				dump_cpu();
-		}
 
 		CPU->PC += inst.size;
 		CPU->cycles += inst.cycles;
