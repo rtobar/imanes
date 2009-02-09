@@ -1,8 +1,40 @@
-imaNES
+ImaNES
 ======
 
 
-Well, welcome to the imaNES project. This project has started recently in an
-effort to add some intelligence to the emulation of a NES game. The idea is, that
-through the training of the machine, it could be capable of self-play the game,
-in order to win without problems.
+Well, welcome to the ImaNES project. This project has started recently in an
+effort to add some intelligence to the emulation of a NES game. The idea is,
+that through the training of the machine, it could be capable of self-play the
+game, in order to win without problems.
+
+Anyways, the first goal of this project is to emulate a NES properly. With some
+functionalities missing, it could be considered to emulate well a NES (for
+example, the sound could be missing, but the user input not). Therefore, the
+first version of ImaNES will be just an emulator, with the most basic things,
+but future versions should have more improvements, in the emulation side, in the
+intelligence side, and also on the user experience side.
+
+Hope you enjoy ImaNES!
+
+
+Compiling
+=========
+
+imaNES has been developed under Linux, using the gcc compiler. SDL libraries on
+your system should be enough to compile it without problems. A simple Makefile
+is also distributed with the source code to ease the compilation. After
+compiling, a binary called "imanes" should be generated in the same directory as
+the source code is placed.
+
+
+Contact
+=======
+
+Doubts, questions, tips, congratulations? Please, don't hesitate to contact any
+of the authors, depending on your needs. Please check out the AUTHORS file in
+this same directory for the e-mail addresses of each of them, and their roles
+inside the project.
+
+There is also the ImaNES web page, located at
+
+https://csrg.inf.utfsm.cl/twiki4/bin/view/CSRG/ImaNES
