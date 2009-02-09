@@ -89,22 +89,20 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case ASL:
 			if( inst.addr_mode == ADDR_ACCUM ) {
-				if( CPU->A  & 0x8 )	
-					CPU->SR |= C_FLAG;
-				else
-					CPU->SR &= ~C_FLAG;
+				tmp = CPU->A >> 7;
 				CPU->A <<= 1;
 				update_flags(CPU->A, N_FLAG | Z_FLAG);
 			}
 			else {
 				check_read_mapped_io(oper.address);
-				if( *(CPU->RAM + oper.address)  & 0x8 )
-					CPU->SR |= C_FLAG;
-				else
-					CPU->SR &= ~C_FLAG;
+				tmp = *(CPU->RAM + oper.address) >> 7;
 				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
 				update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
 			}
+			if( tmp )	
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			break;
 
 		case BCC:
@@ -124,10 +122,13 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case BIT:
 			check_read_mapped_io(oper.address);
-			tmp = CPU->A & *(CPU->RAM + oper.address);
+			tmp = *(CPU->RAM + oper.address);
 			if( (tmp >> 6)  & 0x01 )
 				CPU->SR |= V_FLAG;
-			update_flags(tmp, N_FLAG | Z_FLAG);
+			else
+				CPU->SR &= ~V_FLAG;
+			update_flags(tmp, N_FLAG);
+			update_flags(tmp & CPU->A, Z_FLAG);
 			break;
 
 		case BMI:
@@ -148,7 +149,7 @@ void execute_instruction(instruction inst, operand oper) {
 		case BRK:
 			/* Set the interrupt flag, push the PC+2 (not a bug) and the SR */
 			/* Finally, jump to the interrupt vector */
-			CPU->SR |= I_FLAG;
+			CPU->SR |= B_FLAG;
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
 			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
@@ -189,6 +190,8 @@ void execute_instruction(instruction inst, operand oper) {
 			}
 			if( CPU->A >= oper.value)
 				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			update_flags(CPU->A - oper.value, N_FLAG | Z_FLAG);
 			break;
 
@@ -199,6 +202,8 @@ void execute_instruction(instruction inst, operand oper) {
 			}
 			if( CPU->X >= oper.value)
 				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			update_flags(CPU->X - oper.value, N_FLAG | Z_FLAG);
 			break;
 
@@ -209,6 +214,8 @@ void execute_instruction(instruction inst, operand oper) {
 			}
 			if( CPU->Y >= oper.value)
 				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			update_flags(CPU->Y - oper.value, N_FLAG | Z_FLAG);
 			break;
 
@@ -291,21 +298,19 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case LSR:
 			if( inst.addr_mode == ADDR_ACCUM ) {
-				if( CPU->A  & 0x1 )	
-					CPU->SR |= C_FLAG;
-				else
-					CPU->SR &= ~C_FLAG;
+				tmp = CPU->A  & 0x1;
 				CPU->A >>= 1;
 				update_flags(CPU->A, Z_FLAG);
 			}
 			else {
-				if( *(CPU->RAM + oper.address)  & 0x1 )	
-					CPU->SR |= C_FLAG;
-				else
-					CPU->SR &= ~C_FLAG;
+				tmp = *(CPU->RAM + oper.address)  & 0x1;
 				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
 				update_flags(*(CPU->RAM + oper.address), Z_FLAG);
 			}
+			if( tmp )	
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			break;
 
 		case NOP: /* Perfect implementation 8-) */
@@ -330,6 +335,7 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case PLA:
 			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case PLP:
@@ -345,7 +351,7 @@ void execute_instruction(instruction inst, operand oper) {
 			} else {
 				check_read_mapped_io(oper.address);
 				tmp = *(CPU->RAM + oper.address) >> 7;
-				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
+				*(CPU->RAM + oper.address) <<= 1;
 				*(CPU->RAM + oper.address) |= (CPU->SR & C_FLAG);
 				check_write_mapped_io(oper.address);
 				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
@@ -365,22 +371,15 @@ void execute_instruction(instruction inst, operand oper) {
 			} else {
 				check_read_mapped_io(oper.address);
 				tmp = *(CPU->RAM + oper.address) & 0x1;
-				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) >> 1;
-				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) | ((CPU->SR & C_FLAG) << 7);
+				*(CPU->RAM + oper.address) >>= 1;
+				*(CPU->RAM + oper.address) |= ((CPU->SR & C_FLAG) << 7);
 				check_write_mapped_io(oper.address);
-				CPU->SR |= tmp;
 				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
 			}
 			if( tmp )
 				CPU->SR |= C_FLAG;
 			else
 				CPU->SR &= ~C_FLAG;
-			break;
-
-		case RTS:
-			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
-			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
-			CPU->PC -= inst.size;
 			break;
 
 		case RTI:
@@ -390,12 +389,18 @@ void execute_instruction(instruction inst, operand oper) {
 			CPU->PC -= inst.size;
 			break;
 
+		case RTS:
+			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
+			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			CPU->PC -= inst.size;
+			break;
+
 		case SBC:
 			if( inst.addr_mode != ADDR_IMMEDIATE ) {
 				check_read_mapped_io(oper.address);
 				oper.value = *(CPU->RAM + oper.address);
 			}
-			CPU->A = CPU->A - oper.value - (CPU->SR & C_FLAG);
+			CPU->A = CPU->A - oper.value - (1 - (CPU->SR & C_FLAG));
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
@@ -449,7 +454,6 @@ void execute_instruction(instruction inst, operand oper) {
 		case TXS:
 			CPU->SP = CPU->X;
 			CPU->SP -= BEGIN_STACK;
-			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
 		case TYA:
