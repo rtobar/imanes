@@ -15,4 +15,4 @@
  * [TESTING] Fix *once for all* the background drawing
  * [TESTING] Fix sprite drawing (they seem to be 1 pixel above)
  * Fix the ADC/SBC instructions (recognize the C flag change)
- * Add a pause option (using pthread_mutex I think...)
+ * [DONE] Add a pause option (using pthread_mutex I think...)
