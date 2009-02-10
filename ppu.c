@@ -118,12 +118,19 @@ void draw_line(int line) {
 
 			/* 8x8 sprites */
 			if(!big_sprite) {
+
+				/* Here we have color index and h/v flip */
+				byte3 = *(PPU->SPR_RAM + 4*drawable_sprites[i] + 2);
+
+				/* y coord. If V Flip... */
 				ty = line - *(PPU->SPR_RAM + 4*drawable_sprites[i]) - 1;
+				if( byte3 & 0x80 )
+					ty = 7 - ty;
+
 				tile = *(PPU->SPR_RAM + 4*drawable_sprites[i] + 1);
 				tmp  = *(PPU->SPR_RAM + 4*drawable_sprites[i] + 3); /* X origin */
 				byte1 = *(spr_patt_table + tile*0x10 + ty);
 				byte2 = *(spr_patt_table + tile*0x10 + ty + 0x08);
-				byte3 = *(PPU->SPR_RAM + 4*drawable_sprites[i] + 2);
 				for(tx=0;tx!=8;tx++) {
 					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 					col_index |=  (byte3&0x03) << 2;
