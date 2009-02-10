@@ -15,7 +15,7 @@ void initialize_cpu() {
 	CPU = (nes_cpu *)malloc(sizeof(nes_cpu));
 	CPU->cycles = 0;
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
-	CPU->SP  = 0;
+	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
 	CPU->reset = 1;
 
 	return;
@@ -39,11 +39,13 @@ void dump_stack() {
 
 	int i;
 
-	printf("CPU Stack:\n==========\n\n");
-	for( i=0; i!=CPU->SP;i++) {
+	printf("CPU Stack:\n==========\nStart: ");
+	for( i=255; i!=(uint8_t)CPU->SP;i--) {
 		printf("%02x ", *(CPU->RAM + BEGIN_STACK + i));
 	}
 	printf("\n");
+
+	return;
 }
 
 void init_cpu_ram(ines_file *file) {
@@ -51,14 +53,14 @@ void init_cpu_ram(ines_file *file) {
 	/* 1 ROM bank games load twice to ensure vector tables */
 	/* Free the file ROM (we don't need it anymore) */
 	if( file->romBanks == 1 ) {
-		memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
-		memcpy( CPU->RAM + 0xC000, CPU->RAM + 0x8000, 0x4000);
+		memcpy( CPU->RAM + 0x8000, file->rom, ROM_BANK_SIZE);
+		memcpy( CPU->RAM + 0xC000, CPU->RAM + 0x8000, ROM_BANK_SIZE);
 	}
 	/* 2 ROM bank games load one in 0x8000 and other in 0xC000 */
 	/* Free the file ROM (we don't need it anymore) */
 	else if (file->romBanks == 2 ) {
-		memcpy( CPU->RAM + 0x8000, file->rom, 0x4000);
-		memcpy( CPU->RAM + 0xC000, file->rom + 0x4000, 0x4000);
+		memcpy( CPU->RAM + 0x8000, file->rom, ROM_BANK_SIZE);
+		memcpy( CPU->RAM + 0xC000, file->rom + ROM_BANK_SIZE, ROM_BANK_SIZE);
 	}
 
 }
@@ -89,22 +91,20 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case ASL:
 			if( inst.addr_mode == ADDR_ACCUM ) {
-				if( CPU->A  & 0x8 )	
-					CPU->SR |= C_FLAG;
-				else
-					CPU->SR &= ~C_FLAG;
+				tmp = CPU->A >> 7;
 				CPU->A <<= 1;
 				update_flags(CPU->A, N_FLAG | Z_FLAG);
 			}
 			else {
 				check_read_mapped_io(oper.address);
-				if( *(CPU->RAM + oper.address)  & 0x8 )
-					CPU->SR |= C_FLAG;
-				else
-					CPU->SR &= ~C_FLAG;
+				tmp = *(CPU->RAM + oper.address) >> 7;
 				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
 				update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
 			}
+			if( tmp )	
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			break;
 
 		case BCC:
@@ -124,10 +124,13 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case BIT:
 			check_read_mapped_io(oper.address);
-			tmp = CPU->A & *(CPU->RAM + oper.address);
+			tmp = *(CPU->RAM + oper.address);
 			if( (tmp >> 6)  & 0x01 )
 				CPU->SR |= V_FLAG;
-			update_flags(tmp, N_FLAG | Z_FLAG);
+			else
+				CPU->SR &= ~V_FLAG;
+			update_flags(tmp, N_FLAG);
+			update_flags(tmp & CPU->A, Z_FLAG);
 			break;
 
 		case BMI:
@@ -148,10 +151,10 @@ void execute_instruction(instruction inst, operand oper) {
 		case BRK:
 			/* Set the interrupt flag, push the PC+2 (not a bug) and the SR */
 			/* Finally, jump to the interrupt vector */
-			CPU->SR |= I_FLAG;
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) & 0xFF);
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+2) >> 8);
+			CPU->SR |= B_FLAG;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+2) & 0xFF);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+2) >> 8);
 			CPU->PC = (*(CPU->RAM + 0xFFFE) | (*(CPU->RAM + 0xFFFF)<<8) );
 			CPU->PC -= inst.size;
 			break;
@@ -189,6 +192,8 @@ void execute_instruction(instruction inst, operand oper) {
 			}
 			if( CPU->A >= oper.value)
 				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			update_flags(CPU->A - oper.value, N_FLAG | Z_FLAG);
 			break;
 
@@ -199,6 +204,8 @@ void execute_instruction(instruction inst, operand oper) {
 			}
 			if( CPU->X >= oper.value)
 				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			update_flags(CPU->X - oper.value, N_FLAG | Z_FLAG);
 			break;
 
@@ -209,6 +216,8 @@ void execute_instruction(instruction inst, operand oper) {
 			}
 			if( CPU->Y >= oper.value)
 				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			update_flags(CPU->Y - oper.value, N_FLAG | Z_FLAG);
 			break;
 
@@ -257,8 +266,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case JSR:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+inst.size) & 0xFF);
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC+inst.size) >> 8);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+inst.size) & 0xFF);
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+inst.size) >> 8);
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -291,21 +300,19 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case LSR:
 			if( inst.addr_mode == ADDR_ACCUM ) {
-				if( CPU->A  & 0x1 )	
-					CPU->SR |= C_FLAG;
-				else
-					CPU->SR &= ~C_FLAG;
+				tmp = CPU->A  & 0x1;
 				CPU->A >>= 1;
 				update_flags(CPU->A, Z_FLAG);
 			}
 			else {
-				if( *(CPU->RAM + oper.address)  & 0x1 )	
-					CPU->SR |= C_FLAG;
-				else
-					CPU->SR &= ~C_FLAG;
+				tmp = *(CPU->RAM + oper.address)  & 0x1;
 				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
 				update_flags(*(CPU->RAM + oper.address), Z_FLAG);
 			}
+			if( tmp )	
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
 			break;
 
 		case NOP: /* Perfect implementation 8-) */
@@ -321,19 +328,20 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case PHA:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->A;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->A;
 			break;
 
 		case PHP:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
+			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
 			break;
 
 		case PLA:
-			CPU->A = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			CPU->A = *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case PLP:
-			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+			CPU->SR = *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
 			break;
 
 		case ROL:
@@ -345,7 +353,7 @@ void execute_instruction(instruction inst, operand oper) {
 			} else {
 				check_read_mapped_io(oper.address);
 				tmp = *(CPU->RAM + oper.address) >> 7;
-				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
+				*(CPU->RAM + oper.address) <<= 1;
 				*(CPU->RAM + oper.address) |= (CPU->SR & C_FLAG);
 				check_write_mapped_io(oper.address);
 				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
@@ -365,10 +373,9 @@ void execute_instruction(instruction inst, operand oper) {
 			} else {
 				check_read_mapped_io(oper.address);
 				tmp = *(CPU->RAM + oper.address) & 0x1;
-				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) >> 1;
-				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) | ((CPU->SR & C_FLAG) << 7);
+				*(CPU->RAM + oper.address) >>= 1;
+				*(CPU->RAM + oper.address) |= ((CPU->SR & C_FLAG) << 7);
 				check_write_mapped_io(oper.address);
-				CPU->SR |= tmp;
 				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
 			}
 			if( tmp )
@@ -377,16 +384,16 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->SR &= ~C_FLAG;
 			break;
 
-		case RTS:
-			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
-			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+		case RTI:
+			CPU->SR =  *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
+			CPU->PC =  *(CPU->RAM + BEGIN_STACK + ++CPU->SP) << 8;
+			CPU->PC |= *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
 			CPU->PC -= inst.size;
 			break;
 
-		case RTI:
-			CPU->PC =  *(CPU->RAM + BEGIN_STACK + --CPU->SP) << 8;
-			CPU->PC |= *(CPU->RAM + BEGIN_STACK + --CPU->SP);
-			CPU->SR = *(CPU->RAM + BEGIN_STACK + --CPU->SP);
+		case RTS:
+			CPU->PC =  *(CPU->RAM + BEGIN_STACK + ++CPU->SP) << 8;
+			CPU->PC |= *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
 			CPU->PC -= inst.size;
 			break;
 
@@ -395,12 +402,16 @@ void execute_instruction(instruction inst, operand oper) {
 				check_read_mapped_io(oper.address);
 				oper.value = *(CPU->RAM + oper.address);
 			}
-			CPU->A = CPU->A - oper.value - (CPU->SR & C_FLAG);
+			CPU->A = CPU->A - oper.value - (1 - (CPU->SR & C_FLAG));
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case SEC:
 			CPU->SR |= C_FLAG;
+			break;
+
+		case SED:
+			CPU->SR |= D_FLAG;
 			break;
 
 		case SEI:
@@ -433,7 +444,7 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case TSX:
-			CPU->X = BEGIN_STACK + CPU->SP;
+			CPU->X = CPU->SP;
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
@@ -444,8 +455,6 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case TXS:
 			CPU->SP = CPU->X;
-			CPU->SP -= BEGIN_STACK;
-			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
 		case TYA:
@@ -537,11 +546,13 @@ void check_write_mapped_io(uint16_t address) {
 
 		/* Data written into PPU->vram_address */
 		case 0x2007:
-			*(PPU->VRAM + PPU->vram_addr) = *(CPU->RAM + 0x2007);
-			if( PPU->CR1 & VERTICAL_WRITE)
-				PPU->vram_addr += 32;
-			else
-				PPU->vram_addr++;
+			if( !(PPU->SR & IGNORE_VRAM_WRITE) ) {
+				*(PPU->VRAM + PPU->vram_addr) = *(CPU->RAM + 0x2007);
+				if( PPU->CR1 & VERTICAL_WRITE)
+					PPU->vram_addr += 32;
+				else
+					PPU->vram_addr++;
+			}
 			break;
 
 		/* Sprite DMA */
@@ -613,9 +624,9 @@ void execute_nmi() {
 	DEBUG( printf("Executing NMI!\n") );
 	/* Push the PC and the SR */
 	/* Finally, jump to the interrupt vector */
-	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = CPU->SR;
-	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC) & 0xFF);
-	*(CPU->RAM + BEGIN_STACK + CPU->SP++) = (uint8_t)((CPU->PC) >> 8);
+	*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC) & 0xFF);
+	*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC) >> 8);
+	*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
 }
