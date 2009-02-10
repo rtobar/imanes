@@ -72,7 +72,7 @@ void nes_keydown(SDL_keysym keysym) {
 
 		/* Show pattern table */
 		case SDLK_F3:
-			config.show_patter_tables = (config.show_patter_tables ? 0 : 1);
+			config.show_pattern_tables = (config.show_pattern_tables ? 0 : 1);
 			break;
 
 		/* Show name table */
