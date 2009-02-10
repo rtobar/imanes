@@ -135,13 +135,15 @@ void draw_line(int line) {
 					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 					col_index |=  (byte3&0x03) << 2;
 
-					/* Horizontal flip? */
-					if( byte3 & 0x40 )
-						tx = 7 - tx;
-
 					/* Don't draw background colors! */
-					if( col_index & 0x03 )
-						draw_pixel( tmp + tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+					if( col_index & 0x03 ) {
+
+						/* Horizontal flip? */
+						if( byte3 & 0x40 )
+							draw_pixel( tmp + 7 - tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+						else
+							draw_pixel( tmp + tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+					}
 
 				}
 				
