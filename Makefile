@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-O3 -Wall -g -ggdb -fomit-frame-pointer
-LDFLAGS=-lSDL -lpthread
+LDFLAGS=-lSDL -lpthread -lrt
 
 EXE = imanes
 OBJS= config.o cpu.o instruction_set.o loop.o main.o mapper.o \
