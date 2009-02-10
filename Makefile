@@ -15,7 +15,7 @@ $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) -c $< 
 
 clean:
-	-rm *.o
+	-rm -f *.o
 
 distclean: clean
-	-rm $(EXE)
+	-rm -f $(EXE)
