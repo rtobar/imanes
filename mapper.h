@@ -19,6 +19,9 @@ typedef struct _mapper {
 	/* Performs the bank switchings */
 	void (*switch_banks)();
 
+	/* Performs the system memory fill at reset or at initialization */
+	void (*reset)();
+
 	/* Registers */
 	uint8_t reg1;
 
@@ -32,5 +35,10 @@ extern nes_mapper mapper_list[];
 
 /* Global current mapper variable */
 nes_mapper *mapper;
+
+/* UNROM MMC */
+int unrom_check_address(uint16_t address);
+void unrom_switch_banks();
+void unrom_reset();
 
 #endif /* mapper_h */
