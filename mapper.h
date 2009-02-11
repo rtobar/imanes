@@ -2,7 +2,6 @@
 #define mapper_h
 
 #include <stdint.h>
-#include "common.h"
 
 #include "common.h"
 
@@ -18,10 +17,10 @@ typedef struct _mapper {
 	int  (*check_address)(uint16_t address);
 
 	/* Performs the bank switchings */
-	void (*switch_banks)(ines_file *file);
+	void (*switch_banks)();
 
 	/* Performs the system memory fill at reset or at initialization */
-	void (*reset)(ines_file *file)
+	void (*reset)()
 
 	/* Registers */
 	uint8_t reg1;

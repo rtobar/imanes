@@ -13,13 +13,15 @@ int unrom_check_address(uint16_t address) {
 	return 0;
 }
 
-void unrom_switch_banks(ines_file *file) {
-	//memcpy();
+void unrom_switch_banks() 
+{
+	memcpy(CPU->RAM+0x8000, mapper->file->rom + mapper->reg1*ROM_BANK_SIZE,
+		  	ROM_BANK_SIZE);
 }
 
-void unrom_reset(ines_file *file)
+void unrom_reset()
 {
-	memcpy(CPU->RAM+0x8000, file->rom, ROM_BANK_SIZE);
+	memcpy(CPU->RAM+0x8000, mapper->file->rom, ROM_BANK_SIZE);
 	memcpy(CPU->RAM+0xC000, 
-			file->rom+file->(romBanks-1)*ROM_BANK_SIZE, ROM_BANK_SIZE);
+			mapper->file->rom+file->(romBanks-1)*ROM_BANK_SIZE, ROM_BANK_SIZE);
 }
