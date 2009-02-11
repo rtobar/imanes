@@ -36,7 +36,6 @@ int main(int args, char *argv[]) {
 	/* Initialize static data */
 	initialize_configuration();
 	initialize_palette();
-	initialize_mapper_list();
 	initialize_instruction_set();
 	initialize_cpu();
 	initialize_ppu();

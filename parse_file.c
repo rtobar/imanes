@@ -11,6 +11,7 @@
 
 ines_file *check_ines_file(char *file_path) {
 
+	int i;
 	int read_bytes;
 	char *buff;
 	struct stat stat_buf;
@@ -65,11 +66,18 @@ ines_file *check_ines_file(char *file_path) {
 	}
 
 	rom_file->mapper_id = (buff[1] & 0xF0) | ( (buff[0] >> 4) & 0x0F );
-	printf("ROM mapper is '%s'\n",mapper_list[rom_file->mapper_id]);
 
-	/* We currently support only No-mapper ROMs :P */
-	if( rom_file->mapper_id != 0 ) {
-		fprintf(stderr,"Sorry, but we currently support cartridges using the '%s' Mapper\n",mapper_list[0]);
+	/* Check which mappers we do support */
+	mapper = NULL;
+	for(i=0; mapper_list[i].id != -1; i++) {
+		if( rom_file->mapper_id == mapper_list[i].id ) {
+			mapper = mapper_list+i;
+			printf("ROM mapper is '%s'\n",mapper->name);
+		}
+	}
+
+	if( mapper == NULL ) {
+		fprintf(stderr,"Sorry, but we currently support cartridges using the mapper %d\n",rom_file->mapper_id);
 		fprintf(stderr,"I'm exiting now.\n\n");
 		exit(EXIT_FAILURE);
 	}
