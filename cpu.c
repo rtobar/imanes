@@ -472,6 +472,13 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		printf("PPU: Write to PPU[%d]=$%02X PC=%04X\n", address - 0x2000, value, CPU->PC);
 	} );
 
+	/* Convert the address to handle mirroring */
+	if( 0x0800 <= address && address < 0x2000 )
+		address = address - 0x800 * ((address >> 11) & 0x3);
+
+	if( 0x2008 <= address && address < 0x4000 )
+		address = address - 0x8 * ((address >> 3) & 0x7FF);
+
 	switch( address ) {
 
 		/* PPU control registers */
@@ -546,6 +553,13 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 uint8_t read_cpu_ram(uint16_t address) {
 
 	uint8_t ret_val = 0;
+
+	/* Convert the address to handle mirroring */
+	if( 0x0800 <= address && address < 0x2000 )
+		address = address - 0x800 * ((address >> 11) & 0x3);
+
+	if( 0x2008 <= address && address < 0x4000 )
+		address = address - 0x8 * ((address >> 3) & 0x7FF);
 
 	/* PPU Control Register 1 */
 	if( address == 0x2000 )
