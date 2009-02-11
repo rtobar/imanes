@@ -480,24 +480,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			break;
 		case 0x2001:
 			PPU->CR2 = value;
-			switch( (PPU->CR2 & 0xE0) >> 5 ) {
-
-				//case 0: /* Black */
-				//	*(PPU->VRAM + 0x3F00) = 0x1D;
-				//	break;
-				//case 1: /* Green */
-				//	*(PPU->VRAM + 0x3F00) = 0x12;
-				//	break;
-				//case 2: /* Blue */
-				//	*(PPU->VRAM + 0x3F00) = 0x1A;
-				//	break;
-				//case 4: /* Green */
-				//	*(PPU->VRAM + 0x3F00) = 0x16;
-				//	break;
-
-				//default:
-				//	fprintf(stderr,"Oops, bad background color? %02x\n", PPU->CR2);
-			}
 			break;
 
 		/* SPR-RAM Address */
