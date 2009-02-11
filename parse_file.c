@@ -64,7 +64,7 @@ ines_file *check_ines_file(char *file_path) {
 		exit(EXIT_FAILURE);
 	}
 
-	rom_file->mapper_id = (buff[1] & 0xFF00) | ( (buff[0] >> 4) & 0xFFFF );
+	rom_file->mapper_id = (buff[1] & 0xF0) | ( (buff[0] >> 4) & 0x0F );
 	printf("ROM mapper is '%s'\n",mapper_list[rom_file->mapper_id]);
 
 	/* We currently support only No-mapper ROMs :P */
