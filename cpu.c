@@ -518,8 +518,8 @@ void check_write_mapped_io(uint16_t address) {
 				//	*(PPU->VRAM + 0x3F00) = 0x16;
 				//	break;
 
-				default:
-					fprintf(stderr,"Oops, bad background color? %02x\n", PPU->CR2);
+				//default:
+				//	fprintf(stderr,"Oops, bad background color? %02x\n", PPU->CR2);
 			}
 			break;
 
