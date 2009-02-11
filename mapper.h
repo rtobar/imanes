@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "common.h"
+
 #define MAX_MAPPER_NAME_SIZE 100
 
 /** Common structure for all mappers */
@@ -19,6 +21,9 @@ typedef struct _mapper {
 
 	/* Registers */
 	uint8_t reg1;
+
+	/* Associated nes file pointer */
+	ines_file *file;
 
 } nes_mapper;
 
