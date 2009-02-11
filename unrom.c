@@ -5,7 +5,9 @@
 
 int unrom_check_address(uint16_t address) {
 
-	if( 0x8000 <= address && address <= 0xFFFF ) {
+	/* It is not necessary to check <= 0xFFFF because of the data range
+	 * of a uint16_t :) */
+	if( 0x8000 <= address ) {
 		mapper->reg1 = CPU->RAM[address];
 		return 1;
 	}

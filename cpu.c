@@ -629,3 +629,13 @@ void execute_nmi() {
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
 }
+
+void execute_reset() {
+
+	/* Let the mapper do its stuff */
+	mapper->reset();
+
+	/* Now, let's search for the RESET vector and point CPU->PC there */
+	CPU->PC = *(CPU->RAM + 0xFFFC) | ( *(CPU->RAM + 0xFFFD) << 8 );
+	CPU->reset = 0;
+}

@@ -50,13 +50,9 @@ void main_loop(ines_file *file) {
 		pthread_mutex_lock(&pause_mutex);
 		pthread_mutex_unlock(&pause_mutex);
 
-		/* Whenever we do a reset, we first need to check out where the game
- 		 * begins. For that, we see the address located at the RESET vector
- 		 */
-		if( CPU->reset ) {
-			CPU->PC = *(CPU->RAM + 0xFFFC) | ( *(CPU->RAM + 0xFFFD) << 8 );
-			CPU->reset = 0;
-		}
+		/* If we need to reset, call the reset routine */
+		if( CPU->reset )
+			execute_reset();
 
 		/* inst_address saves the current process' memory
 		 * pointer for the NES CPU' PC. This way we can

@@ -96,4 +96,9 @@ uint8_t stack_pull();
  */
 void execute_nmi();
 
+/**
+ * Executes a reset on the NES
+ */
+void execute_reset();
+
 #endif /* cpu_h */
