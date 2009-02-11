@@ -279,7 +279,7 @@ void initialize_instruction_set() {
 	return;
 }
 
-operand get_operand(instruction inst, uint8_t *inst_address) {
+operand get_operand(instruction inst, uint16_t inst_address) {
 
 	uint16_t address;
 	operand oper = { 0xDEAD, 0xBE};
@@ -287,46 +287,46 @@ operand get_operand(instruction inst, uint8_t *inst_address) {
 	switch( inst.addr_mode ) {
 
 		case ADDR_IMMEDIATE:
-			oper.value = *(inst_address + 1);
+			oper.value = CPU->RAM[inst_address+1];
 			break;
 
 		case ADDR_ABSOLUTE:
-			oper.address = *(inst_address + 1) | (*(inst_address + 2)  << 8);
+			oper.address = CPU->RAM[inst_address+1] | (CPU->RAM[inst_address + 2]  << 8);
 			break;
 
 		case ADDR_ZEROPAGE:
-			oper.address = *(inst_address + 1);
+			oper.address = CPU->RAM[inst_address+1];
 			break;
 
 		case ADDR_IMPLIED:
-			oper.value = -1;
 			break;
 
+		/* For indirect addressing, we need to use read_cpu_ram*/
 		case ADDR_INDIRECT:
-			address = *(inst_address + 1) | (*(inst_address + 2) << 8);
-			oper.address = *(CPU->RAM + address) | (*(CPU->RAM + address + 1) << 8);
+			address = CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8);
+			oper.address = read_cpu_ram(address) | (read_cpu_ram(address+1) << 8);
 			break;
 
 		case ADDR_ABS_INDX:
-			oper.address = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->X;
+			oper.address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) ) + CPU->X;
 			break;
 
 		case ADDR_ABS_INDY:
-			oper.address = ( *(inst_address + 1) | (*(inst_address + 2) << 8) ) + CPU->Y;
+			oper.address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) ) + CPU->Y;
 			break;
 
 		case ADDR_IND_INDIR:
-			address = *(inst_address + 1) + CPU->X;
-			oper.address = *(CPU->RAM + address) | (*(CPU->RAM + address + 1) << 8);
+			address = CPU->RAM[inst_address+1] + CPU->X;
+			oper.address = read_cpu_ram(address) | (read_cpu_ram(address+1) << 8);
 			break;
 
 		case ADDR_INDIR_IND:
-			address = *(inst_address + 1);
-			oper.address = (*(CPU->RAM + address) | (*(CPU->RAM + address + 1) << 8) ) + CPU->Y;
+			address = CPU->RAM[inst_address+1];
+			oper.address = ( read_cpu_ram(address) | (read_cpu_ram(address+1) << 8) ) + CPU->Y;
 			break;
 
 		case ADDR_RELATIVE:
-			oper.value = *(inst_address + 1);
+			oper.value = CPU->RAM[inst_address+1];
 			break;
 
 		case ADDR_ACCUM:
@@ -334,11 +334,11 @@ operand get_operand(instruction inst, uint8_t *inst_address) {
 			break;
 
 		case ADDR_ZERO_INDX:
-			oper.address = *(inst_address + 1) + CPU->X;
+			oper.address = CPU->RAM[inst_address+1] + CPU->X;
 			break;
 
 		case ADDR_ZERO_INDY:
-			oper.address = *(inst_address + 1) + CPU->Y;
+			oper.address = CPU->RAM[inst_address+1] + CPU->Y;
 			break;
 
 		default:

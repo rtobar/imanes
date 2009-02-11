@@ -18,7 +18,6 @@ pthread_mutex_t pause_mutex;
 void main_loop(ines_file *file) {
 
 	uint8_t opcode;
-	uint8_t *inst_address;
 	int scanline_timeout = CYCLES_PER_SCANLINE;
 	int lines, standard_lines;
 	int frames;
@@ -54,21 +53,12 @@ void main_loop(ines_file *file) {
 		if( CPU->reset )
 			execute_reset();
 
-		/* inst_address saves the current process' memory
-		 * pointer for the NES CPU' PC. This way we can
-		 * debug easier the value of NES PC */
-		inst_address = CPU->RAM + CPU->PC;
-
-		/* Check if we are at the end of the ROM :O */
-		if( inst_address == file->rom + file->romBanks * 16*1024 ) {
-			fprintf(stderr,"Oops, we've reached the end of the instructions\n");
-			fprintf(stderr,"Weird, hah?\n");
-			exit(EXIT_FAILURE);
-		}
-
 		/* Read opcode and full instruction :) */
-		opcode = *(inst_address);
+		/* We don't read with read_cpu_ram since we're in PGR RAM section
+		   and there's nor mirroring nor mm IOs there */
+		opcode = CPU->RAM[CPU->PC];
 		inst = instructions[opcode];
+		instructions[opcode].executed++;
 
 		DEBUG( printf("CPU->PC: 0x%04x - %02x: %s", CPU->PC, opcode, inst.name) );
 		/* Undocumented instruction */
@@ -79,7 +69,7 @@ void main_loop(ines_file *file) {
 		}
 
 		/* Select operand depending on the addressing node */
-		operand = get_operand(inst, inst_address);
+		operand = get_operand(inst, CPU->PC);
 
 		DEBUG( printf(" operand: %04x / %02x\n", operand.address, operand.value) );
 		/* Execute the given instruction */

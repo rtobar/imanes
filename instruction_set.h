@@ -97,6 +97,7 @@ typedef struct {
 	short size;           /* Instruction size / depends on addr_mode */
 	short cycles;         /* CPU cycles that it takes to run the instr */
 	uint8_t cycle_change; /* Cycle number is variable? */
+	long executed;        /* Times that the instruction been executed */
 } instruction;
 
 extern instruction *instructions;
@@ -120,6 +121,7 @@ typedef struct _operand {
    instructions[OPCODE].size         = SIZE;   \
    instructions[OPCODE].cycles       = CYCLES; \
    instructions[OPCODE].cycle_change = CYCLE_##CHANGE; \
+	instructions[OPCODE].executed     = 0; \
 	strncpy(instructions[OPCODE].name,#INST,3); \
 
 /**
@@ -132,6 +134,6 @@ void initialize_instruction_set();
  * When reading an instruction, the operand that should be used depends
  * on the addressing mode. This function does this job
  */
-operand get_operand(instruction inst, uint8_t *inst_address);
+operand get_operand(instruction inst, uint16_t inst_address);
 
 #endif /* instruction_set_h */

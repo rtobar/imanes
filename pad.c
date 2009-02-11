@@ -16,6 +16,8 @@ void initialize_pads() {
 
 void nes_keydown(SDL_keysym keysym) {
 
+	int i;
+
 	switch( keysym.sym ) {
 
 		/* Up */
@@ -98,6 +100,12 @@ void nes_keydown(SDL_keysym keysym) {
 				config.pause = 0;
 			}
 			break;
+
+		case SDLK_F7:
+			INFO( printf("Instructions never executed:\n") );
+			for(i=0;i!=INSTRUCTIONS_NUMBER;i++)
+				if(instructions[i].size != 0 && !instructions[i].executed )
+					printf("%02x - %s\n", instructions[i].opcode, instructions[i].name);
 
 		default:
 			break;
