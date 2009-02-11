@@ -42,7 +42,7 @@ void dump_stack() {
 
 	printf("CPU Stack:\n==========\nStart: ");
 	for( i=255; i!=(uint8_t)CPU->SP;i--) {
-		printf("%02x ", *(CPU->RAM + BEGIN_STACK + i));
+		printf("%02x ", CPU->RAM[BEGIN_STACK + i]);
 	}
 	printf("\n");
 
@@ -608,6 +608,24 @@ uint8_t read_cpu_ram(uint16_t address) {
 		ret_val = CPU->RAM[address];
 
 	return ret_val;
+}
+
+
+void stack_push(uint8_t value) {
+
+	/* The stack is top down. When someone pushes, the SP decreases */
+	/* We need to use write_cpu_ram because of the mirroring */
+	write_cpu_ram( BEGIN_STACK + CPU->SP , value);
+	CPU->SP++;
+
+	return;
+}
+
+uint8_t stack_pull() {
+
+	/* The stack is top down. When someone pulls, the SP increases */
+	CPU->SP--;
+	return CPU->RAM[BEGIN_STACK + CPU->SP];
 }
 
 /* Note: NMI is executed after inscreasing the PC! */

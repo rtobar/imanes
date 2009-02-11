@@ -82,6 +82,16 @@ uint8_t read_cpu_ram(uint16_t address);
 void write_cpu_ram(uint16_t address, uint8_t value);
 
 /**
+ * Pushes the given value into the CPU's stack
+ */
+void stack_push(uint8_t value);
+
+/**
+ * Pulls a value from the CPU's stack
+ */
+uint8_t stack_pull();
+
+/**
  * Executes an NMI interrupt
  */
 void execute_nmi();

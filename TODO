@@ -1,18 +1,17 @@
- * Change the way that the CPU addresses are read/written. For this I should
-   have a separate (inline?) method to do this.
+ * [DONE] Change the way that the CPU addresses are read/written.
+   For this I should have a separate (inline?) method to do this.
    * Handle the mirroring this way, also for the PPU VRAM
-   * This could not be a good idea. For example, the PPU->SR is updated when
-     you read on CPU's RAM 0x2000, so it could be a good idea to leave them
-     totally separated.
  * Draw first sprites / background / last sprites in separate layers, and do
    a merge after that.
  * [DONE] Add initial support for user input through keyboard
   * Support second pad
- * Support user configuration for several thing
+ * Support user configuration for several things
   * Keys
   * Video scaling
   * Verbosity
  * [TESTING] Fix *once for all* the background drawing
  * [TESTING] Fix sprite drawing (they seem to be 1 pixel above)
+   * Testing is needed to check out the vertical flip feature
+   * The "pixel 0 bit" should be recognized and set
  * Fix the ADC/SBC instructions (recognize the C flag change)
  * [DONE] Add a pause option (using pthread_mutex I think...)
