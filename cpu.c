@@ -148,9 +148,9 @@ void execute_instruction(instruction inst, operand oper) {
 			/* Set the interrupt flag, push the PC+2 (not a bug) and the SR */
 			/* Finally, jump to the interrupt vector */
 			CPU->SR |= B_FLAG;
-			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
-			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+2) & 0xFF);
-			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+2) >> 8);
+			stack_push( CPU->SR );
+			stack_push( (CPU->PC+2) & 0xFF );
+			stack_push( (CPU->PC+2) >> 8 );
 			CPU->PC = ( CPU->RAM[0xFFFE] | ( CPU->RAM[0xFFFF]<<8 ) );
 			CPU->PC -= inst.size;
 			break;
@@ -255,8 +255,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case JSR:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+inst.size) & 0xFF);
-			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+inst.size) >> 8);
+			stack_push( (CPU->PC+inst.size) & 0xFF );
+			stack_push( (CPU->PC+inst.size) >> 8 );
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -311,20 +311,20 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case PHA:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->A;
+			stack_push( CPU->A );
 			break;
 
 		case PHP:
-			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
+			stack_push( CPU->SR );
 			break;
 
 		case PLA:
-			CPU->A = *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
+			CPU->A = stack_pull();
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case PLP:
-			CPU->SR = *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
+			CPU->SR = stack_pull();
 			break;
 
 		case ROL:
@@ -368,15 +368,15 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case RTI:
-			CPU->SR =  *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
-			CPU->PC =  *(CPU->RAM + BEGIN_STACK + ++CPU->SP) << 8;
-			CPU->PC |= *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
+			CPU->SR =  stack_pull();
+			CPU->PC =  stack_pull() << 8;
+			CPU->PC |= stack_pull();
 			CPU->PC -= inst.size;
 			break;
 
 		case RTS:
-			CPU->PC =  *(CPU->RAM + BEGIN_STACK + ++CPU->SP) << 8;
-			CPU->PC |= *(CPU->RAM + BEGIN_STACK + ++CPU->SP);
+			CPU->PC =  stack_pull() << 8;
+			CPU->PC |= stack_pull();
 			CPU->PC -= inst.size;
 			break;
 
@@ -616,7 +616,7 @@ void stack_push(uint8_t value) {
 	/* The stack is top down. When someone pushes, the SP decreases */
 	/* We need to use write_cpu_ram because of the mirroring */
 	write_cpu_ram( BEGIN_STACK + CPU->SP , value);
-	CPU->SP++;
+	CPU->SP--;
 
 	return;
 }
@@ -624,7 +624,7 @@ void stack_push(uint8_t value) {
 uint8_t stack_pull() {
 
 	/* The stack is top down. When someone pulls, the SP increases */
-	CPU->SP--;
+	CPU->SP++;
 	return CPU->RAM[BEGIN_STACK + CPU->SP];
 }
 
@@ -634,9 +634,9 @@ void execute_nmi() {
 	DEBUG( printf("Executing NMI!\n") );
 	/* Push the PC and the SR */
 	/* Finally, jump to the interrupt vector */
-	*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC) & 0xFF);
-	*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC) >> 8);
-	*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
+	stack_push( (CPU->PC) & 0xFF );
+	stack_push( (CPU->PC) >> 8 );
+	stack_push( CPU->SR );
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
 }
