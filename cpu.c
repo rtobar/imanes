@@ -5,6 +5,7 @@
 #include "cpu.h"
 #include "debug.h"
 #include "instruction_set.h"
+#include "mapper.h"
 #include "pad.h"
 #include "palette.h"
 #include "ppu.h"
@@ -545,6 +546,11 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* Normal RAM memory area */
 		default:
 			CPU->RAM[address] = value;
+	}
+
+	/* Check if mapper need to come into action */
+	if( mapper->check_address(address) ) {
+		mapper->switch_banks();
 	}
 
 	return;
