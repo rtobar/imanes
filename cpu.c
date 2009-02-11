@@ -73,19 +73,15 @@ void execute_instruction(instruction inst, operand oper) {
 	switch(inst.instr_id) {
 
 		case ADC: /* TODO: check C and V flags */
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			CPU->A += oper.value + (CPU->SR & C_FLAG);
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case AND:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			CPU->A &= oper.value;
 			update_flags(CPU->A, N_FLAG | Z_FLAG );
 			break;
@@ -97,10 +93,10 @@ void execute_instruction(instruction inst, operand oper) {
 				update_flags(CPU->A, N_FLAG | Z_FLAG);
 			}
 			else {
-				check_read_mapped_io(oper.address);
-				tmp = *(CPU->RAM + oper.address) >> 7;
-				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
-				update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
+				oper.value = read_cpu_ram(oper.address);
+				tmp = oper.value >> 7;
+				write_cpu_ram(oper.value << 1, oper.address);
+				update_flags(oper.value, N_FLAG | Z_FLAG);
 			}
 			if( tmp )	
 				CPU->SR |= C_FLAG;
@@ -124,14 +120,13 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case BIT:
-			check_read_mapped_io(oper.address);
-			tmp = *(CPU->RAM + oper.address);
-			if( (tmp >> 6)  & 0x01 )
+			oper.value = read_cpu_ram(oper.address);
+			if( (oper.value >> 6)  & 0x01 )
 				CPU->SR |= V_FLAG;
 			else
 				CPU->SR &= ~V_FLAG;
-			update_flags(tmp, N_FLAG);
-			update_flags(tmp & CPU->A, Z_FLAG);
+			update_flags(oper.value, N_FLAG);
+			update_flags(oper.value & CPU->A, Z_FLAG);
 			break;
 
 		case BMI:
@@ -156,7 +151,7 @@ void execute_instruction(instruction inst, operand oper) {
 			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = CPU->SR;
 			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+2) & 0xFF);
 			*(CPU->RAM + BEGIN_STACK + CPU->SP--) = (uint8_t)((CPU->PC+2) >> 8);
-			CPU->PC = (*(CPU->RAM + 0xFFFE) | (*(CPU->RAM + 0xFFFF)<<8) );
+			CPU->PC = ( CPU->RAM[0xFFFE] | ( CPU->RAM[0xFFFF]<<8 ) );
 			CPU->PC -= inst.size;
 			break;
 
@@ -187,10 +182,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case CMP:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			if( CPU->A >= oper.value)
 				CPU->SR |= C_FLAG;
 			else
@@ -199,10 +192,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case CPX:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			if( CPU->X >= oper.value)
 				CPU->SR |= C_FLAG;
 			else
@@ -211,10 +202,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case CPY:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			if( CPU->Y >= oper.value)
 				CPU->SR |= C_FLAG;
 			else
@@ -223,8 +212,9 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case DEC:
-			*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) - 1;
-			update_flags(*(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
+			tmp = read_cpu_ram(oper.address) - 1;
+			write_cpu_ram(oper.address, tmp);
+			update_flags( tmp , N_FLAG | Z_FLAG);
 			break;
 
 		case DEX:
@@ -238,18 +228,16 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case EOR:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			CPU->A ^= oper.value;
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case INC:
-			check_read_mapped_io(oper.address);
-			*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address)+1; 
-			check_write_mapped_io(oper.address);
+			tmp = read_cpu_ram(oper.address) + 1;
+			write_cpu_ram( oper.address, tmp);
+			update_flags(tmp, N_FLAG | Z_FLAG);
 			break;
 
 		case INX:
@@ -273,28 +261,22 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case LDA:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			CPU->A = oper.value;
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
 		case LDX:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			CPU->X = oper.value;
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
 		case LDY:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			CPU->Y = oper.value;
 			update_flags(CPU->Y, N_FLAG | Z_FLAG);
 			break;
@@ -306,11 +288,13 @@ void execute_instruction(instruction inst, operand oper) {
 				update_flags(CPU->A, Z_FLAG);
 			}
 			else {
-				tmp = *(CPU->RAM + oper.address)  & 0x1;
-				*(CPU->RAM + oper.address) = *(CPU->RAM + oper.address) << 1;
-				update_flags(*(CPU->RAM + oper.address), Z_FLAG);
+				oper.value = read_cpu_ram(oper.address);
+				tmp = oper.value & 0x1;
+				oper.value <<= 1;
+				write_cpu_ram( oper.address, oper.value );
+				update_flags( oper.value , Z_FLAG);
 			}
-			if( tmp )	
+			if( tmp )
 				CPU->SR |= C_FLAG;
 			else
 				CPU->SR &= ~C_FLAG;
@@ -320,10 +304,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case ORA:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			CPU->A |= oper.value;
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
@@ -352,12 +334,12 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->A |= (CPU->SR & C_FLAG);
 				update_flags( CPU->A, N_FLAG | Z_FLAG);
 			} else {
-				check_read_mapped_io(oper.address);
-				tmp = *(CPU->RAM + oper.address) >> 7;
-				*(CPU->RAM + oper.address) <<= 1;
-				*(CPU->RAM + oper.address) |= (CPU->SR & C_FLAG);
-				check_write_mapped_io(oper.address);
-				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
+				oper.value = read_cpu_ram(oper.address);
+				tmp = oper.value >> 7;
+				oper.value <<= 1;
+				oper.value |= (CPU->SR & C_FLAG);
+				write_cpu_ram(oper.address, oper.value);
+				update_flags( oper.value , N_FLAG | Z_FLAG);
 			}
 			if( tmp )
 				CPU->SR |= C_FLAG;
@@ -372,12 +354,12 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->A |= (CPU->SR & C_FLAG) << 7;
 				update_flags( CPU->A, N_FLAG | Z_FLAG);
 			} else {
-				check_read_mapped_io(oper.address);
-				tmp = *(CPU->RAM + oper.address) & 0x1;
-				*(CPU->RAM + oper.address) >>= 1;
-				*(CPU->RAM + oper.address) |= ((CPU->SR & C_FLAG) << 7);
-				check_write_mapped_io(oper.address);
-				update_flags( *(CPU->RAM + oper.address), N_FLAG | Z_FLAG);
+				oper.value = read_cpu_ram(oper.address);
+				tmp = oper.value & 0x1;
+				oper.value >>= 1;
+				oper.value |= ((CPU->SR & C_FLAG) << 7);
+				write_cpu_ram(oper.address, oper.value);
+				update_flags( oper.value , N_FLAG | Z_FLAG);
 			}
 			if( tmp )
 				CPU->SR |= C_FLAG;
@@ -399,10 +381,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case SBC:
-			if( inst.addr_mode != ADDR_IMMEDIATE ) {
-				check_read_mapped_io(oper.address);
-				oper.value = *(CPU->RAM + oper.address);
-			}
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
 			CPU->A = CPU->A - oper.value - (1 - (CPU->SR & C_FLAG));
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
@@ -420,18 +400,15 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case STA:
-			*(CPU->RAM + oper.address) = CPU->A;
-			check_write_mapped_io(oper.address);
+			write_cpu_ram(oper.address, CPU->A);
 			break;
 
 		case STX:
-			*(CPU->RAM + oper.address) = CPU->X;
-			check_write_mapped_io(oper.address);
+			write_cpu_ram(oper.address, CPU->X);
 			break;
 
 		case STY:
-			*(CPU->RAM + oper.address) = CPU->Y;
-			check_write_mapped_io(oper.address);
+			write_cpu_ram(oper.address, CPU->Y);
 			break;
 
 		case TAX:
@@ -485,24 +462,24 @@ void update_flags(int8_t value, uint8_t flags) {
 
 }
 
-void check_write_mapped_io(uint16_t address) {
+void write_cpu_ram(uint16_t address, uint8_t value) {
 
 	static unsigned int first_write = 1;
 	static unsigned int strobe_pad = 0;
 	int i;
 
 	XTREME( if( 0x2000 <= address && address <= 0x2006 ) {
-		printf("PPU: Write to PPU[%d]=$%02X PC=%04X\n", address - 0x2000, *(CPU->RAM + address), CPU->PC);
+		printf("PPU: Write to PPU[%d]=$%02X PC=%04X\n", address - 0x2000, value, CPU->PC);
 	} );
 
 	switch( address ) {
 
 		/* PPU control registers */
 		case 0x2000:
-			PPU->CR1 = *(CPU->RAM + 0x2000);
+			PPU->CR1 = value;
 			break;
 		case 0x2001:
-			PPU->CR2 = *(CPU->RAM + 0x2001);
+			PPU->CR2 = value;
 			switch( (PPU->CR2 & 0xE0) >> 5 ) {
 
 				//case 0: /* Black */
@@ -525,22 +502,22 @@ void check_write_mapped_io(uint16_t address) {
 
 		/* SPR-RAM Address */
 		case 0x2003:
-			PPU->spr_addr = *(CPU->RAM + 0x2003);
+			PPU->spr_addr = value;
 			break;
 
 		case 0x2004:
 			XTREME( printf("Writing into SPR RAM at address %02x\n", PPU->spr_addr) );
-			*(PPU->SPR_RAM + PPU->spr_addr++) = *(CPU->RAM + 0x2004);
+			*(PPU->SPR_RAM + PPU->spr_addr++) = value;
 			break;
 
 		/* PPU VRAM address */
 		case 0x2006:
 			if( first_write ) {
 				PPU->vram_addr = 0;
-				PPU->vram_addr = (*(CPU->RAM + 0x2006) << 8);
+				PPU->vram_addr = (value << 8);
 				first_write = 0;
 			} else {
-				PPU->vram_addr |= *(CPU->RAM + 0x2006);
+				PPU->vram_addr |= value;
 				first_write = 1;
 			}
 			break;
@@ -548,7 +525,7 @@ void check_write_mapped_io(uint16_t address) {
 		/* Data written into PPU->vram_address */
 		case 0x2007:
 			if( !(PPU->SR & IGNORE_VRAM_WRITE) ) {
-				*(PPU->VRAM + PPU->vram_addr) = *(CPU->RAM + 0x2007);
+				*(PPU->VRAM + PPU->vram_addr) = value;
 				if( PPU->CR1 & VERTICAL_WRITE)
 					PPU->vram_addr += 32;
 				else
@@ -558,7 +535,7 @@ void check_write_mapped_io(uint16_t address) {
 
 		/* Sprite DMA */
 		case 0x4014:
-			address = *(CPU->RAM + 0x4014)*0x100;
+			address = value*0x100;
 			for(i=0;i!=256;i++) 
 				*(PPU->SPR_RAM + i) = *(CPU->RAM + address + i);
 			CPU->cycles += 512;
@@ -566,57 +543,71 @@ void check_write_mapped_io(uint16_t address) {
 
 		/* 1st joystick */			
 		case 0x4016:
-			if( *(CPU->RAM + 0x4016) == 0x01 ) {
+			if( value == 0x01 ) {
 				strobe_pad = 1;
 			}
-			else if( *(CPU->RAM + 0x4016) == 0x00 && strobe_pad ) {
+			else if( value == 0x00 && strobe_pad ) {
 				pads[0].reads = 0;
 				strobe_pad = 0;
 			}
 			break;
+
+
+		/* Normal RAM memory area */
+		default:
+			CPU->RAM[address] = value;
 	}
 
+	return;
 }
 
-void check_read_mapped_io(uint16_t address) {
+uint8_t read_cpu_ram(uint16_t address) {
+
+	uint8_t ret_val = 0;
 
 	/* PPU Control Register 1 */
 	if( address == 0x2000 )
-		*(CPU->RAM + 0x2000) = PPU->CR1;
+		ret_val = PPU->CR1;
 	
 	/* PPU Control Register 1 */
 	if( address == 0x2001 )
-		*(CPU->RAM + 0x2000) = PPU->CR2;
+		ret_val = PPU->CR2;
 
 	/* PPU Status Register */
 	else if( address == 0x2002 ) {
-		*(CPU->RAM + 0x2002) = PPU->SR;
+		ret_val = PPU->SR;
 		PPU->SR &= ~VBLANK_FLAG;
 	}
 
 	/* SPR-RAM access */
 	else if( address == 0x2004 ) 
-		*(CPU->RAM + 0x2003) = *(PPU->SPR_RAM + PPU->spr_addr);
+		ret_val = *(PPU->SPR_RAM + PPU->spr_addr);
 
 	/* PPU VRAM */
 	else if( address == 0x2007 )
-		*(CPU->RAM + 0x2007) = *(PPU->VRAM + PPU->vram_addr);
+		ret_val = *(PPU->VRAM + PPU->vram_addr);
 
 	/* 1st Joystick */
 	else if( address == 0x4016 ) {
 		pads[0].reads++;
 		*(CPU->RAM + 0x4016) = 0;
 		if( !pads[0].plugged )
-			*(CPU->RAM + 0x4016) = 2; // bit 1 set if not plugged
+			ret_val = 2; // bit 1 set if not plugged
 
 		/* If we should return a key state... */
 		if( pads[0].reads <= 8 ) {
-			*(CPU->RAM + 0x4016) |= ((pads[0].pressed_keys >> (pads[0].reads-1)) & 0x1); 
+			ret_val |= ((pads[0].pressed_keys >> (pads[0].reads-1)) & 0x1); 
 		}
 
 		if( pads[0].reads == 32 )
 			pads[0].reads = 0;
 	}
+
+	/* Normal RAM area */
+	else
+		ret_val = CPU->RAM[address];
+
+	return ret_val;
 }
 
 /* Note: NMI is executed after inscreasing the PC! */
