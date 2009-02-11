@@ -1,7 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "common.h"
 #include "palette.h"
+#include "ppu.h"
 
 nes_palette *system_palette;
 
@@ -74,4 +76,16 @@ void initialize_palette() {
 	FILL_NES_PALETTE(0x3E, 0x00, 0x00, 0x00);
 	FILL_NES_PALETTE(0x3F, 0x00, 0x00, 0x00);
 
+}
+
+void dump_palette() {
+
+	int i;
+
+	printf("No | Picture       | Sprites\n");
+	for(i=0;i!=16;i++) {
+		printf("%2d | %02x           | %02x\n", i, *(PPU->VRAM + 0x3F00 + i), *(PPU->VRAM + 0x3F10 + i) );
+	}
+
+	return;
 }

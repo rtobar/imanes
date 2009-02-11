@@ -77,9 +77,9 @@ void draw_line(int line) {
 
 	ty = line & 0x07; /* ty = line % 8 */
 
-	/* Fill all pixels with background color */
+	/* Fill all pixels with the "colour intensity" color */
 	for(i=0;i!=NES_SCREEN_WIDTH;i++)
-			draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
+		draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
 
 	/* Draw the background tiles */
 	if( config.show_bg ) {
@@ -106,7 +106,7 @@ void draw_line(int line) {
 				tmp = (((line >> 4)&0x1)<<1) + ((i >> 1)&0x1);
 				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
-				//if( col_index )
+				if( col_index & 0x03 )
 					draw_pixel(i*8+tx, line, system_palette[*(PPU->VRAM + 0x3F00 + col_index)]);
 			}
 		}

@@ -26,4 +26,9 @@ extern nes_palette *system_palette;
  */
 void initialize_palette();
 
+/**
+ *  Dumps the contents of the palette to the stdout
+ */
+void dump_palette();
+
 #endif /* palette_h */

@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "instruction_set.h"
 #include "pad.h"
+#include "palette.h"
 #include "ppu.h"
 
 nes_cpu *CPU;
@@ -504,18 +505,18 @@ void check_write_mapped_io(uint16_t address) {
 			PPU->CR2 = *(CPU->RAM + 0x2001);
 			switch( (PPU->CR2 & 0xE0) >> 5 ) {
 
-				case 0: /* Black */
-					*(PPU->VRAM + 0x3F00) = 0x1D;
-					break;
-				case 1: /* Green */
-					*(PPU->VRAM + 0x3F00) = 0x12;
-					break;
-				case 2: /* Blue */
-					*(PPU->VRAM + 0x3F00) = 0x1A;
-					break;
-				case 4: /* Green */
-					*(PPU->VRAM + 0x3F00) = 0x16;
-					break;
+				//case 0: /* Black */
+				//	*(PPU->VRAM + 0x3F00) = 0x1D;
+				//	break;
+				//case 1: /* Green */
+				//	*(PPU->VRAM + 0x3F00) = 0x12;
+				//	break;
+				//case 2: /* Blue */
+				//	*(PPU->VRAM + 0x3F00) = 0x1A;
+				//	break;
+				//case 4: /* Green */
+				//	*(PPU->VRAM + 0x3F00) = 0x16;
+				//	break;
 
 				default:
 					fprintf(stderr,"Oops, bad background color? %02x\n", PPU->CR2);
