@@ -17,3 +17,4 @@
    * [URGENT] Add support for 8x16 sprites
  * Fix the ADC/SBC instructions (recognize the C flag change)
  * [DONE] Add a pause option (using pthread_mutex I think...)
+ * Hey! CNROM catridges have no VROM???
