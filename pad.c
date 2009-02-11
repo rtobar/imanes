@@ -88,7 +88,7 @@ void nes_keydown(SDL_keysym keysym) {
 
 		/* Pause */
 		case SDLK_F6:
-			INFO( printf("Pausing emulation\n") );
+			INFO( printf("%s emulation\n", (config.pause ? "Resuming" : "Pausing")) );
 			if( !config.pause ) {
 				pthread_mutex_lock(&pause_mutex);
 				config.pause = 1;
