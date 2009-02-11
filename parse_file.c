@@ -72,6 +72,7 @@ ines_file *check_ines_file(char *file_path) {
 	for(i=0; mapper_list[i].id != -1; i++) {
 		if( rom_file->mapper_id == mapper_list[i].id ) {
 			mapper = mapper_list+i;
+			mapper->file = rom_file;
 			printf("ROM mapper is '%s'\n",mapper->name);
 		}
 	}
