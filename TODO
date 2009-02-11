@@ -14,5 +14,6 @@
  * [TESTING] Fix sprite drawing (they seem to be 1 pixel above)
    * Testing is needed to check out the vertical flip feature
    * The "pixel 0 bit" should be recognized and set
+   * [URGENT] Add support for 8x16 sprites
  * Fix the ADC/SBC instructions (recognize the C flag change)
  * [DONE] Add a pause option (using pthread_mutex I think...)
