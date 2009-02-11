@@ -68,16 +68,18 @@ void execute_instruction(instruction inst, operand oper);
 void update_flags(int8_t value, uint8_t flags);
 
 /**
- * For special memory location where IO is mapped, we update the
- * corresponding information when writing to it
+ * Read from a RAM address and return the value there. This function
+ * handles all the mirroring at RAM level, as well as the memory mapped
+ * IOs at the emulation level
  */
-void check_write_mapped_io(uint16_t address);
+uint8_t read_cpu_ram(uint16_t address);
 
 /**
- * For special memory location where IO is mapped, we update the
- * corresponding information when reading it
+ * Writw to RAM at the given address. This function
+ * handles all the mirroring at RAM level, as well as the memory mapped
+ * IOs at the emulation level
  */
-void check_read_mapped_io(uint16_t address);
+void write_cpu_ram(uint16_t address, uint8_t value);
 
 /**
  * Executes an NMI interrupt
