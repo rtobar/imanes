@@ -27,7 +27,7 @@ void main_loop(ines_file *file) {
 	struct timespec sleepTime = { 0, 2e7 };
 	struct timespec startTime;
 	struct timespec endTime;
-	uint16_t pc_dumps[DUMPS] = { 0xffff };
+	uint16_t pc_dumps[DUMPS] = { 0x0000 };
 	operand operand = { 0, 0 };
 	instruction inst;
 
