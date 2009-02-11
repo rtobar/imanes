@@ -8,3 +8,9 @@ inline int nrom_check_address(uint16_t address) {
 inline void nrom_switch_banks() {
 	return;
 }
+
+/* This shouldn't be called never, anyways */
+void nrom_reset()
+{
+	return;
+}
