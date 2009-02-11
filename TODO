@@ -1,6 +1,7 @@
  * [DONE] Change the way that the CPU addresses are read/written.
    For this I should have a separate (inline?) method to do this.
-   * Handle the mirroring this way, also for the PPU VRAM
+   * [DONE] Handle the mirroring this way
+      * Also for the PPU VRAM
  * Draw first sprites / background / last sprites in separate layers, and do
    a merge after that.
  * [DONE] Add initial support for user input through keyboard
