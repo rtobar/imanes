@@ -250,8 +250,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case JSR:
-			stack_push( (CPU->PC+inst.size) & 0xFF );
 			stack_push( (CPU->PC+inst.size) >> 8 );
+			stack_push( (CPU->PC+inst.size) & 0xFF );
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -364,14 +364,14 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case RTI:
 			CPU->SR =  stack_pull();
-			CPU->PC =  stack_pull() << 8;
-			CPU->PC |= stack_pull();
+			CPU->PC =  stack_pull();
+			CPU->PC |= stack_pull() << 8;
 			CPU->PC -= inst.size;
 			break;
 
 		case RTS:
-			CPU->PC =  stack_pull() << 8;
-			CPU->PC |= stack_pull();
+			CPU->PC =  stack_pull();
+			CPU->PC |= stack_pull() << 8;
 			CPU->PC -= inst.size;
 			break;
 
@@ -468,11 +468,17 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 	} );
 
 	/* Convert the address to handle mirroring */
-	if( 0x0800 <= address && address < 0x2000 )
+	if( 0x0800 <= address && address < 0x2000 ) {
+		DEBUG( printf("Adress mirroring: from %04x to ", address) );
 		address = address - 0x800 * ((address >> 11) & 0x3);
+		DEBUG( printf("%04x\n",address) );
+	}
 
-	if( 0x2008 <= address && address < 0x4000 )
+	if( 0x2008 <= address && address < 0x4000 ) {
+		DEBUG( printf("Adress mirroring: from %04x to ", address) );
 		address = address - 0x8 * ((address >> 3) & 0x7FF);
+		DEBUG( printf("%04x\n",address) );
+	}
 
 	switch( address ) {
 
@@ -542,6 +548,13 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			CPU->RAM[address] = value;
 	}
 
+	DEBUG( 
+	printf("%04x: ", address & 0xfff0 );
+	for(i=0;i!=0x10;i++)
+		printf("%02x ", CPU->RAM[(address&0xfff0) + i]);
+	printf("\n");
+	);
+
 	/* Check if mapper need to come into action */
 	if( mapper->check_address(address) ) {
 		mapper->switch_banks();
@@ -555,11 +568,17 @@ uint8_t read_cpu_ram(uint16_t address) {
 	uint8_t ret_val = 0;
 
 	/* Convert the address to handle mirroring */
-	if( 0x0800 <= address && address < 0x2000 )
+	if( 0x0800 <= address && address < 0x2000 ) {
+		DEBUG( printf("Adress mirroring: from %04x to ", address) );
 		address = address - 0x800 * ((address >> 11) & 0x3);
+		DEBUG( printf("%04x\n",address) );
+	}
 
-	if( 0x2008 <= address && address < 0x4000 )
+	if( 0x2008 <= address && address < 0x4000 ) {
+		DEBUG( printf("Adress mirroring: from %04x to ", address) );
 		address = address - 0x8 * ((address >> 3) & 0x7FF);
+		DEBUG( printf("%04x\n",address) );
+	}
 
 	/* PPU Control Register 1 */
 	if( address == 0x2000 )
@@ -603,6 +622,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 	else
 		ret_val = CPU->RAM[address];
 
+	XTREME( printf("Returning %02x from %04x\n", ret_val, address) );
 	return ret_val;
 }
 
@@ -630,8 +650,8 @@ void execute_nmi() {
 	DEBUG( printf("Executing NMI!\n") );
 	/* Push the PC and the SR */
 	/* Finally, jump to the interrupt vector */
-	stack_push( (CPU->PC) & 0xFF );
 	stack_push( (CPU->PC) >> 8 );
+	stack_push( (CPU->PC) & 0xFF );
 	stack_push( CPU->SR );
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
