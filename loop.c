@@ -39,6 +39,8 @@ void main_loop(ines_file *file) {
 	/* Get the initial time for the first screen drawing */
 	clock_gettime(CLOCK_REALTIME, &startTime);
 
+	execute_reset();
+
 	/* This is the main loop */
 	for(;;) {
 
@@ -60,7 +62,7 @@ void main_loop(ines_file *file) {
 		inst = instructions[opcode];
 		instructions[opcode].executed++;
 
-		DEBUG( dump_cpu(); );
+		XTREME( dump_cpu(); );
 		DEBUG( printf("CPU->PC: 0x%04x - %02x: %s ", CPU->PC, opcode, inst.name) );
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
@@ -72,7 +74,9 @@ void main_loop(ines_file *file) {
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, CPU->PC);
 
-		DEBUG( printf("operand: %04x / %02x\n\n\n", operand.address, operand.value) );
+		DEBUG( printf("operand: %04x / %02x\n", operand.address, operand.value) );
+		XTREME( printf("\n\n") );
+
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 

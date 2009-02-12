@@ -31,7 +31,7 @@ int main(int args, char *argv[]) {
 
 	setbuf(stdout,NULL);
 	setbuf(stderr,NULL);
-	verbosity = INFO_LEVEL;
+	verbosity = DEBUG_LEVEL;
 
 	/* Initialize static data */
 	initialize_configuration();
@@ -43,7 +43,6 @@ int main(int args, char *argv[]) {
 
 	nes_rom = check_ines_file(argv[1]);
 	map_rom_memory(nes_rom);
-	init_cpu_ram(nes_rom);
 	init_ppu_vram(nes_rom);
 	init_screen();
 

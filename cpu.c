@@ -548,7 +548,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			CPU->RAM[address] = value;
 	}
 
-	DEBUG( 
+	XTREME( 
 	printf("%04x: ", address & 0xfff0 );
 	for(i=0;i!=0x10;i++)
 		printf("%02x ", CPU->RAM[(address&0xfff0) + i]);
