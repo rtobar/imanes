@@ -1,20 +1,34 @@
+General:
+========
+
+ * Configurable verbosity
+ * [DONE] Add a pause option (using pthread_mutex I think...)
+
+CPU:
+====
+
  * [DONE] Change the way that the CPU addresses are read/written.
-   For this I should have a separate (inline?) method to do this.
-   * [DONE] Handle the mirroring this way
-      * Also for the PPU VRAM
+          For this I should have a separate (inline?) method to do this.
+ * [DONE] Handle the mirroring by means of this separate method
+ * Fix the ADC/SBC instructions (recognize the C flag change)
+
+PPU:
+====
+
+ * PPU VRAM read/write in separate method
  * Draw first sprites / background / last sprites in separate layers, and do
    a merge after that.
- * [DONE] Add initial support for user input through keyboard
-  * Support second pad
- * Support user configuration for several things
-  * Keys
-  * Video scaling
-  * Verbosity
+ * Configurable video scaling
  * [TESTING] Fix *once for all* the background drawing
  * [TESTING] Fix sprite drawing (they seem to be 1 pixel above)
-   * Testing is needed to check out the vertical flip feature
-   * The "pixel 0 bit" should be recognized and set
-   * [URGENT] Add support for 8x16 sprites
- * Fix the ADC/SBC instructions (recognize the C flag change)
- * [DONE] Add a pause option (using pthread_mutex I think...)
- * Hey! CNROM catridges have no VROM???
+ * [TESTING] Support for vertical flip sprites feature
+ * Recognize and set "pixel 0 bit"
+ * [URGENT] Add support for 8x16 sprites
+
+
+Pads:
+=====
+
+ * [DONE] Add initial support for user input through keyboard
+ * Support second pad
+ * Configurable keys
