@@ -19,20 +19,27 @@ void initialize_cpu() {
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
 	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
 	CPU->reset = 1;
+	CPU->SR = R_FLAG; /* It is never ever used, compatibility with ines */
 
 	return;
 }
 
 void dump_cpu() {
 
-	printf("CPU Dumping:\n============\n\n");
-	printf("PC: %04x\n", (unsigned int)CPU->PC);
-	printf("A:  %02x\n", CPU->A);
-	printf("X:  %02x\n", CPU->X);
-	printf("Y:  %02x\n", CPU->Y);
-	printf("SR: %02x\n", CPU->SR);
-	printf("SP: %02u\n", CPU->SP);
-	printf("Cycles: %lld\n", CPU->cycles);
+	printf("A:%02x  ", CPU->A);
+	printf("P:%02x  ", CPU->SR);
+	printf("X:%02x  ", CPU->X);
+	printf("Y:%02x  ", CPU->Y);
+	printf("SP:01%02x  ", CPU->SP);
+	printf("PC:%04x   ", CPU->PC);
+	printf("Flags:[");
+	printf("%s", (CPU->SR & N_FLAG) ?    "N" : "." );
+	printf("%sR", (CPU->SR & V_FLAG) ?   "V" : "." );
+	printf("%s", (CPU->SR & B_FLAG) ?    "B" : "." );
+	printf("%s", (CPU->SR & D_FLAG) ?    "D" : "." );
+	printf("%s", (CPU->SR & I_FLAG) ?    "I" : "." );
+	printf("%s", (CPU->SR & Z_FLAG) ?    "Z" : "." );
+	printf("%s]\n", (CPU->SR & C_FLAG) ? "C" : "." );
 
 	return;
 }

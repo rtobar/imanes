@@ -60,7 +60,8 @@ void main_loop(ines_file *file) {
 		inst = instructions[opcode];
 		instructions[opcode].executed++;
 
-		DEBUG( printf("CPU->PC: 0x%04x - %02x: %s", CPU->PC, opcode, inst.name) );
+		DEBUG( dump_cpu(); );
+		DEBUG( printf("CPU->PC: 0x%04x - %02x: %s ", CPU->PC, opcode, inst.name) );
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
 			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
@@ -71,7 +72,7 @@ void main_loop(ines_file *file) {
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, CPU->PC);
 
-		DEBUG( printf(" operand: %04x / %02x\n", operand.address, operand.value) );
+		DEBUG( printf("operand: %04x / %02x\n\n\n", operand.address, operand.value) );
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 
