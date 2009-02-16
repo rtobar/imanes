@@ -156,3 +156,20 @@ void draw_line(int line) {
 	}
 
 }
+
+uint8_t read_ppu_vram(uint16_t address) {
+
+	uint8_t ret_val;
+
+	ret_val = PPU->VRAM[address];
+
+	return ret_val;
+
+}
+
+void write_ppu_vram(uint16_t address, uint8_t value) {
+
+	PPU->VRAM[address] = value;
+
+	return;
+}
