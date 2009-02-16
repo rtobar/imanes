@@ -13,7 +13,7 @@ typedef struct {
 	uint8_t  Y;   /* Y register */
 	uint8_t  SR;  /* Status register */
 	uint8_t  SP;  /* Stack pointer */
-	long long cycles; /* How many cycles has it given */
+	unsigned long long cycles; /* How many cycles has it given */
 
 	/* Memory */
 	uint8_t *RAM;
