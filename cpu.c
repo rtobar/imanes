@@ -515,7 +515,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* Data written into PPU->vram_address */
 		case 0x2007:
 			if( !(PPU->SR & IGNORE_VRAM_WRITE) ) {
-				*(PPU->VRAM + PPU->vram_addr) = value;
+				write_ppu_vram(PPU->vram_addr, value);
 				if( PPU->CR1 & VERTICAL_WRITE)
 					PPU->vram_addr += 32;
 				else
@@ -602,7 +602,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 
 	/* PPU VRAM */
 	else if( address == 0x2007 )
-		ret_val = *(PPU->VRAM + PPU->vram_addr);
+		ret_val = read_ppu_vram(PPU->vram_addr);
 
 	/* 1st Joystick */
 	else if( address == 0x4016 ) {
