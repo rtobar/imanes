@@ -25,10 +25,10 @@
 #define VBLANK_FLAG          (0x80)
 
 /** Mirroring types */
-#define HORIZONTAL_MIRRORING     1
-#define VERTICAL_MIRRORING       2
+#define HORIZONTAL_MIRRORING     0
+#define VERTICAL_MIRRORING       1
+#define SINGLE_SCREEN_MIRRORING  2
 #define FOUR_SCREEN_MIRRORING    3
-#define SINGLE_SCREEN_MIRRORING  4
 
 typedef struct _ppu {
 	uint8_t CR1;        /* Control Register 1 */
