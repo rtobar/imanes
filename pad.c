@@ -60,26 +60,22 @@ void nes_keydown(SDL_keysym keysym) {
 			pads[0].pressed_keys |= NES_SELECT;
 			break;
 
-		/* Show sprites */
-		case SDLK_F1:
-			INFO( printf("Sprites %s\n", (config.show_spr ? "OFF": "ON")) );
-			config.show_spr = (config.show_spr ? 0 : 1);
-			break;
-
 		/* Show background */
-		case SDLK_F2:
+		case SDLK_F1:
 			INFO( printf("Background %s\n", (config.show_bg  ? "OFF" : "ON")) );
 			config.show_bg  = (config.show_bg  ? 0 : 1);
 			break;
 
-		/* Show pattern table */
-		case SDLK_F3:
-			config.show_pattern_tables = (config.show_pattern_tables ? 0 : 1);
+		/* Show front sprites */
+		case SDLK_F2:
+			INFO( printf("Front sprites %s\n", (config.show_front_spr ? "OFF": "ON")) );
+			config.show_front_spr = (config.show_front_spr ? 0 : 1);
 			break;
 
-		/* Show name table */
-		case SDLK_F4:
-			config.show_name_tables = (config.show_name_tables ? 0 : 1);
+		/* Show front sprites */
+		case SDLK_F3:
+			INFO( printf("Back sprites %s\n", (config.show_back_spr ? "OFF": "ON")) );
+			config.show_back_spr = (config.show_back_spr ? 0 : 1);
 			break;
 
 		/* Reset */
