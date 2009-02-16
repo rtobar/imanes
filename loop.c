@@ -26,7 +26,7 @@ void main_loop(ines_file *file) {
 	struct timespec sleepTime = { 0, 2e7 };
 	struct timespec startTime;
 	struct timespec endTime;
-	uint16_t pc_dumps[DUMPS] = { 0x0000 };
+	uint16_t pc_dumps[DUMPS] = { 0xc73a };
 	operand operand = { 0, 0 };
 	instruction inst;
 
@@ -80,13 +80,13 @@ void main_loop(ines_file *file) {
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 
-		for(i=0;i!=DUMPS;i++)
-			if(CPU->PC == pc_dumps[i])
-				dump_cpu();
-
 		CPU->PC += inst.size;
 		CPU->cycles += inst.cycles;
 		scanline_timeout -= inst.cycles;
+
+		for(i=0;i!=DUMPS;i++)
+			if(CPU->PC == pc_dumps[i])
+				dump_cpu();
 
 		/* A line has ended its scanning, draw it */
 		if( scanline_timeout <= 0 ) {
