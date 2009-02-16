@@ -1,7 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
 
-#include "mapper.h"
 #include "cpu.h"
+#include "debug.h"
+#include "mapper.h"
 
 int unrom_check_address(uint16_t address) {
 
@@ -17,6 +19,8 @@ int unrom_check_address(uint16_t address) {
 
 void unrom_switch_banks() 
 {
+
+	DEBUG( printf("Performing bank switching: Switching to bank %d of ROM\n",mapper->reg1) );
 	memcpy(CPU->RAM+0x8000, mapper->file->rom + mapper->reg1*ROM_BANK_SIZE,
 		  	ROM_BANK_SIZE);
 }

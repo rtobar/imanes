@@ -2,6 +2,7 @@
 
 #include "cnrom.h"
 #include "cpu.h"
+#include "debug.h"
 #include "ppu.h"
 
 int cnrom_check_address(uint16_t address) {
@@ -19,6 +20,7 @@ int cnrom_check_address(uint16_t address) {
 void cnrom_switch_banks() {	
 
 	/* Copy the VROM bank to the 0x0000 of VRAM */
+	DEBUG( printf("Performing switch to bank %d of VROM\n", mapper->reg1) );
 	memcpy(PPU->VRAM, mapper->file->vrom + mapper->reg1*VROM_BANK_SIZE,
 	       VROM_BANK_SIZE);
 
