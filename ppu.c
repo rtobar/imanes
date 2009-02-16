@@ -60,6 +60,7 @@ void draw_line(int line) {
 
 	/* Identify which sprites have to be drawn */
 	/* If 8x16 sprites, we check 32 sprites instead of 64 */
+	/* TODO: Investigate better how 8x16 sprites work */
 	big_sprite = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
 	frt_sprites = 0;
 	bck_sprites = 0;
@@ -231,6 +232,39 @@ uint8_t read_ppu_vram(uint16_t address) {
 		DEBUG( printf("%04x\n",address) );
 	}
 
+	/* TODO: Inter palette mirroring */
+
+	/* Name table mirroring. This depends on the type of mirroring
+	 * that the ines file header states */
+	switch( PPU->mirroring) {
+
+		case HORIZONTAL_MIRRORING:
+			if( (0x2400 <= address && address < 0x2800) ||
+			    (0x2C00 <= address && address < 0x3000)) {
+				printf("PPU Address mirroring: from %04x to ", address);
+				address -= 0x400;
+				printf("%04x\n",address);
+			}
+			break;
+
+		case VERTICAL_MIRRORING:
+			if( 0x2800 <= address && address < 0x3000 ) {
+				printf("PPU Address mirroring: from %04x to ", address);
+				address -= 0x800;
+				printf("%04x\n",address);
+			}
+			break;
+
+		case SINGLE_SCREEN_MIRRORING:
+			if( 0x2400 <= address && address < 0x3000 ) {
+				printf("PPU Address mirroring: from %04x to ", address);
+				address -= 0x400*( ((address - 0x2000) >> 10) & 0x3);
+				printf("%04x\n",address);
+			}
+		default:
+			break;
+	}
+
 	return PPU->VRAM[address];
 }
 
@@ -280,6 +314,12 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 			}
 			break;
 
+		case SINGLE_SCREEN_MIRRORING:
+			if( 0x2400 <= address && address < 0x3000 ) {
+				printf("PPU Address mirroring: from %04x to ", address);
+				address -= 0x400*( ((address - 0x2000) >> 10) & 0x3);
+				printf("%04x\n",address);
+			}
 		default:
 			break;
 	}
