@@ -206,6 +206,11 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 		DEBUG( printf("%04x\n",address) );
 	}
 
+	/* TODO: Inter palette mirroring */
+
+	/* Name table mirroring. This depends on the type of mirroring
+	 * that the ines file header states */
+
 	PPU->VRAM[address] = value;
 
 	return;

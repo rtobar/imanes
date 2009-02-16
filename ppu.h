@@ -24,6 +24,12 @@
 #define HIT_FLAG             (0x40)
 #define VBLANK_FLAG          (0x80)
 
+/** Mirroring types */
+#define HORIZONTAL_MIRRORING     1
+#define VERTICAL_MIRRORING       2
+#define FOUR_SCREEN_MIRRORING    3
+#define SINGLE_SCREEN_MIRRORING  4
+
 typedef struct _ppu {
 	uint8_t CR1;        /* Control Register 1 */
 	uint8_t CR2;        /* Control Register 2 */
@@ -33,6 +39,8 @@ typedef struct _ppu {
 
 	uint8_t *SPR_RAM; /* 256 bytes area memory for sprite attributes */
 	uint8_t spr_addr; /* Address to be written by 0x2004 CPU RAM */
+
+	uint8_t mirroring; /* Type of mirroring */
 } nes_ppu;
 
 /* Global PPU used through all the program */

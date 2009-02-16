@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "parse_file.h"
+#include "ppu.h"
 #include "mapper.h"
 
 ines_file *check_ines_file(char *file_path) {
@@ -57,9 +58,20 @@ ines_file *check_ines_file(char *file_path) {
 	printf("File contains %hu 16kb ROM banks and %hu 8kb VROM banks\n",
           rom_file->romBanks, rom_file->vromBanks);
 
-	/* Mapper and other stuff */
+	/* Mapper and name table mirroring */
 	buff = realloc(buff,2);
 	read_bytes = read(rom_file->fd, buff, 2);
+
+	/* Vert/Horiz mirroring */
+	PPU->mirroring = buff[0] & 0x1;
+
+	/* Four-screen mirroring */
+	if( buff[0] & 0x4 ) {
+		PPU->mirroring = FOUR_SCREEN_MIRRORING;
+	}
+
+	printf("Mirroring type: %d\n", PPU->mirroring);
+
 	if( read_bytes != 2 ) {
 		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
 		exit(EXIT_FAILURE);
