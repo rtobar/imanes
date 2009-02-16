@@ -30,6 +30,11 @@
 #define SINGLE_SCREEN_MIRRORING  2
 #define FOUR_SCREEN_MIRRORING    3
 
+/* Sprite attributes */
+#define SPRITE_OVER_BACK     (0x20)
+#define SPRITE_FLIP_HORIZ    (0x40)
+#define SPRITE_FLIP_VERT     (0x80)
+
 typedef struct _ppu {
 	uint8_t CR1;        /* Control Register 1 */
 	uint8_t CR2;        /* Control Register 2 */

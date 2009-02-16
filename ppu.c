@@ -37,8 +37,10 @@ void draw_line(int line) {
 	int ty; /* Y coord inside a tile */
 	int tmp;
 	int big_sprite;
-	int sprites;
-	uint8_t drawable_sprites[8];
+	int bck_sprites; /* Counters for arrays bellow */
+	int frt_sprites;
+	uint8_t front_sprites[8];
+	uint8_t back_sprites[8];
 	uint8_t col_index;
 	uint8_t byte1;
 	uint8_t byte2;
@@ -59,20 +61,25 @@ void draw_line(int line) {
 	/* Identify which sprites have to be drawn */
 	/* If 8x16 sprites, we check 32 sprites instead of 64 */
 	big_sprite = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
-	sprites = 0;
+	frt_sprites = 0;
+	bck_sprites = 0;
 	for(i=0;i!=64/(big_sprite+1);i++) {
 		tmp = *(PPU->SPR_RAM + 4*i*(big_sprite+1)) + 1;
 		if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
-			drawable_sprites[sprites++] = i;
-			if( sprites == 8 )
+			if( *(PPU->SPR_RAM + 4*i*(big_sprite+1) + 2) & SPRITE_OVER_BACK )
+				front_sprites[frt_sprites++] = i;
+			else
+				back_sprites[bck_sprites++] = i;
+			if( (frt_sprites + bck_sprites)== 8 )
 				break;
 		}
 	}
-	if( sprites != 8 )
+	if( (frt_sprites + bck_sprites) != 8 )
 		PPU->SR &= ~MAX_SPRITES_DRAWN;
 	else
 		PPU->SR |= MAX_SPRITES_DRAWN;
-	sprites--;
+	frt_sprites--;
+	bck_sprites--;
 
 
 	ty = line & 0x07; /* ty = line % 8 */
@@ -80,6 +87,50 @@ void draw_line(int line) {
 	/* Fill all pixels with the "colour intensity" color */
 	for(i=0;i!=NES_SCREEN_WIDTH;i++)
 		draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
+
+
+	/* Draw the back sprites */
+	if( config.show_spr ) {
+		for(i=bck_sprites;i>=0;i--) {
+
+			/* 8x8 sprites */
+			if(!big_sprite) {
+
+				/* Here we have color index and h/v flip */
+				byte3 = *(PPU->SPR_RAM + 4*back_sprites[i] + 2);
+
+				/* y coord. If V Flip... */
+				ty = line - *(PPU->SPR_RAM + 4*back_sprites[i]) - 1;
+				if( byte3 & SPRITE_FLIP_VERT )
+					ty = 7 - ty;
+
+				tile = *(PPU->SPR_RAM + 4*back_sprites[i] + 1);
+				tmp  = *(PPU->SPR_RAM + 4*back_sprites[i] + 3); /* X origin */
+				byte1 = *(spr_patt_table + tile*0x10 + ty);
+				byte2 = *(spr_patt_table + tile*0x10 + ty + 0x08);
+				for(tx=0;tx!=8;tx++) {
+					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
+					col_index |=  (byte3&0x03) << 2;
+
+					/* Don't draw background colors! */
+					if( col_index & 0x03 ) {
+
+						/* Horizontal flip? */
+						if( byte3 & SPRITE_FLIP_HORIZ )
+							draw_pixel( tmp + 7 - tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+						else
+							draw_pixel( tmp + tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+					}
+
+				}
+				
+			}
+
+			else {
+				fprintf(stderr,"Still not implemented :(\n");
+			}
+		}
+	}
 
 	/* Draw the background tiles */
 	if( config.show_bg ) {
@@ -114,21 +165,21 @@ void draw_line(int line) {
 
 	/* Draw the front sprites */
 	if( config.show_spr ) {
-		for(i=sprites;i>=0;i--) {
+		for(i=frt_sprites;i>=0;i--) {
 
 			/* 8x8 sprites */
 			if(!big_sprite) {
 
 				/* Here we have color index and h/v flip */
-				byte3 = *(PPU->SPR_RAM + 4*drawable_sprites[i] + 2);
+				byte3 = *(PPU->SPR_RAM + 4*front_sprites[i] + 2);
 
 				/* y coord. If V Flip... */
-				ty = line - *(PPU->SPR_RAM + 4*drawable_sprites[i]) - 1;
-				if( byte3 & 0x80 )
+				ty = line - *(PPU->SPR_RAM + 4*front_sprites[i]) - 1;
+				if( byte3 & SPRITE_FLIP_VERT )
 					ty = 7 - ty;
 
-				tile = *(PPU->SPR_RAM + 4*drawable_sprites[i] + 1);
-				tmp  = *(PPU->SPR_RAM + 4*drawable_sprites[i] + 3); /* X origin */
+				tile = *(PPU->SPR_RAM + 4*front_sprites[i] + 1);
+				tmp  = *(PPU->SPR_RAM + 4*front_sprites[i] + 3); /* X origin */
 				byte1 = *(spr_patt_table + tile*0x10 + ty);
 				byte2 = *(spr_patt_table + tile*0x10 + ty + 0x08);
 				for(tx=0;tx!=8;tx++) {
@@ -139,7 +190,7 @@ void draw_line(int line) {
 					if( col_index & 0x03 ) {
 
 						/* Horizontal flip? */
-						if( byte3 & 0x40 )
+						if( byte3 & SPRITE_FLIP_HORIZ )
 							draw_pixel( tmp + 7 - tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
 						else
 							draw_pixel( tmp + tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
