@@ -159,15 +159,52 @@ void draw_line(int line) {
 
 uint8_t read_ppu_vram(uint16_t address) {
 
-	uint8_t ret_val;
+	/* This duplicates everything else on VRAM */
+	if( 0x4000 <= address ) {
+		DEBUG( printf("PPU Address mirroring: from %04x to ", address) );
+		address = address - 0x4000 * ((address >> 14) & 0x3);
+		DEBUG( printf("%04x\n",address) );
+	}
 
-	ret_val = PPU->VRAM[address];
+	/* After palette mirroring */
+	if( 0x3F20 <= address && address < 0x4000) {
+		DEBUG( printf("PPU Address mirroring: from %04x to ", address) );
+		address = address - 0x20 * ((((address - 0x3F20) >> 5) & 0x7) + 1);
+		DEBUG( printf("%04x\n",address) );
+	}
 
-	return ret_val;
+	/* Name and attribute tables before palette  */
+	if( 0x3000 <= address && address < 0x3F00 ) {
+		DEBUG( printf("PPU Address mirroring: from %04x to ", address) );
+		address = address - 0x1000;
+		DEBUG( printf("%04x\n",address) );
+	}
 
+	return PPU->VRAM[address];
 }
 
 void write_ppu_vram(uint16_t address, uint8_t value) {
+
+	/* This duplicates everything else on VRAM */
+	if( 0x4000 <= address ) {
+		DEBUG( printf("PPU Address mirroring: from %04x to ", address) );
+		address = address - 0x4000 * ((address >> 14) & 0x3);
+		DEBUG( printf("%04x\n",address) );
+	}
+
+	/* After palette mirroring */
+	if( 0x3F20 <= address && address < 0x4000) {
+		DEBUG( printf("PPU Address mirroring: from %04x to ", address) );
+		address = address - 0x20 * ((((address - 0x3F20) >> 5) & 0x7) + 1);
+		DEBUG( printf("%04x\n",address) );
+	}
+
+	/* Name and attribute tables before palette  */
+	if( 0x3000 <= address && address < 0x3F00 ) {
+		DEBUG( printf("PPU Address mirroring: from %04x to ", address) );
+		address = address - 0x1000;
+		DEBUG( printf("%04x\n",address) );
+	}
 
 	PPU->VRAM[address] = value;
 
