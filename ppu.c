@@ -210,6 +210,28 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 
 	/* Name table mirroring. This depends on the type of mirroring
 	 * that the ines file header states */
+	switch( PPU->mirroring) {
+
+		case HORIZONTAL_MIRRORING:
+			if( (0x2400 <= address && address < 0x2800) ||
+			    (0x2C00 <= address && address < 0x3000)) {
+				printf("PPU Address mirroring: from %04x to ", address);
+				address -= 0x400;
+				printf("%04x\n",address);
+			}
+			break;
+
+		case VERTICAL_MIRRORING:
+			if( 0x2800 <= address && address < 0x3000 ) {
+				printf("PPU Address mirroring: from %04x to ", address);
+				address -= 0x800;
+				printf("%04x\n",address);
+			}
+			break;
+
+		default:
+			break;
+	}
 
 	PPU->VRAM[address] = value;
 
