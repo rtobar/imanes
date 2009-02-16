@@ -66,10 +66,10 @@ void draw_line(int line) {
 	for(i=0;i!=64/(big_sprite+1);i++) {
 		tmp = *(PPU->SPR_RAM + 4*i*(big_sprite+1)) + 1;
 		if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
-			if( *(PPU->SPR_RAM + 4*i*(big_sprite+1) + 2) & SPRITE_OVER_BACK )
-				front_sprites[frt_sprites++] = i;
-			else
+			if( *(PPU->SPR_RAM + 4*i*(big_sprite+1) + 2) & SPRITE_BACK_PRIOR )
 				back_sprites[bck_sprites++] = i;
+			else
+				front_sprites[frt_sprites++] = i;
 			if( (frt_sprites + bck_sprites)== 8 )
 				break;
 		}
