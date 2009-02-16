@@ -53,4 +53,17 @@ void init_ppu_vram(ines_file *);
  */
 void draw_line(int line);
 
+/**
+ * Reads a value from a given PPU VRAM address. This method should
+ * handles the mirroring that should ocurr in the PPU VRAM
+ */
+uint8_t read_ppu_vram(uint16_t address);
+
+/**
+ * Write a value in PPU VRAM space. This method handles the mirroring
+ * that should ocurr in the PPU VRAM
+ */
+void write_ppu_vram(uint16_t address, uint8_t value);
+
+
 #endif /* ppu_h */
