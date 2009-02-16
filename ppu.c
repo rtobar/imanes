@@ -90,7 +90,7 @@ void draw_line(int line) {
 
 
 	/* Draw the back sprites */
-	if( config.show_spr ) {
+	if( config.show_back_spr ) {
 		for(i=bck_sprites;i>=0;i--) {
 
 			/* 8x8 sprites */
@@ -164,7 +164,7 @@ void draw_line(int line) {
 	}
 
 	/* Draw the front sprites */
-	if( config.show_spr ) {
+	if( config.show_front_spr ) {
 		for(i=frt_sprites;i>=0;i--) {
 
 			/* 8x8 sprites */
