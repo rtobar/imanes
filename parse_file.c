@@ -62,20 +62,19 @@ ines_file *check_ines_file(char *file_path) {
 	buff = realloc(buff,2);
 	read_bytes = read(rom_file->fd, buff, 2);
 
-	/* Vert/Horiz mirroring */
-	PPU->mirroring = buff[0] & 0x1;
-
-	/* Four-screen mirroring */
-	if( buff[0] & 0x4 ) {
-		PPU->mirroring = FOUR_SCREEN_MIRRORING;
-	}
-
-	printf("Mirroring type: %d\n", PPU->mirroring);
-
 	if( read_bytes != 2 ) {
 		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
 		exit(EXIT_FAILURE);
 	}
+
+	/* Vert/Horiz mirroring */
+	PPU->mirroring = buff[0] & 0x1;
+
+	/* Four-screen mirroring */
+	if( buff[0] & 0x08 )
+		PPU->mirroring = FOUR_SCREEN_MIRRORING;
+
+	printf("Mirroring type: %d\n", PPU->mirroring);
 
 	rom_file->mapper_id = (buff[1] & 0xF0) | ( (buff[0] >> 4) & 0x0F );
 

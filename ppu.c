@@ -137,6 +137,12 @@ void draw_line(int line) {
 	if( config.show_bg ) {
 		for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
 
+			/* Check out in which name table the tile is
+			 * because of the horizontal mirroring */
+			if( PPU->mirroring == HORIZONTAL_MIRRORING ) {
+				/* Check nametable */;
+			}
+
 			/* Get the 8x8 pixel table where the line is present */
 			tile = *(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
 
