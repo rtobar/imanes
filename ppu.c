@@ -64,10 +64,10 @@ void draw_line(int line) {
 	big_sprite = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
 	frt_sprites = 0;
 	bck_sprites = 0;
-	for(i=0;i!=64/(big_sprite+1);i++) {
-		tmp = *(PPU->SPR_RAM + 4*i*(big_sprite+1)) + 1;
-		if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
-			if( *(PPU->SPR_RAM + 4*i*(big_sprite+1) + 2) & SPRITE_BACK_PRIOR )
+	for(i=0;i!=64;i++) {
+		tmp = *(PPU->SPR_RAM + 4*i) + 1;
+		if( tmp <= line && line < tmp+8 ) {
+			if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR )
 				back_sprites[bck_sprites++] = i;
 			else
 				front_sprites[frt_sprites++] = i;
@@ -94,8 +94,7 @@ void draw_line(int line) {
 	if( config.show_back_spr ) {
 		for(i=bck_sprites;i>=0;i--) {
 
-			/* 8x8 sprites */
-			if(!big_sprite) {
+			if(!big_sprite || big_sprite ) {
 
 				/* Here we have color index and h/v flip */
 				byte3 = *(PPU->SPR_RAM + 4*back_sprites[i] + 2);
@@ -127,9 +126,6 @@ void draw_line(int line) {
 				
 			}
 
-			else {
-				fprintf(stderr,"Still not implemented :(\n");
-			}
 		}
 	}
 
@@ -175,7 +171,7 @@ void draw_line(int line) {
 		for(i=frt_sprites;i>=0;i--) {
 
 			/* 8x8 sprites */
-			if(!big_sprite) {
+			if(!big_sprite || big_sprite) {
 
 				/* Here we have color index and h/v flip */
 				byte3 = *(PPU->SPR_RAM + 4*front_sprites[i] + 2);
@@ -205,10 +201,6 @@ void draw_line(int line) {
 
 				}
 				
-			}
-
-			else {
-				fprintf(stderr,"Still not implemented :(\n");
 			}
 		}
 	}
