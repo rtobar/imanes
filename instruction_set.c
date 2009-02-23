@@ -333,12 +333,17 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 			oper.value = CPU->A;
 			break;
 
+		/* Wrap around if grater out of zeropage */
 		case ADDR_ZERO_INDX:
 			oper.address = CPU->RAM[inst_address+1] + CPU->X;
+			if( oper.address >= 0x0100 )
+				oper.address -= 0x100;
 			break;
 
 		case ADDR_ZERO_INDY:
 			oper.address = CPU->RAM[inst_address+1] + CPU->Y;
+			if( oper.address >= 0x0100 )
+				oper.address -= 0x100;
 			break;
 
 		default:

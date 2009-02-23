@@ -285,7 +285,7 @@ void execute_instruction(instruction inst, operand oper) {
 			else {
 				oper.value = read_cpu_ram(oper.address);
 				tmp = oper.value & 0x1;
-				oper.value <<= 1;
+				oper.value >>= 1;
 				write_cpu_ram( oper.address, oper.value );
 				update_flags( oper.value , Z_FLAG);
 			}
