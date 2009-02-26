@@ -63,14 +63,30 @@ void init_cpu_ram(ines_file *file) {
 
 void execute_instruction(instruction inst, operand oper) {
 
-	uint8_t tmp;
+	uint8_t  tmp;
+	uint16_t tmp16;
 
 	switch(inst.instr_id) {
 
 		case ADC: /* TODO: check C and V flags */
 			if( inst.addr_mode != ADDR_IMMEDIATE )
 				oper.value = read_cpu_ram(oper.address);
-			CPU->A += oper.value + (CPU->SR & C_FLAG);
+			tmp16 = CPU->A + oper.value + (CPU->SR & C_FLAG);
+
+			/* If result is over 0xFF, then the carry is 1 */
+			if( tmp16 > 0xFF )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+
+			/* Set overflow flag if needed */
+			if( ( ((CPU->A    ^tmp16) & 0x80) != 0 ) &&
+			    ( ((oper.value^tmp16) & 0x80) != 0 ) )
+				CPU->SR |= V_FLAG;
+			else
+				CPU->SR &= ~V_FLAG;
+
+			CPU->A = tmp16 & 0xFF; /* Truncate to 8 bits */
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
@@ -378,7 +394,23 @@ void execute_instruction(instruction inst, operand oper) {
 		case SBC:
 			if( inst.addr_mode != ADDR_IMMEDIATE )
 				oper.value = read_cpu_ram(oper.address);
-			CPU->A = CPU->A - oper.value - (1 - (CPU->SR & C_FLAG));
+			tmp16 = CPU->A - oper.value - (1 - (CPU->SR & C_FLAG));
+
+			/* If result is over 0xFF, then the carry is 1 */
+			if( tmp16 >= 0xFF )
+				CPU->SR &= ~C_FLAG;
+			else
+				CPU->SR |= C_FLAG;
+
+			/* Set overflow flag if needed */
+			if( ( ((CPU->A    ^tmp16) & 0x80) != 0 ) &&
+			    ( ((oper.value^tmp16) & 0x80) != 0 ) )
+				CPU->SR |= V_FLAG;
+			else
+				CPU->SR &= ~V_FLAG;
+
+			CPU->A = tmp16 & 0xFF; /* truncate to 8 bits */
+
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
