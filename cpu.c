@@ -80,8 +80,8 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->SR &= ~C_FLAG;
 
 			/* Set overflow flag if needed */
-			if( ( ((CPU->A    ^tmp16) & 0x80) != 0 ) &&
-			    ( ((oper.value^tmp16) & 0x80) != 0 ) )
+			if( ( ((CPU->A^tmp16)      & 0x80) != 0 ) &&
+			    ( ((CPU->A^oper.value) & 0x80) == 0 ) )
 				CPU->SR |= V_FLAG;
 			else
 				CPU->SR &= ~V_FLAG;
@@ -403,8 +403,8 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->SR |= C_FLAG;
 
 			/* Set overflow flag if needed */
-			if( ( ((CPU->A    ^tmp16) & 0x80) != 0 ) &&
-			    ( ((oper.value^tmp16) & 0x80) != 0 ) )
+			if( ( ((CPU->A^tmp16)      & 0x80) != 0 ) &&
+			    ( ((CPU->A^oper.value) & 0x80) != 0 ) )
 				CPU->SR |= V_FLAG;
 			else
 				CPU->SR &= ~V_FLAG;
