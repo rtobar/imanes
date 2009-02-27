@@ -22,13 +22,14 @@ void unrom_switch_banks()
 
 	DEBUG( printf("Performing bank switching: Switching to bank %d of ROM\n",mapper->reg1) );
 	memcpy(CPU->RAM+0x8000, mapper->file->rom + mapper->reg1*ROM_BANK_SIZE,
-		  	ROM_BANK_SIZE);
+	       ROM_BANK_SIZE);
 }
 
 void unrom_reset()
 {
+
 	memcpy(CPU->RAM+0x8000, mapper->file->rom, ROM_BANK_SIZE);
 	memcpy(CPU->RAM+0xC000, 
-			mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE, 
-			ROM_BANK_SIZE);
+	       mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE, 
+	       ROM_BANK_SIZE);
 }
