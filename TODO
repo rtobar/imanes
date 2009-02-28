@@ -1,7 +1,7 @@
 General:
 ========
 
- * Configurable verbosity
+ * [DONE] Configurable verbosity
  * [DONE] Add a pause option (using pthread_mutex I think...)
 
 CPU:

@@ -20,6 +20,29 @@ void usage(char *argv[]) {
 	fprintf(stderr,"Usage: %s <rom file>\n",argv[0]);
 }
 
+void parse_options(int args, char *argv[]) {
+
+	int opt;
+
+	verbosity = 0;
+
+	while( (opt = getopt(args, argv, "v")) != -1 ) {
+
+		switch(opt) {
+			case 'v':
+				verbosity++;
+				break;
+
+			default:
+				printf("pn %d\n", opt);
+				break;
+		}
+
+	}
+
+
+}
+
 int main(int args, char *argv[]) {
 
 	ines_file *nes_rom;
@@ -31,7 +54,9 @@ int main(int args, char *argv[]) {
 
 	setbuf(stdout,NULL);
 	setbuf(stderr,NULL);
-	verbosity = INFO_LEVEL;
+
+	/* Parse command line options */
+	parse_options(args, argv);
 
 	/* Initialize static data */
 	initialize_configuration();
@@ -41,7 +66,7 @@ int main(int args, char *argv[]) {
 	initialize_ppu();
 	initialize_pads();
 
-	nes_rom = check_ines_file(argv[1]);
+	nes_rom = check_ines_file(argv[optind]);
 	map_rom_memory(nes_rom);
 	init_ppu_vram(nes_rom);
 	init_screen();
