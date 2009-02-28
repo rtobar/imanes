@@ -88,7 +88,7 @@ void main_loop(ines_file *file) {
 
 		for(i=0;i!=DUMPS;i++)
 			if(CPU->PC == pc_dumps[i])
-				dump_cpu();
+				DEBUG( dump_cpu() );
 
 		/* A line has ended its scanning, draw it */
 		if( scanline_timeout <= 0 ) {
