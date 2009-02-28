@@ -10,8 +10,8 @@ CPU:
  * [DONE] Change the way that the CPU addresses are read/written.
           For this I should have a separate (inline?) method to do this.
  * [DONE] Handle the mirroring by means of this separate method
- * Fix the ADC/SBC instructions (recognize the C flag change)
- * Check LSR
+ * [TESTING] Fix the ADC/SBC instructions (recognize the C flag change)
+ * Check ASL/LSR
 
 PPU:
 ====
@@ -21,12 +21,12 @@ PPU:
    a merge after that [TESTING IN SEPARATE BRANCH].
  * Configurable video scaling
  * [TESTING] Fix *once for all* the background drawing
- * [TESTING] Fix sprite drawing (they seem to be 1 pixel above)
+ * [DONE] Fix sprite drawing (they seem to be 1 pixel above)
  * [TESTING] Support for vertical flip sprites feature
- * Support background scrolling
+ * [URGENT] Support background scrolling
  * Recognize and set "pixel 0 bit"
  * [URGENT] Add support for 8x16 sprites
- * Fix the back and front sprites drawing
+ * [TESTING] Fix the back and front sprites drawing
 
 Pads:
 =====
