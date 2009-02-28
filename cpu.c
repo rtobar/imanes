@@ -267,8 +267,8 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case JSR:
-			stack_push( (CPU->PC+inst.size) >> 8 );
-			stack_push( (CPU->PC+inst.size) & 0xFF );
+			stack_push( (CPU->PC+2) >> 8 );
+			stack_push( (CPU->PC+2) & 0xFF );
 			CPU->PC = oper.address - inst.size;
 			break;
 
@@ -389,6 +389,7 @@ void execute_instruction(instruction inst, operand oper) {
 		case RTS:
 			CPU->PC =  stack_pull();
 			CPU->PC |= stack_pull() << 8;
+			CPU->PC++;
 			CPU->PC -= inst.size;
 			break;
 
