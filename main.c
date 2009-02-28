@@ -17,7 +17,11 @@
 int verbosity;
 
 void usage(char *argv[]) {
-	fprintf(stderr,"Usage: %s <rom file>\n",argv[0]);
+	fprintf(stderr,"\nUsage: %s [options] <rom file>\n\n",argv[0]);
+	fprintf(stderr,"Options:\n");
+	fprintf(stderr,"  -v        Increase the verbosity. Default: 0\n");
+	fprintf(stderr,"  -h,-?     Show this help and exit\n");
+	fprintf(stderr,"\n");
 }
 
 void parse_options(int args, char *argv[]) {
@@ -26,31 +30,39 @@ void parse_options(int args, char *argv[]) {
 
 	verbosity = 0;
 
-	while( (opt = getopt(args, argv, "v")) != -1 ) {
+	while( (opt = getopt(args, argv, "vhH?")) != -1 ) {
 
 		switch(opt) {
 			case 'v':
 				verbosity++;
 				break;
 
+			case '?':
+			case 'h':
+			case 'H':
+				usage(argv);
+				exit(EXIT_SUCCESS);
+				break;
+
 			default:
-				printf("pn %d\n", opt);
+				usage(argv);
+				exit(EXIT_FAILURE);
 				break;
 		}
 
 	}
 
+	if( optind >= args ) {
+		fprintf(stderr,"%s: Error: Expected ROM file, none given\n", argv[0]);
+		usage(argv);
+		exit(EXIT_FAILURE);
+	}
 
 }
 
 int main(int args, char *argv[]) {
 
 	ines_file *nes_rom;
-
-	if( args < 2 ) {
-		usage(argv);
-		exit(EXIT_FAILURE);
-	}
 
 	setbuf(stdout,NULL);
 	setbuf(stderr,NULL);
