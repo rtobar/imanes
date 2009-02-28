@@ -99,14 +99,15 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case ASL:
 			if( inst.addr_mode == ADDR_ACCUM ) {
-				tmp = CPU->A >> 7;
+				tmp = CPU->A & 0x80;
 				CPU->A <<= 1;
 				update_flags(CPU->A, N_FLAG | Z_FLAG);
 			}
 			else {
 				oper.value = read_cpu_ram(oper.address);
-				tmp = oper.value >> 7;
-				write_cpu_ram(oper.value << 1, oper.address);
+				tmp = oper.value & 0x80;
+				oper.value <<= 1;
+				write_cpu_ram(oper.value, oper.address);
 				update_flags(oper.value, N_FLAG | Z_FLAG);
 			}
 			if( tmp )	
@@ -294,7 +295,7 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case LSR:
 			if( inst.addr_mode == ADDR_ACCUM ) {
-				tmp = CPU->A  & 0x1;
+				tmp = CPU->A & 0x1;
 				CPU->A >>= 1;
 				update_flags(CPU->A, Z_FLAG);
 			}
@@ -340,13 +341,13 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case ROL:
 			if( inst.addr_mode == ADDR_ACCUM ) {
-				tmp = CPU->A >> 7;
+				tmp = CPU->A & 0x80;
 				CPU->A <<= 1;
 				CPU->A |= (CPU->SR & C_FLAG);
 				update_flags( CPU->A, N_FLAG | Z_FLAG);
 			} else {
 				oper.value = read_cpu_ram(oper.address);
-				tmp = oper.value >> 7;
+				tmp = oper.value & 0x80;
 				oper.value <<= 1;
 				oper.value |= (CPU->SR & C_FLAG);
 				write_cpu_ram(oper.address, oper.value);

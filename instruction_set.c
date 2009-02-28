@@ -330,10 +330,9 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 			break;
 
 		case ADDR_ACCUM:
-			oper.value = CPU->A;
 			break;
 
-		/* Wrap around if grater out of zeropage */
+		/* Wrap around if resulting address is out of zeropage */
 		case ADDR_ZERO_INDX:
 			oper.address = CPU->RAM[inst_address+1] + CPU->X;
 			if( oper.address >= 0x0100 )
