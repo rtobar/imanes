@@ -10,8 +10,8 @@ CPU:
  * [DONE] Change the way that the CPU addresses are read/written.
           For this I should have a separate (inline?) method to do this.
  * [DONE] Handle the mirroring by means of this separate method
- * [TESTING] Fix the ADC/SBC instructions (recognize the C flag change)
- * Check ASL/LSR
+ * [DONE] Fix the ADC/SBC instructions (recognize the C flag change)
+ * Check ASL
 
 PPU:
 ====
@@ -34,3 +34,8 @@ Pads:
  * [DONE] Add initial support for user input through keyboard
  * Support second pad
  * Configurable keys
+
+Mappers:
+========
+
+ * Finish and test MMC1
