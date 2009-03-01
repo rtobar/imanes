@@ -25,8 +25,8 @@ typedef struct {
 /** SR flags */
 #define N_FLAG 0x80
 #define V_FLAG 0x40
-#define R_FLAG 0x20 /* taken from ines */
-#define B_FLAG 0x10
+#define R_FLAG 0x20 /* It doesn't even physically exist */
+#define B_FLAG 0x10 /* It doesn't physically exist either, but it is used */
 #define D_FLAG 0x08
 #define I_FLAG 0x04
 #define Z_FLAG 0x02

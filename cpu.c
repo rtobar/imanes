@@ -19,7 +19,7 @@ void initialize_cpu() {
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
 	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
 	CPU->reset = 1;
-	CPU->SR = R_FLAG; /* It is never ever used, compatibility with ines */
+	CPU->SR = R_FLAG; /* It is never ever used, but always set */
 
 	return;
 }
@@ -327,6 +327,7 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case PHP:
+			CPU->SR |= B_FLAG;
 			stack_push( CPU->SR );
 			break;
 
@@ -337,6 +338,7 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case PLP:
 			CPU->SR = stack_pull();
+			CPU->SR |= R_FLAG; /* R_FLAG should be _always_ set */
 			break;
 
 		case ROL:
@@ -381,6 +383,7 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case RTI:
 			CPU->SR =  stack_pull();
+			CPU->SR |= R_FLAG; /* R_FLAG should be _always_ set */
 			CPU->PC =  stack_pull();
 			CPU->PC |= stack_pull() << 8;
 			CPU->PC -= inst.size;
@@ -684,6 +687,10 @@ uint8_t stack_pull() {
 void execute_nmi() {
 
 	DEBUG( printf("Executing NMI!\n") );
+
+	/* NMI clears the B_FLAG from CPU status */
+	CPU->SR &= ~B_FLAG;
+
 	/* Push the PC and the SR */
 	/* Finally, jump to the interrupt vector */
 	stack_push( CPU->PC >> 8 );
