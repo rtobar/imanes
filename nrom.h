@@ -9,4 +9,4 @@ int  nrom_check_address(uint16_t address);
 void nrom_switch_banks();
 void nrom_reset();
 
-#endif
+#endif /* nrom_h */
