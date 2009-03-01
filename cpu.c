@@ -297,14 +297,14 @@ void execute_instruction(instruction inst, operand oper) {
 			if( inst.addr_mode == ADDR_ACCUM ) {
 				tmp = CPU->A & 0x1;
 				CPU->A >>= 1;
-				update_flags(CPU->A, Z_FLAG);
+				update_flags(CPU->A, Z_FLAG | N_FLAG);
 			}
 			else {
 				oper.value = read_cpu_ram(oper.address);
 				tmp = oper.value & 0x1;
 				oper.value >>= 1;
 				write_cpu_ram( oper.address, oper.value );
-				update_flags( oper.value , Z_FLAG);
+				update_flags( oper.value , Z_FLAG | N_FLAG);
 			}
 			if( tmp )
 				CPU->SR |= C_FLAG;
@@ -494,6 +494,8 @@ void update_flags(int8_t value, uint8_t flags) {
 
 }
 
+uint8_t pn;
+
 void write_cpu_ram(uint16_t address, uint8_t value) {
 
 	static unsigned int first_write = 1;
@@ -515,6 +517,13 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		DEBUG( printf("CPU Address mirroring: from %04x to ", address) );
 		address = address - 0x8 * ((address >> 3) & 0x7FF);
 		DEBUG( printf("%04x\n",address) );
+	}
+
+	pn = value;
+	/* Check if mapper need to come into action */
+	if( mapper->check_address(address) ) {
+		mapper->switch_banks();
+		return;
 	}
 
 	switch( address ) {
@@ -591,11 +600,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		printf("%02x ", CPU->RAM[(address&0xfff0) + i]);
 	printf("\n");
 	);
-
-	/* Check if mapper need to come into action */
-	if( mapper->check_address(address) ) {
-		mapper->switch_banks();
-	}
 
 	return;
 }
