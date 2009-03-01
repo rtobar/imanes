@@ -106,13 +106,44 @@ void mmc1_switch_banks() {
 
 	/* First register has changed */
 	if( touched_regs[0] == 1 ) {
+
+		DEBUG( printf("MMC1: Switching banks...\n") );
+
 		PPU->mirroring = mapper->regs[0] & 0x01;
 		if( !(mapper->regs[0] & 0x02 ) )
 			PPU->mirroring = SINGLE_SCREEN_MIRRORING;
 
-		
+		/* We have three major options:
+		 *  1) VROM packed catridges
+		 *  2) 512 Kb packed catridges
+		 *  3) 1024 Kb packed catridges.
+		 *
+		 * This distinction is for the usage of bit 4 of register 0
+		 * and the usage of register 1 and 2. In the first case they are
+		 * used to switch VROM banks, while in the second to help in the
+		 * choose of the appropiate ROM bank to switch */
+
+		/* VROM packed roms */
+		if( mapper->file->vromBanks != 0 ) {
+
+			/* Switch VROM banks. Banks sizes can be 8 Kb or 4 Kb.
+			 * In both cases we fill form 0x0000 to 0x2000. */
+			if( !(mapper->regs[0] & 0x10) ) {
+				offset = mapper->regs[1] & 0x0F;
+				memcpy( PPU->VRAM, mapper->file->vrom+offset, VROM_BANK_SIZE*2);
+			}
+			else {
+				memcpy( PPU->VRAM, mapper->file->vrom + (mapper->regs[1]&0x0F),
+				        VROM_BANK_SIZE);
+				memcpy( PPU->VRAM+0x1000,
+				        mapper->file->vrom + (mapper->regs[2]&0xF),
+				        VROM_BANK_SIZE);
+			}
+
+		}
+
 		/* 512 Kb roms */
-		if( mapper->file->romBanks == 32 && (mapper->regs[1] & 0x10) )
+		else if( mapper->file->romBanks == 32 && (mapper->regs[1] & 0x10) )
 			offset = 0x40000;
 
 		/* 1024 Kb roms */
