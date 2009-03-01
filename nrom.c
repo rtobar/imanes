@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "mapper.h"
 #include "nrom.h"
 #include "cpu.h"
 

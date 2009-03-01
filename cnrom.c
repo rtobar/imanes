@@ -4,6 +4,7 @@
 #include "cnrom.h"
 #include "cpu.h"
 #include "debug.h"
+#include "mapper.h"
 #include "ppu.h"
 
 int cnrom_check_address(uint16_t address) {

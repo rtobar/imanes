@@ -4,6 +4,7 @@
 #include "cnrom.h"
 #include "mapper.h"
 #include "nrom.h"
+#include "unrom.h"
 
 nes_mapper *mapper;
 

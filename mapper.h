@@ -36,9 +36,4 @@ extern nes_mapper mapper_list[];
 /* Global current mapper variable */
 nes_mapper *mapper;
 
-/* UNROM MMC */
-int unrom_check_address(uint16_t address);
-void unrom_switch_banks();
-void unrom_reset();
-
 #endif /* mapper_h */
