@@ -686,8 +686,8 @@ void execute_nmi() {
 	DEBUG( printf("Executing NMI!\n") );
 	/* Push the PC and the SR */
 	/* Finally, jump to the interrupt vector */
-	stack_push( (CPU->PC) >> 8 );
-	stack_push( (CPU->PC) & 0xFF );
+	stack_push( CPU->PC >> 8 );
+	stack_push( CPU->PC & 0xFF );
 	stack_push( CPU->SR );
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
