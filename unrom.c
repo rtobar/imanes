@@ -4,6 +4,7 @@
 #include "cpu.h"
 #include "debug.h"
 #include "mapper.h"
+#include "unrom.h"
 
 void unrom_initialize_mapper() {
 	mapper->regs = (uint8_t *)malloc(1);
