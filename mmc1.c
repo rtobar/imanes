@@ -129,21 +129,23 @@ void mmc1_switch_banks() {
 			/* Switch VROM banks. Banks sizes can be 8 Kb or 4 Kb.
 			 * In both cases we fill form 0x0000 to 0x2000. */
 			if( !(mapper->regs[0] & 0x10) ) {
-				printf("MMC1: Switching to 8 Kb VROM bank %d\n", mapper->regs[1]&0x0F);
+				printf("MMC1: Switching 8 Kb VROM bank %d. Offset is ", mapper->regs[1]&0x0F);
 				offset = (mapper->regs[1] & 0x0F) * VROM_BANK_SIZE;
+				printf("%04x\n", offset);
 				memcpy( PPU->VRAM, mapper->file->vrom+offset, VROM_BANK_SIZE);
 			}
 			else {
-				printf("MMC1: Switching to 4 Kb VROM banks %d/%d\n", mapper->regs[1]&0x0F, mapper->regs[2]&0x0F);
+				printf("MMC1: Switching 4 Kb VROM banks %d/%d. Offsets are ", mapper->regs[1]&0x0F, mapper->regs[2]&0x0F);
 
 				offset = (mapper->regs[1] & 0x0F) * VROM_BANK_SIZE/2;
+				printf("%04x", offset);
 				memcpy( PPU->VRAM, mapper->file->vrom + offset,
 				        VROM_BANK_SIZE/2);
 				offset = (mapper->regs[2] & 0x0F) * VROM_BANK_SIZE/2;
+				printf("%04x/\n", offset);
 				memcpy( PPU->VRAM+0x1000, mapper->file->vrom + offset,
 				        VROM_BANK_SIZE/2);
 			}
-
 		}
 
 		/* 512 Kb roms */
@@ -165,13 +167,13 @@ void mmc1_switch_banks() {
 
 			/* Select the actual bank that will be switched */
 			offset += (mapper->regs[3] & 0x0F) * ROM_BANK_SIZE/2;
-			printf("MMC1: Switching to 32 Kb ROM bank %d\n", offset/ROM_BANK_SIZE);
+			printf("MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n", offset/ROM_BANK_SIZE, offset);
 			memcpy( CPU->RAM+0x8000, mapper->file->rom + offset,
 			        ROM_BANK_SIZE*2);
 		}
 		else {
 			offset += (mapper->regs[3] & 0x0F) * ROM_BANK_SIZE;
-			printf("MMC1: Switching to 16 Kb ROM bank %d\n", offset/ROM_BANK_SIZE);
+			printf("MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n", offset/ROM_BANK_SIZE, offset, 0x8000 + (mapper->regs[0]&0x04?0:0x4000));
 			memcpy( CPU->RAM+0x8000 + (mapper->regs[0]&0x04 ? 0 : 0x4000),
 			        mapper->file->rom + offset, ROM_BANK_SIZE);
 		}
