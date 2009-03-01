@@ -107,8 +107,8 @@ void execute_instruction(instruction inst, operand oper) {
 				oper.value = read_cpu_ram(oper.address);
 				tmp = oper.value & 0x80;
 				oper.value <<= 1;
-				write_cpu_ram(oper.value, oper.address);
 				update_flags(oper.value, N_FLAG | Z_FLAG);
+				write_cpu_ram(oper.value, oper.address);
 			}
 			if( tmp )	
 				CPU->SR |= C_FLAG;

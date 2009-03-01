@@ -304,7 +304,12 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 		/* For indirect addressing, we need to use read_cpu_ram*/
 		case ADDR_INDIRECT:
 			address = CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8);
-			oper.address = read_cpu_ram(address) | (read_cpu_ram(address+1) << 8);
+			oper.address =  read_cpu_ram(address);
+
+			/* 6502 bug: if address is $xxFF, the next read wraps page */
+			if( address%0x100 == 0xFF )
+				address -= 0x100;
+			oper.address |= (read_cpu_ram(address+1) << 8);
 			break;
 
 		case ADDR_ABS_INDX:
