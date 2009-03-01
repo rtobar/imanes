@@ -5,6 +5,10 @@
 #include "nrom.h"
 #include "cpu.h"
 
+inline void nrom_initialize_mapper() {
+	return;
+}
+
 inline int nrom_check_address(uint16_t address) {
 	return 0;
 }

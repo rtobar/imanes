@@ -94,6 +94,8 @@ ines_file *check_ines_file(char *file_path) {
 		exit(EXIT_FAILURE);
 	}
 
+	mapper->initialize_mapper();
+
 	/* The rest of the header is ignored until now... */
 	buff = realloc(buff,8);
 	read_bytes = read(rom_file->fd, buff, 8);

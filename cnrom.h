@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 /* Implementation of mapper struct function pointers */
+void cnrom_initialize_mapper();
 int  cnrom_check_address(uint16_t address);
 void cnrom_switch_banks();
 void cnrom_reset();

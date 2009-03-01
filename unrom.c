@@ -5,12 +5,17 @@
 #include "debug.h"
 #include "mapper.h"
 
+void unrom_initialize_mapper() {
+	mapper->regs = (uint8_t *)malloc(1);
+	return;
+}
+
 int unrom_check_address(uint16_t address) {
 
 	/* It is not necessary to check <= 0xFFFF because of the data range
 	 * of a uint16_t :) */
 	if( 0x8000 <= address ) {
-		mapper->reg1 = CPU->RAM[address];
+		mapper->regs[0] = CPU->RAM[address];
 		return 1;
 	}
 
@@ -20,8 +25,8 @@ int unrom_check_address(uint16_t address) {
 void unrom_switch_banks() 
 {
 
-	DEBUG( printf("Performing bank switching: Switching to bank %d of ROM\n",mapper->reg1) );
-	memcpy(CPU->RAM+0x8000, mapper->file->rom + mapper->reg1*ROM_BANK_SIZE,
+	DEBUG( printf("Performing bank switching: Switching to bank %d of ROM\n",mapper->regs[0]) );
+	memcpy(CPU->RAM+0x8000, mapper->file->rom + mapper->regs[0]*ROM_BANK_SIZE,
 	       ROM_BANK_SIZE);
 }
 
