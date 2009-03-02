@@ -494,8 +494,6 @@ void update_flags(int8_t value, uint8_t flags) {
 
 }
 
-uint8_t pn;
-
 void write_cpu_ram(uint16_t address, uint8_t value) {
 
 	static unsigned int first_write = 1;
@@ -519,7 +517,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		DEBUG( printf("%04x\n",address) );
 	}
 
-	pn = value;
 	/* Check if mapper need to come into action */
 	if( mapper->check_address(address) ) {
 		mapper->switch_banks();
