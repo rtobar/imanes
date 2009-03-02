@@ -56,17 +56,16 @@ void draw_line(int line) {
 	attr_table     = name_table + 0x3C0;
 	spr_patt_table = PPU->VRAM + ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
 	scr_patt_table = PPU->VRAM + ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
+	big_sprite     = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
 
 
 	/* Identify which sprites have to be drawn */
-	/* If 8x16 sprites, we check 32 sprites instead of 64 */
 	/* TODO: Investigate better how 8x16 sprites work */
-	big_sprite = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
 	frt_sprites = 0;
 	bck_sprites = 0;
 	for(i=0;i!=64;i++) {
 		tmp = *(PPU->SPR_RAM + 4*i) + 1;
-		if( tmp <= line && line < tmp+8 ) {
+		if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
 			if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR )
 				back_sprites[bck_sprites++] = i;
 			else
