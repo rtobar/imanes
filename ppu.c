@@ -40,6 +40,7 @@ void draw_line(int line) {
 	int bck_sprites; /* Counters for arrays bellow */
 	int frt_sprites;
 	int second_sprite; /* For 8x16 sprites */
+	int first_bg_pixel; /* For Sprite #0 hit flag */
 	uint8_t front_sprites[8];
 	uint8_t back_sprites[8];
 	uint8_t col_index;
@@ -141,6 +142,7 @@ void draw_line(int line) {
 
 	/* Draw the background tiles */
 	ty = line & 0x07; /* ty = line % 8 */
+	first_bg_pixel = -1;
 
 	if( config.show_bg ) {
 		for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
@@ -172,8 +174,11 @@ void draw_line(int line) {
 				tmp = (((line >> 4)&0x1)<<1) + ((i >> 1)&0x1);
 				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
-				if( col_index & 0x03 )
+				if( col_index & 0x03 ) {
+					if( first_bg_pixel == -1 )
+						first_bg_pixel = i*8+tx;
 					draw_pixel(i*8+tx, line, system_palette[*(PPU->VRAM + 0x3F00 + col_index)]);
+				}
 			}
 		}
 	}
@@ -216,10 +221,19 @@ void draw_line(int line) {
 					if( col_index & 0x03 ) {
 
 						/* Horizontal flip? */
-						if( byte3 & SPRITE_FLIP_HORIZ )
-							draw_pixel( tmp + 7 - tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
-						else
-							draw_pixel( tmp + tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+						if( byte3 & SPRITE_FLIP_HORIZ ) {
+							if( !(PPU->SR&HIT_FLAG) && tmp+7-tx == first_bg_pixel)
+								PPU->SR |= HIT_FLAG;
+							draw_pixel( tmp + 7 - tx, line,
+							system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+						}
+						else {
+							if( !(PPU->SR&HIT_FLAG) && tmp+tx == first_bg_pixel )
+								PPU->SR |= HIT_FLAG;
+							draw_pixel( tmp + tx, line,
+							system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+						}
+
 					}
 
 				}
