@@ -104,8 +104,20 @@ void draw_line(int line) {
 
 				tile = *(PPU->SPR_RAM + 4*back_sprites[i] + 1);
 				tmp  = *(PPU->SPR_RAM + 4*back_sprites[i] + 3); /* X origin */
-				byte1 = *(spr_patt_table + tile*0x10 + ty);
-				byte2 = *(spr_patt_table + tile*0x10 + ty + 0x08);
+
+				/* 8x16 sprites patter table depends on i being even or not */
+				second_sprite = 0;
+				if( big_sprite ) {
+					spr_patt_table = PPU->VRAM + 0x1000*(tile&0x1);
+					tile &= 0xFE;
+					if( ty >= 8 ) {
+						ty -= 8;
+						second_sprite = 1;
+					}
+				}
+
+				byte1 = *(spr_patt_table + (tile+second_sprite)*0x10 + ty);
+				byte2 = *(spr_patt_table + (tile+second_sprite)*0x10 + ty + 0x08);
 				for(tx=0;tx!=8;tx++) {
 					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 					col_index |=  (byte3&0x03) << 2;
