@@ -11,7 +11,7 @@ CPU:
           For this I should have a separate (inline?) method to do this.
  * [DONE] Handle the mirroring by means of this separate method
  * [DONE] Fix the ADC/SBC instructions (recognize the C flag change)
- * Check ASL
+ * [DONE] Check ASL
 
 PPU:
 ====
