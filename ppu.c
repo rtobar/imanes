@@ -83,8 +83,6 @@ void draw_line(int line) {
 	bck_sprites--;
 
 
-	ty = line & 0x07; /* ty = line % 8 */
-
 	/* Fill all pixels with the "colour intensity" color */
 	for(i=0;i!=NES_SCREEN_WIDTH;i++)
 		draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
@@ -130,6 +128,8 @@ void draw_line(int line) {
 	}
 
 	/* Draw the background tiles */
+	ty = line & 0x07; /* ty = line % 8 */
+
 	if( config.show_bg ) {
 		for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
 
