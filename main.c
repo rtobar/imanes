@@ -14,12 +14,11 @@
 #include "ppu.h"
 #include "screen.h"
 
-int verbosity;
-
 void usage(char *argv[]) {
 	fprintf(stderr,"\nUsage: %s [options] <rom file>\n\n",argv[0]);
 	fprintf(stderr,"Options:\n");
 	fprintf(stderr,"  -v        Increase the verbosity. Default: 0\n");
+	fprintf(stderr,"  -s        Video scaling facotr. Default: 1\n");
 	fprintf(stderr,"  -h,-?     Show this help and exit\n");
 	fprintf(stderr,"\n");
 }
@@ -28,13 +27,22 @@ void parse_options(int args, char *argv[]) {
 
 	int opt;
 
-	verbosity = 0;
+	config.verbosity = 0;
 
-	while( (opt = getopt(args, argv, "vhH?")) != -1 ) {
+	while( (opt = getopt(args, argv, "vhHs:?")) != -1 ) {
 
 		switch(opt) {
 			case 'v':
-				verbosity++;
+				config.verbosity++;
+				break;
+
+			case 's':
+				config.video_scale = atoi(optarg);
+				if( config.video_scale == 0 ) {
+					fprintf(stderr,"Error: invalid video scale factor. Must be an integer value\n");
+					usage(argv);
+					exit(EXIT_FAILURE);
+				}
 				break;
 
 			case '?':

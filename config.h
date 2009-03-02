@@ -8,6 +8,9 @@ typedef struct _config {
 	uint8_t show_back_spr;       /* Should we display back sprites? */
 	uint8_t show_bg;             /* Should we display the background */
 	uint8_t pause;               /* Pause emulation */
+
+	int video_scale;             /* Video scale factor */
+	int verbosity;               /* How verbose imanes should be */
 } imanes_config;
 
 /* This is the global configuration */

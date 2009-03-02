@@ -4,10 +4,9 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "config.h"
 #include "pad.h"
 #include "screen.h"
-
-#define AMPLIFICATION (3)
 
 static SDL_Surface *nes_screen;
 
@@ -53,7 +52,7 @@ void init_screen() {
 		exit(EXIT_FAILURE);
 	}
 
-	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*AMPLIFICATION, NES_SCREEN_HEIGHT*AMPLIFICATION, NES_SCREEN_BPP, 0);
+	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*config.video_scale, NES_SCREEN_HEIGHT*config.video_scale, NES_SCREEN_BPP, 0);
 	if( nes_screen == NULL ) {
 		fprintf(stderr,"Error while setting video mode: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
@@ -81,9 +80,9 @@ void draw_pixel(int x, int y, nes_palette color) {
 
 	pixmem32 = (Uint32*)nes_screen->pixels;
 
-	for(i=0;i!=AMPLIFICATION;i++)
-		for(j=0;j!=AMPLIFICATION;j++) 
-			pixmem32[AMPLIFICATION*x+i+NES_SCREEN_WIDTH*AMPLIFICATION*(y*AMPLIFICATION+j)] = colour;
+	for(i=0;i!=config.video_scale;i++)
+		for(j=0;j!=config.video_scale;j++) 
+			pixmem32[config.video_scale*x+i+NES_SCREEN_WIDTH*config.video_scale*(y*config.video_scale+j)] = colour;
 
 }
 

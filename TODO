@@ -19,14 +19,14 @@ PPU:
  * [DONE] PPU VRAM read/write in separate method
  * Draw first sprites / background / last sprites in separate layers, and do
    a merge after that [TESTING IN SEPARATE BRANCH].
- * Configurable video scaling
- * [TESTING] Fix *once for all* the background drawing
+ * [DONE] Configurable video scaling
+ * [DONE] Fix *once for all* the background drawing
  * [DONE] Fix sprite drawing (they seem to be 1 pixel above)
  * [TESTING] Support for vertical flip sprites feature
  * [URGENT] Support background scrolling
  * Recognize and set "pixel 0 bit"
  * [URGENT] Add support for 8x16 sprites
- * [TESTING] Fix the back and front sprites drawing
+ * [DONE] Fix the back and front sprites drawing
 
 Pads:
 =====

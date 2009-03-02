@@ -11,4 +11,9 @@ void initialize_configuration() {
 
 	/* Start on non-pause */
 	config.pause = 0;
+
+	/* Set default video scale factor */
+	if( config.video_scale == 0 )
+		config.video_scale = 1;
+
 }
