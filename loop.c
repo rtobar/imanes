@@ -117,6 +117,7 @@ void main_loop(ines_file *file) {
 					standard_lines = 0;
 					lines = 0;
 					PPU->SR &= ~VBLANK_FLAG;
+					PPU->SR &= ~HIT_FLAG;
 
 					/* Calculate how much we should sleep for 50/60 FPS */
 					/* For this, we calculate the next "start" time,    */
