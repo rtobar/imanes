@@ -25,7 +25,7 @@ PPU:
  * [DONE] Support for vertical flip sprites feature
  * [URGENT] Support background scrolling
  * Recognize and set "pixel 0 bit"
- * [URGENT] Add support for 8x16 sprites
+ * [DONE] Add support for 8x16 sprites
  * [DONE] Fix the back and front sprites drawing
 
 Pads:
