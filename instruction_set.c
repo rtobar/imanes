@@ -322,7 +322,12 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 
 		case ADDR_IND_INDIR:
 			address = CPU->RAM[inst_address+1] + CPU->X;
-			oper.address = read_cpu_ram(address) | (read_cpu_ram(address+1) << 8);
+			if( address > 0xFF )
+				address -= 0x100;
+			oper.address = read_cpu_ram(address);
+			if( address == 0xFF )
+				address -= 0x100;
+			oper.address |= read_cpu_ram(address+1) << 8;
 			break;
 
 		case ADDR_INDIR_IND:
