@@ -49,15 +49,15 @@ void draw_line(int line) {
 	uint8_t byte3;
 	uint8_t *name_table;
 	uint8_t *attr_table;
-	uint8_t *scr_patt_table;
-	uint8_t *spr_patt_table;
 	uint8_t tile;
+	uint16_t spr_patt_table;
+	uint16_t scr_patt_table;
 
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
 	name_table     = PPU->VRAM + 0x2000 + 0x400*(PPU->CR1 & 0x03);
 	attr_table     = name_table + 0x3C0;
-	spr_patt_table = PPU->VRAM + ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
-	scr_patt_table = PPU->VRAM + ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
+	spr_patt_table = ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
+	scr_patt_table = ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
 	big_sprite     = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
 
 
@@ -109,7 +109,7 @@ void draw_line(int line) {
 				/* 8x16 sprites patter table depends on i being even or not */
 				second_sprite = 0;
 				if( big_sprite ) {
-					spr_patt_table = PPU->VRAM + 0x1000*(tile&0x1);
+					spr_patt_table = 0x1000*(tile&0x1);
 					tile &= 0xFE;
 					if( ty >= 8 ) {
 						ty -= 8;
@@ -117,8 +117,8 @@ void draw_line(int line) {
 					}
 				}
 
-				byte1 = *(spr_patt_table + (tile+second_sprite)*0x10 + ty);
-				byte2 = *(spr_patt_table + (tile+second_sprite)*0x10 + ty + 0x08);
+				byte1 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty);
+				byte2 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty + 0x08);
 				for(tx=0;tx!=8;tx++) {
 					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 					col_index |=  (byte3&0x03) << 2;
@@ -128,9 +128,9 @@ void draw_line(int line) {
 
 						/* Horizontal flip? */
 						if( byte3 & SPRITE_FLIP_HORIZ )
-							draw_pixel( tmp + 7 - tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+							draw_pixel( tmp + 7 - tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 						else
-							draw_pixel( tmp + tx, line, system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+							draw_pixel( tmp + tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 					}
 
 				}
@@ -157,8 +157,8 @@ void draw_line(int line) {
 			tile = *(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
 
 			/* Bytes that participate on the lower bits for the color */
-			byte1 = *(scr_patt_table + tile*0x10 + ty);
-			byte2 = *(scr_patt_table + tile*0x10 + ty + 0x08);
+			byte1 = read_ppu_vram(scr_patt_table + tile*0x10 + ty);
+			byte2 = read_ppu_vram(scr_patt_table + tile*0x10 + ty + 0x08);
 			/* Byte participating on the higher bits for the color */
 			byte3 = *(attr_table + (i >> 2) + (line >> 5)*NES_SCREEN_WIDTH/32);
 
@@ -177,7 +177,7 @@ void draw_line(int line) {
 				if( col_index & 0x03 ) {
 					if( first_bg_pixel == -1 )
 						first_bg_pixel = i*8+tx;
-					draw_pixel(i*8+tx, line, system_palette[*(PPU->VRAM + 0x3F00 + col_index)]);
+					draw_pixel(i*8+tx, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
 				}
 			}
 		}
@@ -203,7 +203,7 @@ void draw_line(int line) {
 				/* 8x16 sprites patter table depends on i being even or not */
 				second_sprite = 0;
 				if( big_sprite ) {
-					spr_patt_table = PPU->VRAM + 0x1000*(tile&0x1);
+					spr_patt_table = 0x1000*(tile&0x1);
 					tile &= 0xFE;
 					if( ty >= 8 ) {
 						ty -= 8;
@@ -211,8 +211,8 @@ void draw_line(int line) {
 					}
 				}
 
-				byte1 = *(spr_patt_table + (tile+second_sprite)*0x10 + ty);
-				byte2 = *(spr_patt_table + (tile+second_sprite)*0x10 + ty + 0x08);
+				byte1 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty);
+				byte2 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty + 0x08);
 				for(tx=0;tx!=8;tx++) {
 					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 					col_index |=  (byte3&0x03) << 2;
@@ -225,13 +225,13 @@ void draw_line(int line) {
 							if( !(PPU->SR&HIT_FLAG) && tmp+7-tx == first_bg_pixel)
 								PPU->SR |= HIT_FLAG;
 							draw_pixel( tmp + 7 - tx, line,
-							system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+							system_palette[read_ppu_vram(0x3F10+col_index)]);
 						}
 						else {
 							if( !(PPU->SR&HIT_FLAG) && tmp+tx == first_bg_pixel )
 								PPU->SR |= HIT_FLAG;
 							draw_pixel( tmp + tx, line,
-							system_palette[*(PPU->VRAM + 0x3F10 + col_index)]);
+							system_palette[read_ppu_vram(0x3F10+col_index)]);
 						}
 
 					}
@@ -326,7 +326,17 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 		XTREME( printf("%04x\n",address) );
 	}
 
-	/* TODO: Inter palette mirroring */
+	/* Inter palette mirroring */
+	if( 0x3F10 <= address && address < 0x3F20 && !(address&0x03) ) {
+		XTREME( printf("Palette mirroring: from %04x to ", address) );
+		address -= 0x10;
+		XTREME( printf("%04x\n",address) );
+	}
+	//if( 0x3F00 <= address && address < 0x3F10 && !(address&0x03) ) {
+	//	XTREME( printf("Palette mirroring: from %04x to ", address) );
+	//	address = address - 0x04*( (address & 0xFF) >> 2 );
+	//	XTREME( printf("%04x\n",address) );
+	//}
 
 	/* Name table mirroring. This depends on the type of mirroring
 	 * that the ines file header states */
