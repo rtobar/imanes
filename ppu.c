@@ -267,7 +267,12 @@ uint8_t read_ppu_vram(uint16_t address) {
 		XTREME( printf("%04x\n",address) );
 	}
 
-	/* TODO: Inter palette mirroring */
+	/* Inter palette mirroring */
+	if( 0x3F10 <= address && address < 0x3F20 && !(address&0x03) ) {
+		XTREME( printf("Palette mirroring: from %04x to ", address) );
+		address -= 0x10;
+		XTREME( printf("%04x\n",address) );
+	}
 
 	/* Name table mirroring. This depends on the type of mirroring
 	 * that the ines file header states */
