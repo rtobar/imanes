@@ -295,26 +295,27 @@ uint8_t read_ppu_vram(uint16_t address) {
 		case HORIZONTAL_MIRRORING:
 			if( (0x2400 <= address && address < 0x2800) ||
 			    (0x2C00 <= address && address < 0x3000)) {
-				printf("PPU Address mirroring: from %04x to ", address);
+				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
 				address -= 0x400;
-				printf("%04x\n",address);
+				DEBUG(printf("%04x\n",address));
 			}
 			break;
 
 		case VERTICAL_MIRRORING:
 			if( 0x2800 <= address && address < 0x3000 ) {
-				printf("PPU Address mirroring: from %04x to ", address);
+				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
 				address -= 0x800;
-				printf("%04x\n",address);
+				DEBUG(printf("%04x\n",address));
 			}
 			break;
 
 		case SINGLE_SCREEN_MIRRORING:
 			if( 0x2400 <= address && address < 0x3000 ) {
-				printf("PPU Address mirroring: from %04x to ", address);
+				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
 				address -= 0x400*( ((address - 0x2000) >> 10) & 0x3);
-				printf("%04x\n",address);
+				DEBUG(printf("%04x\n",address));
 			}
+
 		default:
 			break;
 	}

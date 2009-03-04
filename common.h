@@ -27,6 +27,7 @@ typedef struct {
 	uint8_t *vrom;
 
 	int has_trainer;
+	int sram_enabled;
 } ines_file;
 
 #endif /* common_h */
