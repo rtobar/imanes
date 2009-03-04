@@ -25,6 +25,8 @@ typedef struct {
 	uint8_t mapper_id;
 	uint8_t *rom;
 	uint8_t *vrom;
+
+	int has_trainer;
 } ines_file;
 
 #endif /* common_h */

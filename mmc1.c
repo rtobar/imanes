@@ -7,93 +7,57 @@
 #include "mmc1.h"
 #include "ppu.h"
 
-static int touched_regs[4];
-
 void mmc1_initialize_mapper() {
 
 	mapper->regs = (uint8_t *)malloc(4);
 	bzero(mapper->regs,4);
-	bzero(touched_regs,4);
 
+	mapper->regs[0] = 0x04; /* Swap 0x8000 by default */
 	return;
 }
 
 int  mmc1_check_address(uint16_t address) {
 
-	//int i;
-	int touched = 0;
 	uint8_t value;
-	static uint8_t shifts[4] = {0, 0, 0, 0};
+	static uint8_t shifts = 0;
+	static int saved = 0;
 
-	if( 0x8000 <= address && address < 0xA000 ) {
+	/* Save the entering value */
+	if( 0x8000 <= address ) {
+
 		value = CPU->RAM[address];
-		if( value & 0x80 ) {
-			mapper->regs[0] = 0;
-			shifts[0] = 0;
-		}
-		else
-			mapper->regs[0] |= (value&0x01) << shifts[0]++;
 
-		touched_regs[0] = 0;
-		if( shifts[0] == 5 ) {
-			shifts[0] = 0;
-			touched_regs[0] = 1;
-			touched = 1;
+		if( value & 0x80 ) {
+			shifts = 0;
+			saved = 0;
+			return 0;
+		}
+
+		saved |= (value&0x01) << shifts++;
+
+		/* Last write is the important */
+		if( shifts == 5 ) {
+
+			if( 0x8000 <= address && address < 0xA000 )
+				mapper->regs[0] = saved;
+
+			else if( 0xA000 <= address && address < 0xC000 )
+				mapper->regs[1] = saved;
+
+			else if( 0xC000 <= address && address < 0xE000 )
+				mapper->regs[2] = saved;
+
+			else if( 0xE000 <= address )
+				mapper->regs[3] = saved;
+
+			shifts = 0;
+			saved = 0;
+			return 1;
 		}
 	}
 
-	else if( 0xA000 <= address && address < 0xC000 ) {
-		value = CPU->RAM[address];
-		if( value & 0x80 ) {
-			mapper->regs[1] = 0;
-			shifts[1] = 0;
-		}
-		else
-			mapper->regs[1] |= (value&0x01) << shifts[1]++;
 
-		touched_regs[1] = 0;
-		if( shifts[1] == 5 ) {
-			shifts[1] = 0;
-			touched_regs[1] = 1;
-			touched = 1;
-		}
-	}
-
-	else if( 0xC000 <= address && address < 0xE000 ) {
-		value = CPU->RAM[address];
-		if( value & 0x80 ) {
-			mapper->regs[2] = 0;
-			shifts[2] = 0;
-		}
-		else
-			mapper->regs[2] |= (value&0x01) << shifts[2]++;
-
-		touched_regs[2] = 0;
-		if( shifts[2] == 5 ) {
-			shifts[2] = 0;
-			touched_regs[2] = 1;
-			touched = 1;
-		}
-	}
-
-	else if( 0xE000 <= address ) {
-		value = CPU->RAM[address];
-		if( value & 0x80 ) {
-			mapper->regs[3] = 0;
-			shifts[3] = 0;
-		}
-		else
-			mapper->regs[3] |= (value&0x01) << shifts[3]++;
-
-		touched_regs[3] = 0;
-		if( shifts[3] == 5 ) {
-			shifts[3] = 0;
-			touched_regs[3] = 1;
-			touched = 1;
-		}
-	}
-
-	return touched;
+	return 0;
 }
 
 void mmc1_switch_banks() {
@@ -110,8 +74,6 @@ void mmc1_switch_banks() {
 	/* First register has changed */
 	//if( touched_regs[0] == 1 ) {
 	if( 1 ) {
-
-		touched_regs[0] = 0;
 
 		DEBUG( printf("MMC1: Switching banks...\n") );
 
@@ -139,7 +101,6 @@ void mmc1_switch_banks() {
 				offset = (mapper->regs[1] & 0x0F) * VROM_BANK_SIZE;
 				DEBUG( printf("%04x\n", offset) );
 				memcpy( PPU->VRAM, mapper->file->vrom+offset, VROM_BANK_SIZE);
-				offset = 0;
 			}
 			else {
 				DEBUG( printf("MMC1: Switching 4 Kb VROM banks %d/%d. Offsets are ", mapper->regs[1]&0x0F, mapper->regs[2]&0x0F) );
@@ -152,8 +113,9 @@ void mmc1_switch_banks() {
 				DEBUG( printf("%04x\n", offset) );
 				memcpy( PPU->VRAM+0x1000, mapper->file->vrom + offset,
 				        VROM_BANK_SIZE/2);
-				offset = 0;
 			}
+
+			offset = 0;
 		}
 
 		/* 512 Kb roms */

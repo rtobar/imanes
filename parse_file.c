@@ -58,7 +58,7 @@ ines_file *check_ines_file(char *file_path) {
 	printf("File contains %hu 16kb ROM banks and %hu 8kb VROM banks\n",
           rom_file->romBanks, rom_file->vromBanks);
 
-	/* Mapper and name table mirroring */
+	/* Mapper, name table mirroring and others */
 	buff = realloc(buff,2);
 	read_bytes = read(rom_file->fd, buff, 2);
 
@@ -76,6 +76,7 @@ ines_file *check_ines_file(char *file_path) {
 
 	printf("Mirroring type: %d\n", PPU->mirroring);
 
+	rom_file->has_trainer = buff[0] & 0x04;
 	rom_file->mapper_id = (buff[1] & 0xF0) | ( (buff[0] >> 4) & 0x0F );
 
 	/* Check which mappers we do support */
@@ -102,6 +103,16 @@ ines_file *check_ines_file(char *file_path) {
 	if( read_bytes != 8 ) {
 		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
 		exit(EXIT_FAILURE);
+	}
+
+	if( rom_file->has_trainer ) {
+
+		printf("Trainer present in ROM file\n");
+		read_bytes = read( rom_file->fd, buff, 512);
+		if( read_bytes != 512 ) {
+			fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	free(buff);

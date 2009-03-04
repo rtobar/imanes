@@ -518,12 +518,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		DEBUG( printf("%04x\n",address) );
 	}
 
-	/* Check if mapper need to come into action */
-	if( mapper->check_address(address) ) {
-		mapper->switch_banks();
-		return;
-	}
-
 	switch( address ) {
 
 		/* PPU control registers */
@@ -601,6 +595,12 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* Normal RAM memory area */
 		default:
 			CPU->RAM[address] = value;
+	}
+
+	/* Check if mapper need to come into action */
+	if( mapper->check_address(address) ) {
+		mapper->switch_banks();
+		return;
 	}
 
 	XTREME( 
