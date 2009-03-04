@@ -32,6 +32,8 @@ void init_ppu_vram(ines_file *file) {
 
 void draw_line(int line) {
 
+	int x;  /* Final x pixel coordinate */
+	int y;  /* Final y pixel coordinate */
 	int i;
 	int tx; /* X coord inside a tile */
 	int ty; /* Y coord inside a tile */
@@ -177,7 +179,19 @@ void draw_line(int line) {
 				if( col_index & 0x03 ) {
 					if( first_bg_pixel == -1 )
 						first_bg_pixel = i*8+tx;
-					draw_pixel(i*8+tx, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
+					x = i*8+tx-PPU->h_offset;
+					if( x < 0 )
+						x += NES_SCREEN_WIDTH;
+					if( x > NES_SCREEN_WIDTH )
+						x -= NES_SCREEN_WIDTH;
+
+					y = line - PPU->v_offset;
+					if( y < 0 )
+						y += NES_SCREEN_HEIGHT;
+					if( y > NES_SCREEN_HEIGHT )
+						y -= NES_SCREEN_HEIGHT;
+
+					draw_pixel(x, y, system_palette[read_ppu_vram(0x3F00+col_index)]);
 				}
 			}
 		}
