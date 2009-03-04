@@ -46,6 +46,10 @@ typedef struct _ppu {
 	uint8_t spr_addr; /* Address to be written by 0x2004 CPU RAM */
 
 	uint8_t mirroring; /* Type of mirroring */
+
+	uint8_t h_offset;  /* Horizontal offset */
+	uint8_t v_offset;  /* Vertical offset */
+
 } nes_ppu;
 
 /* Global PPU used through all the program */

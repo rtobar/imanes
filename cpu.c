@@ -498,6 +498,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 	static unsigned int first_write = 1;
 	static unsigned int strobe_pad = 0;
+	static unsigned int h_offset = 1;
 	int i;
 
 	XTREME( if( 0x2000 <= address && address <= 0x2006 ) {
@@ -541,6 +542,17 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		case 0x2004:
 			XTREME( printf("Writing into SPR RAM at address %02x\n", PPU->spr_addr) );
 			*(PPU->SPR_RAM + PPU->spr_addr++) = value;
+			break;
+
+		case 0x2005:
+			if( h_offset ) {
+				PPU->h_offset = value;
+				h_offset = 0;
+			}
+			else {
+				PPU->v_offset = value;
+				h_offset = 1;
+			}
 			break;
 
 		/* PPU VRAM address */
