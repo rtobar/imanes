@@ -63,20 +63,15 @@ void draw_line(int line) {
 	uint8_t tile;
 	uint16_t attr_table;
 	uint16_t name_table;
-	uint16_t scroll_table;   /* second name table used in scrolling */
+	uint16_t orig_name_table;
 	uint16_t spr_patt_table;
 	uint16_t scr_patt_table;
 
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
-	name_table     = 0x2000 + 0x400*(PPU->CR1 & 0x03);
-	scroll_table   = name_table + 0x400;
-	attr_table     = name_table + 0x3C0;
+	orig_name_table     = 0x2000 + 0x400*(PPU->CR1 & 0x03);
 	spr_patt_table = ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
 	scr_patt_table = ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
 	big_sprite     = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
-
-	if( scroll_table == 0x3000 )
-		scroll_table = 0x2000;
 
 	/* Identify which sprites have to be drawn */
 	frt_sprites = 0;
@@ -160,10 +155,26 @@ void draw_line(int line) {
 	ty = line & 0x07; /* ty = line % 8 */
 	first_bg_pixel = -1;
 
+	//printf("Line %d\n", line);
 	if( config.show_bg ) {
-		for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
+		for(x=0;x!=NES_SCREEN_WIDTH;x++) {
 
-			/* Get the 8x8 pixel table where the line is present */
+			/* Check which name table should be use */
+			i =   x+PPU->h_offset;
+			tx = (x+PPU->h_offset) & 0x7;
+
+			if( i >= NES_SCREEN_WIDTH ) {
+				name_table = orig_name_table + 0x400;
+				i -= NES_SCREEN_WIDTH;
+			}
+			else
+				name_table = orig_name_table;
+
+			//printf("Offset:%03d  i:%02x  ii:%02x  nt:%04x\n", PPU->h_offset, i, i >> 3, name_table);
+			i = i >> 3;
+
+			attr_table = name_table + 0x3C0;
+			/* Get the 8x8 pixel tile where the line is present */
 			tile = read_ppu_vram(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
 
 			/* Bytes that participate on the lower bits for the color */
@@ -176,32 +187,26 @@ void draw_line(int line) {
 				printf("Tile %d in (%d,%d), with attr (%d,%d). Attr is %02x, so corresponding is (%d,%d)\n", tile, i*8, line, (i >> 2), (line >> 5), byte3, ((i >> 1)&0x1), (line >> 4)&0x1);
 			);
 
-			for(tx=0;tx!=8;tx++) {
-				/* This is from the pattern table */
-				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
+			/* This is from the pattern table */
+			col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 
-				/* And this from the attribute table */
-				tmp = (((line >> 4)&0x1)<<1) + ((i >> 1)&0x1);
-				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
+			/* And this from the attribute table */
+			tmp = (((line >> 4)&0x1)<<1) + ((i >> 1)&0x1);
+			col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
-				if( col_index & 0x03 ) {
-					if( first_bg_pixel == -1 )
-						first_bg_pixel = i*8+tx;
-					x = i*8+tx-PPU->h_offset;
-					if( x < 0 )
-						x += NES_SCREEN_WIDTH;
-					if( x > NES_SCREEN_WIDTH )
-						x -= NES_SCREEN_WIDTH;
+			if( col_index & 0x03 ) {
+				if( first_bg_pixel == -1 )
+					first_bg_pixel = x;
 
-					y = line - PPU->v_offset;
-					if( y < 0 )
-						y += NES_SCREEN_HEIGHT;
-					if( y > NES_SCREEN_HEIGHT )
-						y -= NES_SCREEN_HEIGHT;
+				y = line - PPU->v_offset;
+				if( y < 0 )
+					y += NES_SCREEN_HEIGHT;
+				if( y > NES_SCREEN_HEIGHT )
+					y -= NES_SCREEN_HEIGHT;
 
-					draw_pixel(x, y, system_palette[read_ppu_vram(0x3F00+col_index)]);
-				}
+				draw_pixel(x, y, system_palette[read_ppu_vram(0x3F00+col_index)]);
 			}
+
 		}
 	}
 
