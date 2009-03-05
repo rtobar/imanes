@@ -82,5 +82,9 @@ uint8_t read_ppu_vram(uint16_t address);
  */
 void write_ppu_vram(uint16_t address, uint8_t value);
 
+/**
+ * Dumps the content of the PPU to the stdout
+ */
+void dump_ppu();
 
 #endif /* ppu_h */

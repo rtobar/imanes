@@ -30,6 +30,17 @@ void init_ppu_vram(ines_file *file) {
 
 }
 
+void dump_ppu() {
+
+	printf("CR1:%02x  ", PPU->CR1);
+	printf("CR2:%02x  ", PPU->CR2);
+	printf("SR:%02x  ", PPU->SR);
+	printf("VADDR:%04x\n", PPU->vram_addr);
+	printf("SPRADDR:%04x\n", PPU->spr_addr);
+	printf("Offsets: %03u,%03u\n", PPU->h_offset, PPU->v_offset);
+
+}
+
 void draw_line(int line) {
 
 	int x;  /* Final x pixel coordinate */
