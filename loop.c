@@ -69,7 +69,7 @@ void main_loop(ines_file *file) {
 			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
 			fprintf(stderr,"I'm exiting now... sorry :(\n");
 			fprintf(stderr,"Close the window when finished\n");
-			scanf("%s", inst.name);
+			inst.size = scanf("%s", inst.name);
 			exit(EXIT_FAILURE);
 		}
 
