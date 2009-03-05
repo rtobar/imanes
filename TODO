@@ -23,7 +23,7 @@ PPU:
  * [DONE] Fix *once for all* the background drawing
  * [DONE] Fix sprite drawing (they seem to be 1 pixel above)
  * [DONE] Support for vertical flip sprites feature
- * [URGENT] Support background scrolling
+ * [VERTICAL MISSING] Support background scrolling
  * [BACK SPRITES MISSING] Recognize and set "pixel 0 bit"
  * [DONE] Add support for 8x16 sprites
  * [DONE] Fix the back and front sprites drawing
@@ -38,4 +38,4 @@ Pads:
 Mappers:
 ========
 
- * Finish and test MMC1
+ * [TESTING] Finish and test MMC1
