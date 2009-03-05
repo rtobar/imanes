@@ -152,7 +152,12 @@ void draw_line(int line) {
 	}
 
 	/* Draw the background tiles */
-	ty = line & 0x07; /* ty = line % 8 */
+	y = line - PPU->v_offset;
+	if( y < 0 )
+		y += NES_SCREEN_HEIGHT;
+	if( y >= NES_SCREEN_HEIGHT )
+		y -= NES_SCREEN_HEIGHT;
+	ty = y & 0x07; /* ty = line % 8 */
 	first_bg_pixel = -1;
 
 	//printf("Line %d\n", line);
@@ -170,7 +175,7 @@ void draw_line(int line) {
 			else
 				name_table = orig_name_table;
 
-			//printf("Offset:%03d  i:%02x  ii:%02x  nt:%04x\n", PPU->h_offset, i, i >> 3, name_table);
+			/* Entry in name table */
 			i = i >> 3;
 
 			attr_table = name_table + 0x3C0;
@@ -197,12 +202,6 @@ void draw_line(int line) {
 			if( col_index & 0x03 ) {
 				if( first_bg_pixel == -1 )
 					first_bg_pixel = x;
-
-				y = line - PPU->v_offset;
-				if( y < 0 )
-					y += NES_SCREEN_HEIGHT;
-				if( y > NES_SCREEN_HEIGHT )
-					y -= NES_SCREEN_HEIGHT;
 
 				draw_pixel(x, y, system_palette[read_ppu_vram(0x3F00+col_index)]);
 			}
