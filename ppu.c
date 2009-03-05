@@ -49,22 +49,25 @@ void draw_line(int line) {
 	uint8_t byte1;
 	uint8_t byte2;
 	uint8_t byte3;
-	uint8_t *name_table;
-	uint8_t *attr_table;
 	uint8_t tile;
+	uint16_t attr_table;
+	uint16_t name_table;
+	uint16_t scroll_table;   /* second name table used in scrolling */
 	uint16_t spr_patt_table;
 	uint16_t scr_patt_table;
 
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
-	name_table     = PPU->VRAM + 0x2000 + 0x400*(PPU->CR1 & 0x03);
+	name_table     = 0x2000 + 0x400*(PPU->CR1 & 0x03);
+	scroll_table   = name_table + 0x400;
 	attr_table     = name_table + 0x3C0;
 	spr_patt_table = ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
 	scr_patt_table = ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
 	big_sprite     = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
 
+	if( scroll_table == 0x3000 )
+		scroll_table = 0x2000;
 
 	/* Identify which sprites have to be drawn */
-	/* TODO: Investigate better how 8x16 sprites work */
 	frt_sprites = 0;
 	bck_sprites = 0;
 	for(i=0;i!=64;i++) {
@@ -149,20 +152,14 @@ void draw_line(int line) {
 	if( config.show_bg ) {
 		for(i=0;i!=NES_SCREEN_WIDTH/8;i++) {
 
-			/* Check out in which name table the tile is
-			 * because of the horizontal mirroring */
-			if( PPU->mirroring == HORIZONTAL_MIRRORING ) {
-				/* Check nametable */;
-			}
-
 			/* Get the 8x8 pixel table where the line is present */
-			tile = *(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
+			tile = read_ppu_vram(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
 
 			/* Bytes that participate on the lower bits for the color */
 			byte1 = read_ppu_vram(scr_patt_table + tile*0x10 + ty);
 			byte2 = read_ppu_vram(scr_patt_table + tile*0x10 + ty + 0x08);
 			/* Byte participating on the higher bits for the color */
-			byte3 = *(attr_table + (i >> 2) + (line >> 5)*NES_SCREEN_WIDTH/32);
+			byte3 = read_ppu_vram(attr_table + (i >> 2) + (line >> 5)*NES_SCREEN_WIDTH/32);
 
 			XTREME( if( !ty && byte3 )
 				printf("Tile %d in (%d,%d), with attr (%d,%d). Attr is %02x, so corresponding is (%d,%d)\n", tile, i*8, line, (i >> 2), (line >> 5), byte3, ((i >> 1)&0x1), (line >> 4)&0x1);
