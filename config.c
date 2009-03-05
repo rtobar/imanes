@@ -9,8 +9,9 @@ void initialize_configuration() {
 	config.show_back_spr = 1;
 	config.show_bg  = 1;
 
-	/* Start on non-pause */
+	/* Start on non-pause and at 60 fps */
 	config.pause = 0;
+	config.run_fast = 0;
 
 	/* Set default video scale factor */
 	if( config.video_scale == 0 )

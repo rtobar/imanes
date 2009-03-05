@@ -103,6 +103,11 @@ void nes_keydown(SDL_keysym keysym) {
 				if(instructions[i].size != 0 && !instructions[i].executed )
 					printf("%02x - %s\n", instructions[i].opcode, instructions[i].name);
 
+		/* Run as fast as possible */
+		case SDLK_BACKSPACE:
+			config.run_fast = 1;
+			break;
+
 		default:
 			break;
 	}
@@ -151,6 +156,11 @@ void nes_keyup(SDL_keysym keysym) {
 		/* Select button */
 		case SDLK_RCTRL:
 			pads[0].pressed_keys &= ~NES_SELECT;
+			break;
+
+		/* Run at 60 fps */
+		case SDLK_BACKSPACE:
+			config.run_fast = 0;
 			break;
 
 		default:
