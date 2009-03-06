@@ -152,17 +152,31 @@ void draw_line(int line) {
 		}
 	}
 
-	/* Draw the background tiles */
-	y = line - PPU->v_offset;
-	if( y < 0 )
-		y += NES_SCREEN_HEIGHT;
-	if( y >= NES_SCREEN_HEIGHT )
-		y -= NES_SCREEN_HEIGHT;
-	ty = y & 0x07; /* ty = line % 8 */
+	/* Draw the background tiles
+	 * For this we have to consider the horizontal and vertical
+	 * mirroring. Based on this, we choose the name table where the
+	 * tiles come from.
+	 */
 	first_bg_pixel = -1;
-
-	//printf("Line %d\n", line);
 	if( config.show_bg ) {
+
+		y = line + (PPU->v_offset - (PPU->v_offset < 240 ? 0 : 256) );
+	
+		if( y < 0 ) {
+			y += NES_SCREEN_HEIGHT;
+			orig_name_table += 0x800;
+		}
+		else if( y >= NES_SCREEN_HEIGHT ) {
+			y -= NES_SCREEN_HEIGHT;
+			orig_name_table -= 0x800;
+		}
+		if( orig_name_table >= 0x3000 )
+			orig_name_table -= 0x1000;
+		else if( orig_name_table < 0x2000 )
+			orig_name_table += 0x1000;
+	
+		ty = y & 0x07; /* ty = line % 8 */
+
 		for(x=0;x!=NES_SCREEN_WIDTH;x++) {
 
 			/* Check which name table should be use */
@@ -181,17 +195,13 @@ void draw_line(int line) {
 
 			attr_table = name_table + 0x3C0;
 			/* Get the 8x8 pixel tile where the line is present */
-			tile = read_ppu_vram(name_table + i + (line >> 3)*NES_SCREEN_WIDTH/8);
+			tile = read_ppu_vram(name_table + i + (y >> 3)*NES_SCREEN_WIDTH/8);
 
 			/* Bytes that participate on the lower bits for the color */
 			byte1 = read_ppu_vram(scr_patt_table + tile*0x10 + ty);
 			byte2 = read_ppu_vram(scr_patt_table + tile*0x10 + ty + 0x08);
 			/* Byte participating on the higher bits for the color */
-			byte3 = read_ppu_vram(attr_table + (i >> 2) + (line >> 5)*NES_SCREEN_WIDTH/32);
-
-			XTREME( if( !ty && byte3 )
-				printf("Tile %d in (%d,%d), with attr (%d,%d). Attr is %02x, so corresponding is (%d,%d)\n", tile, i*8, line, (i >> 2), (line >> 5), byte3, ((i >> 1)&0x1), (line >> 4)&0x1);
-			);
+			byte3 = read_ppu_vram(attr_table + (i >> 2) + (y >> 5)*NES_SCREEN_WIDTH/32);
 
 			/* This is from the pattern table */
 			col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
@@ -204,7 +214,7 @@ void draw_line(int line) {
 				if( first_bg_pixel == -1 )
 					first_bg_pixel = x;
 
-				draw_pixel(x, y, system_palette[read_ppu_vram(0x3F00+col_index)]);
+				draw_pixel(x, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
 			}
 
 		}
