@@ -170,6 +170,7 @@ void draw_line(int line) {
 			y -= NES_SCREEN_HEIGHT;
 			orig_name_table -= 0x800;
 		}
+		/* Restore the address for name table if wraps out */
 		if( orig_name_table >= 0x3000 )
 			orig_name_table -= 0x1000;
 		else if( orig_name_table < 0x2000 )
@@ -207,7 +208,7 @@ void draw_line(int line) {
 			col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 
 			/* And this from the attribute table */
-			tmp = (((line >> 4)&0x1)<<1) + ((i >> 1)&0x1);
+			tmp = (((y >> 4)&0x1)<<1) + ((i >> 1)&0x1);
 			col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
 			if( col_index & 0x03 ) {
