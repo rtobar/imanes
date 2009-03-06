@@ -14,13 +14,13 @@
 #include "ppu.h"
 #include "screen.h"
 
-void usage(char *argv[]) {
-	fprintf(stderr,"\nUsage: %s [options] <rom file>\n\n",argv[0]);
-	fprintf(stderr,"Options:\n");
-	fprintf(stderr,"  -v        Increase the verbosity. Default: 0\n");
-	fprintf(stderr,"  -s        Video scaling facotr. Default: 1\n");
-	fprintf(stderr,"  -h,-?     Show this help and exit\n");
-	fprintf(stderr,"\n");
+void usage(FILE *file, char *argv[]) {
+	fprintf(file,"\nUsage: %s [options] <rom file>\n\n",argv[0]);
+	fprintf(file,"Options:\n");
+	fprintf(file,"  -v        Increase verbosity. More -v, more verbose. Default: 0\n");
+	fprintf(file,"  -s        Video scaling facotr. Default: 1\n");
+	fprintf(file,"  -h,-?     Show this help and exit\n");
+	fprintf(file,"\n");
 }
 
 void parse_options(int args, char *argv[]) {
@@ -40,7 +40,7 @@ void parse_options(int args, char *argv[]) {
 				config.video_scale = atoi(optarg);
 				if( config.video_scale == 0 ) {
 					fprintf(stderr,"Error: invalid video scale factor. Must be an integer value\n");
-					usage(argv);
+					usage(stderr, argv);
 					exit(EXIT_FAILURE);
 				}
 				break;
@@ -48,12 +48,12 @@ void parse_options(int args, char *argv[]) {
 			case '?':
 			case 'h':
 			case 'H':
-				usage(argv);
+				usage(stdout,argv);
 				exit(EXIT_SUCCESS);
 				break;
 
 			default:
-				usage(argv);
+				usage(stderr,argv);
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -62,7 +62,7 @@ void parse_options(int args, char *argv[]) {
 
 	if( optind >= args ) {
 		fprintf(stderr,"%s: Error: Expected ROM file, none given\n", argv[0]);
-		usage(argv);
+		usage(stderr,argv);
 		exit(EXIT_FAILURE);
 	}
 
