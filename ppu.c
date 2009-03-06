@@ -165,7 +165,7 @@ void draw_line(int line) {
 		for(x=0;x!=NES_SCREEN_WIDTH;x++) {
 
 			/* Check which name table should be use */
-			i =   x+PPU->h_offset;
+			i  =  x+PPU->h_offset;
 			tx = (x+PPU->h_offset) & 0x7;
 
 			if( i >= NES_SCREEN_WIDTH ) {
