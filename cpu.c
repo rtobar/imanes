@@ -496,9 +496,7 @@ void update_flags(int8_t value, uint8_t flags) {
 
 void write_cpu_ram(uint16_t address, uint8_t value) {
 
-	static unsigned int first_write = 1;
 	static unsigned int strobe_pad = 0;
-	static unsigned int h_offset = 1;
 	int i;
 
 	XTREME( if( 0x2000 <= address && address <= 0x2006 ) {
@@ -539,25 +537,25 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			break;
 
 		case 0x2005:
-			if( h_offset ) {
+			if( PPU->first_write ) {
 				PPU->h_offset = value;
-				h_offset = 0;
+				PPU->first_write = 0;
 			}
 			else {
 				PPU->v_offset = value;
-				h_offset = 1;
+				PPU->first_write = 1;
 			}
 			break;
 
 		/* PPU VRAM address */
 		case 0x2006:
-			if( first_write ) {
+			if( PPU->first_write ) {
 				PPU->vram_addr = 0;
 				PPU->vram_addr = (value << 8);
-				first_write = 0;
+				PPU->first_write = 0;
 			} else {
 				PPU->vram_addr |= value;
-				first_write = 1;
+				PPU->first_write = 1;
 			}
 			break;
 
@@ -644,6 +642,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 		PPU->SR &= ~VBLANK_FLAG;
 		CPU->RAM[2005] = 0;
 		PPU->vram_addr = 0; /* FIXME: Reset the first_read counter for 0x2006 */
+		PPU->first_write = 1;
 	}
 
 	/* SPR-RAM access */

@@ -18,6 +18,7 @@ void initialize_ppu() {
 	PPU->VRAM = (uint8_t *)malloc(NES_VRAM_SIZE);
 	PPU->SPR_RAM = (uint8_t *)malloc(256);
 
+	PPU->first_write = 1;
 }
 
 void init_ppu_vram(ines_file *file) {
