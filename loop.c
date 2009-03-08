@@ -144,11 +144,11 @@ void main_loop(ines_file *file) {
 					}
 
 					/* We were on pause or in fast run */
-					//if( sleepTime.tv_sec > 0 || sleepTime.tv_nsec > 1.666666e7 ) {
-					//	printf("Catching up the frames...\n");
-					//	sleepTime.tv_sec = 0;
-					//	sleepTime.tv_nsec = 1.666666e7;
-					//}
+					if( sleepTime.tv_sec > 0 || sleepTime.tv_nsec > 1.666666e7 ) {
+						clock_gettime(CLOCK_REALTIME, &startTime);
+						sleepTime.tv_sec = 0;
+						sleepTime.tv_nsec = 0;
+					}
 					if( sleepTime.tv_sec >= 0 && !config.run_fast )
 						nanosleep(&sleepTime, NULL);
 				}
