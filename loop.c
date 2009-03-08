@@ -123,29 +123,34 @@ void main_loop(ines_file *file) {
 					/* For this, we calculate the next "start" time,    */
 					/* and then we calculate the different between it   */
 					/* the actual time                                  */
-					if( !config.run_fast ) {
-						tmp = endTime.tv_sec;
-						clock_gettime(CLOCK_REALTIME, &endTime);
-						startTime.tv_nsec += 2e7;
-						if( startTime.tv_nsec > 1e9 ) {
-							startTime.tv_sec++;
-							startTime.tv_nsec -= 1e9;
-						}
-	
-						if( endTime.tv_sec != tmp ) {
-							INFO( fprintf(stderr,"Running at %d fps\n",frames) );
-							frames = 0;
-						}
-	
-						sleepTime.tv_nsec = startTime.tv_nsec - endTime.tv_nsec;
-						sleepTime.tv_sec  = startTime.tv_sec  - endTime.tv_sec;
-						if( sleepTime.tv_nsec < 0 ) {
-							sleepTime.tv_sec--;
-							sleepTime.tv_nsec += 1e9;
-						}
-						if( sleepTime.tv_sec >= 0 )
-							nanosleep(&sleepTime, NULL);
+					tmp = endTime.tv_sec;
+					clock_gettime(CLOCK_REALTIME, &endTime);
+					startTime.tv_nsec += 1.666666e7;
+					if( startTime.tv_nsec > 1e9 ) {
+						startTime.tv_sec++;
+						startTime.tv_nsec -= 1e9;
 					}
+	
+					if( endTime.tv_sec != tmp ) {
+						INFO( fprintf(stderr,"Running at %d fps\n",frames) );
+						frames = 0;
+					}
+	
+					sleepTime.tv_nsec = startTime.tv_nsec - endTime.tv_nsec;
+					sleepTime.tv_sec  = startTime.tv_sec  - endTime.tv_sec;
+					if( sleepTime.tv_nsec < 0 ) {
+						sleepTime.tv_sec--;
+						sleepTime.tv_nsec += 1e9;
+					}
+
+					/* We were on pause or in fast run */
+					//if( sleepTime.tv_sec > 0 || sleepTime.tv_nsec > 1.666666e7 ) {
+					//	printf("Catching up the frames...\n");
+					//	sleepTime.tv_sec = 0;
+					//	sleepTime.tv_nsec = 1.666666e7;
+					//}
+					if( sleepTime.tv_sec >= 0 && !config.run_fast )
+						nanosleep(&sleepTime, NULL);
 				}
 			}
 
