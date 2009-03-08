@@ -176,7 +176,7 @@ void draw_line(int line) {
 		else if( orig_name_table < 0x2000 )
 			orig_name_table += 0x1000;
 	
-		ty = y & 0x07; /* ty = line % 8 */
+		ty = y & 0x7; /* ty = y % 8 */
 
 		for(x=0;x!=NES_SCREEN_WIDTH;x++) {
 
@@ -186,6 +186,8 @@ void draw_line(int line) {
 
 			if( i >= NES_SCREEN_WIDTH ) {
 				name_table = orig_name_table + 0x400;
+				if( name_table == 0x2800 || name_table == 0x3000 )
+					name_table -= 0x800;
 				i -= NES_SCREEN_WIDTH;
 			}
 			else
