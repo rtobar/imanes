@@ -180,7 +180,7 @@ void draw_line(int line) {
 
 	/* Draw the background tiles
 	 * For this we have to consider the horizontal and vertical
-	 * mirroring. Based on this, we choose the name table where the
+	 * scrolling. Based on this, we choose the name table where the
 	 * tiles come from.
 	 */
 	first_bg_pixel = -1;
