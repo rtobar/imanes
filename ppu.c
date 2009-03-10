@@ -117,8 +117,14 @@ void draw_line(int line) {
 
 
 	/* Fill all pixels with the "colour intensity" color */
-	for(i=0;i!=NES_SCREEN_WIDTH;i++)
-		draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
+	if( config.show_screen_bg ) {
+		for(i=0;i!=NES_SCREEN_WIDTH;i++)
+			draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
+	}
+	else {
+		for(i=0;i!=NES_SCREEN_WIDTH;i++)
+			draw_pixel(i, line, system_palette[0]);
+	}
 
 
 	/* Draw the back sprites */

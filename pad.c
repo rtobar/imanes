@@ -98,6 +98,11 @@ void nes_keydown(SDL_keysym keysym) {
 			config.show_back_spr = (config.show_back_spr ? 0 : 1);
 			break;
 
+		case SDLK_F4:
+			INFO( printf("Screen background %s\n", (config.show_screen_bg ? "OFF" : "ON")) );
+			config.show_screen_bg = (config.show_screen_bg ? 0 : 1);
+			break;
+
 		/* Reset */
 		case SDLK_F5:
 			INFO( printf("Reseting NES\n") );
