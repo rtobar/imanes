@@ -131,50 +131,45 @@ void draw_line(int line) {
 	if( config.show_back_spr ) {
 		for(i=bck_sprites;i>=0;i--) {
 
-			if(!big_sprite || big_sprite ) {
+			/* Here we have color index and h/v flip */
+			byte3 = *(PPU->SPR_RAM + 4*back_sprites[i] + 2);
 
-				/* Here we have color index and h/v flip */
-				byte3 = *(PPU->SPR_RAM + 4*back_sprites[i] + 2);
+			/* y coord. If V Flip... */
+			ty = line - *(PPU->SPR_RAM + 4*back_sprites[i]) - 1;
+			if( byte3 & SPRITE_FLIP_VERT )
+				ty = 7 - ty;
 
-				/* y coord. If V Flip... */
-				ty = line - *(PPU->SPR_RAM + 4*back_sprites[i]) - 1;
-				if( byte3 & SPRITE_FLIP_VERT )
-					ty = 7 - ty;
+			tile = *(PPU->SPR_RAM + 4*back_sprites[i] + 1);
+			tmp  = *(PPU->SPR_RAM + 4*back_sprites[i] + 3); /* X origin */
 
-				tile = *(PPU->SPR_RAM + 4*back_sprites[i] + 1);
-				tmp  = *(PPU->SPR_RAM + 4*back_sprites[i] + 3); /* X origin */
-
-				/* 8x16 sprites patter table depends on i being even or not */
-				second_sprite = 0;
-				if( big_sprite ) {
-					spr_patt_table = 0x1000*(tile&0x1);
-					tile &= 0xFE;
-					if( ty >= 8 ) {
-						ty -= 8;
-						second_sprite = 1;
-					}
+			/* 8x16 sprites patter table depends on i being even or not */
+			second_sprite = 0;
+			if( big_sprite ) {
+				spr_patt_table = 0x1000*(tile&0x1);
+				tile &= 0xFE;
+				if( ty >= 8 ) {
+					ty -= 8;
+					second_sprite = 1;
 				}
-
-				byte1 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty);
-				byte2 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty + 0x08);
-				for(tx=0;tx!=8;tx++) {
-					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
-					col_index |=  (byte3&0x03) << 2;
-
-					/* Don't draw background colors! */
-					if( col_index & 0x03 ) {
-
-						/* Horizontal flip? */
-						if( byte3 & SPRITE_FLIP_HORIZ )
-							draw_pixel( tmp + 7 - tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
-						else
-							draw_pixel( tmp + tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
-					}
-
-				}
-				
 			}
 
+			byte1 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty);
+			byte2 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty + 0x08);
+			for(tx=0;tx!=8;tx++) {
+				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
+				col_index |=  (byte3&0x03) << 2;
+
+				/* Don't draw background colors! */
+				if( col_index & 0x03 ) {
+
+					/* Horizontal flip? */
+					if( byte3 & SPRITE_FLIP_HORIZ )
+						draw_pixel( tmp + 7 - tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+					else
+						draw_pixel( tmp + tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+				}
+
+			}
 		}
 	}
 
@@ -253,57 +248,53 @@ void draw_line(int line) {
 	if( config.show_front_spr ) {
 		for(i=frt_sprites;i>=0;i--) {
 
-			if(!big_sprite || big_sprite) {
+			/* Here we have color index and h/v flip */
+			byte3 = *(PPU->SPR_RAM + 4*front_sprites[i] + 2);
 
-				/* Here we have color index and h/v flip */
-				byte3 = *(PPU->SPR_RAM + 4*front_sprites[i] + 2);
+			/* y coord. If V Flip... */
+			ty = line - *(PPU->SPR_RAM + 4*front_sprites[i]) - 1;
+			if( byte3 & SPRITE_FLIP_VERT )
+				ty = 7 - ty;
 
-				/* y coord. If V Flip... */
-				ty = line - *(PPU->SPR_RAM + 4*front_sprites[i]) - 1;
-				if( byte3 & SPRITE_FLIP_VERT )
-					ty = 7 - ty;
+			tile = *(PPU->SPR_RAM + 4*front_sprites[i] + 1);
+			tmp  = *(PPU->SPR_RAM + 4*front_sprites[i] + 3); /* X origin */
 
-				tile = *(PPU->SPR_RAM + 4*front_sprites[i] + 1);
-				tmp  = *(PPU->SPR_RAM + 4*front_sprites[i] + 3); /* X origin */
-
-				/* 8x16 sprites patter table depends on i being even or not */
-				second_sprite = 0;
-				if( big_sprite ) {
-					spr_patt_table = 0x1000*(tile&0x1);
-					tile &= 0xFE;
-					if( ty >= 8 ) {
-						ty -= 8;
-						second_sprite = 1;
-					}
+			/* 8x16 sprites patter table depends on i being even or not */
+			second_sprite = 0;
+			if( big_sprite ) {
+				spr_patt_table = 0x1000*(tile&0x1);
+				tile &= 0xFE;
+				if( ty >= 8 ) {
+					ty -= 8;
+					second_sprite = 1;
 				}
+			}
 
-				byte1 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty);
-				byte2 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty + 0x08);
-				for(tx=0;tx!=8;tx++) {
-					col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
-					col_index |=  (byte3&0x03) << 2;
+			byte1 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty);
+			byte2 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty + 0x08);
+			for(tx=0;tx!=8;tx++) {
+				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
+				col_index |=  (byte3&0x03) << 2;
 
-					/* Don't draw background colors! */
-					if( col_index & 0x03 ) {
+				/* Don't draw background colors! */
+				if( col_index & 0x03 ) {
 
-						/* Horizontal flip? */
-						if( byte3 & SPRITE_FLIP_HORIZ ) {
-							if( !(PPU->SR&HIT_FLAG) && tmp+7-tx == first_bg_pixel)
-								PPU->SR |= HIT_FLAG;
-							draw_pixel( tmp + 7 - tx, line,
-							system_palette[read_ppu_vram(0x3F10+col_index)]);
-						}
-						else {
-							if( !(PPU->SR&HIT_FLAG) && tmp+tx == first_bg_pixel )
-								PPU->SR |= HIT_FLAG;
-							draw_pixel( tmp + tx, line,
-							system_palette[read_ppu_vram(0x3F10+col_index)]);
-						}
-
+					/* Horizontal flip? */
+					if( byte3 & SPRITE_FLIP_HORIZ ) {
+						if( !(PPU->SR&HIT_FLAG) && tmp+7-tx == first_bg_pixel)
+							PPU->SR |= HIT_FLAG;
+						draw_pixel( tmp + 7 - tx, line,
+						system_palette[read_ppu_vram(0x3F10+col_index)]);
+					}
+					else {
+						if( !(PPU->SR&HIT_FLAG) && tmp+tx == first_bg_pixel )
+							PPU->SR |= HIT_FLAG;
+						draw_pixel( tmp + tx, line,
+						system_palette[read_ppu_vram(0x3F10+col_index)]);
 					}
 
 				}
-				
+
 			}
 		}
 	}
