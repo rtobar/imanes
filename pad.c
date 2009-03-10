@@ -83,24 +83,24 @@ void nes_keydown(SDL_keysym keysym) {
 		/* Show background */
 		case SDLK_F1:
 			INFO( printf("Background %s\n", (config.show_bg  ? "OFF" : "ON")) );
-			config.show_bg  = (config.show_bg  ? 0 : 1);
+			config.show_bg  = ( !config.show_bg );
 			break;
 
 		/* Show front sprites */
 		case SDLK_F2:
 			INFO( printf("Front sprites %s\n", (config.show_front_spr ? "OFF": "ON")) );
-			config.show_front_spr = (config.show_front_spr ? 0 : 1);
+			config.show_front_spr = ( !config.show_front_spr );
 			break;
 
 		/* Show front sprites */
 		case SDLK_F3:
 			INFO( printf("Back sprites %s\n", (config.show_back_spr ? "OFF": "ON")) );
-			config.show_back_spr = (config.show_back_spr ? 0 : 1);
+			config.show_back_spr = ( !config.show_back_spr );
 			break;
 
 		case SDLK_F4:
 			INFO( printf("Screen background %s\n", (config.show_screen_bg ? "OFF" : "ON")) );
-			config.show_screen_bg = (config.show_screen_bg ? 0 : 1);
+			config.show_screen_bg = ( !config.show_screen_bg );
 			break;
 
 		/* Reset */
