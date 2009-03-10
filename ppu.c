@@ -89,10 +89,10 @@ void draw_line(int line) {
 	uint16_t scr_patt_table;
 
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
-	orig_name_table     = 0x2000 + 0x400*(PPU->CR1 & 0x03);
-	spr_patt_table = ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
-	scr_patt_table = ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
-	big_sprite     = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
+	orig_name_table = 0x2000 + 0x400*(PPU->CR1 & 0x03);
+	spr_patt_table  = ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
+	scr_patt_table  = ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
+	big_sprite      = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
 
 	/* Identify which sprites have to be drawn */
 	frt_sprites = 0;
