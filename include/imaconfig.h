@@ -1,5 +1,5 @@
-#ifndef config_h
-#define config_h
+#ifndef imaconfig_h
+#define imaconfig_h
 
 #include <stdint.h>
 
@@ -21,4 +21,4 @@ extern imanes_config config;
 /* Initializes imanes configuration */
 void initialize_configuration();
 
-#endif /* config_h */
+#endif /* imaconfig_h */

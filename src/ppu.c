@@ -24,8 +24,8 @@
 #include <string.h>
 
 #include "common.h"
-#include "config.h"
 #include "debug.h"
+#include "imaconfig.h"
 #include "palette.h"
 #include "ppu.h"
 #include "screen.h"

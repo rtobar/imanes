@@ -2,8 +2,8 @@ bin_PROGRAMS = imanes
 
 imanes_SOURCES = \
      cnrom.c \
-     config.c \
      cpu.c \
+     imaconfig.c \
      instruction_set.c \
      loop.c \
      main.c \

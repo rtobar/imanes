@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 #include "common.h"
-#include "config.h"
+#include "imaconfig.h"
 #include "pad.h"
 #include "screen.h"
 

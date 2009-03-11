@@ -22,9 +22,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "config.h"
 #include "cpu.h"
 #include "debug.h"
+#include "imaconfig.h"
 #include "instruction_set.h"
 #include "loop.h"
 #include "mapper.h"

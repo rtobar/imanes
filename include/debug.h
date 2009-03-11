@@ -1,7 +1,7 @@
 #ifndef debug_h
 #define debug_h
 
-#include "config.h"
+#include "imaconfig.h"
 
 #define NORMAL_LEVEL  0
 #define INFO_LEVEL    1

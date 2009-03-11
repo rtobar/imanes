@@ -18,9 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
 #include "cpu.h"
 #include "debug.h"
+#include "imaconfig.h"
 #include "loop.h"
 #include "pad.h"
 
