@@ -1,7 +1,7 @@
 #ifndef pad_h
 #define pad_h
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <stdint.h>
 
 /* Joypad buttons */
