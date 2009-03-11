@@ -17,4 +17,4 @@ imanes_SOURCES = \
      screen.c \
      unrom.c
 
-INCLUDES = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include -Wall
