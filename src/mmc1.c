@@ -97,7 +97,7 @@ void mmc1_switch_banks() {
 
 		DEBUG( printf("MMC1: Switching banks...\n") );
 
-		PPU->mirroring = mapper->regs[0] & 0x01;
+		PPU->mirroring = !(mapper->regs[0] & 0x01);
 		if( !(mapper->regs[0] & 0x02 ) )
 			PPU->mirroring = SINGLE_SCREEN_MIRRORING;
 
