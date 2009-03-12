@@ -163,10 +163,14 @@ void draw_line(int line) {
 				if( col_index & 0x03 ) {
 
 					/* Horizontal flip? */
-					if( byte3 & SPRITE_FLIP_HORIZ )
-						draw_pixel( tmp + 7 - tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
-					else
-						draw_pixel( tmp + tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+					if( byte3 & SPRITE_FLIP_HORIZ ) {
+						if( tmp+7-tx < NES_SCREEN_WIDTH )
+							draw_pixel( tmp + 7 - tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+					}
+					else {
+						if( tmp+tx < NES_SCREEN_WIDTH )
+							draw_pixel( tmp + tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+					}
 				}
 
 			}
@@ -283,14 +287,18 @@ void draw_line(int line) {
 					if( byte3 & SPRITE_FLIP_HORIZ ) {
 						if( !(PPU->SR&HIT_FLAG) && tmp+7-tx == first_bg_pixel)
 							PPU->SR |= HIT_FLAG;
-						draw_pixel( tmp + 7 - tx, line,
-						system_palette[read_ppu_vram(0x3F10+col_index)]);
+
+						if( tmp+7-tx < NES_SCREEN_WIDTH )
+							draw_pixel( tmp + 7 - tx, line,
+							system_palette[read_ppu_vram(0x3F10+col_index)]);
 					}
 					else {
-						if( !(PPU->SR&HIT_FLAG) && tmp+tx == first_bg_pixel )
+						if( !(PPU->SR&HIT_FLAG) && (tmp+tx == first_bg_pixel) )
 							PPU->SR |= HIT_FLAG;
-						draw_pixel( tmp + tx, line,
-						system_palette[read_ppu_vram(0x3F10+col_index)]);
+
+						if( tmp+tx < NES_SCREEN_WIDTH )
+							draw_pixel( tmp + tx, line,
+							system_palette[read_ppu_vram(0x3F10+col_index)]);
 					}
 
 				}
