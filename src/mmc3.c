@@ -122,15 +122,12 @@ void mmc3_switch_banks() {
 				/* Copy 2 1Kb VROM pages */
 				if( command <= 1 ) {
 					offset = 0x800*command;
-					printf("Copying banks %02x/%02x into %04x\n", bank, bank+1, offset);
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 2*1024);
 				}
 				/* Copy 1 Kb VROM page */
 				else {
 					offset = 0x1000 + (command-2)*0x400;
-
-					printf("Copying bank %02x into %04x\n", bank, offset);
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 1024);
 				}
@@ -138,6 +135,8 @@ void mmc3_switch_banks() {
 			else {
 
 				offset = 0x8000;
+
+				/* 0xA000 is present in both regions */
 				if( command == 7 )
 					offset += 0x2000;
 				else
