@@ -29,10 +29,52 @@
 
 void mmc3_initialize_mapper() {
 
+	mapper->regs = (uint8_t *)malloc(8);
+	bzero(mapper->regs,8);
 	return;
 }
 
 int  mmc3_check_address(uint16_t address) {
+
+	if( address == 0x8000 ) {
+		mapper->regs[0] = CPU->RAM[address];
+		return 1;
+	}
+
+	if( address == 0x8001 ) {
+		mapper->regs[1] = CPU->RAM[address];
+		return 1;
+	}
+
+	if( address == 0xA000 ) {
+		mapper->regs[2] = CPU->RAM[address];
+		return 1;
+	}
+
+	if( address == 0xA001 ) {
+		mapper->regs[3] = CPU->RAM[address];
+		return 1;
+	}
+
+	if( address == 0xC000 ) {
+		mapper->regs[4] = CPU->RAM[address];
+		return 1;
+	}
+
+	if( address == 0xC001 ) {
+		mapper->regs[5] = CPU->RAM[address];
+		return 1;
+	}
+
+	if( address == 0xE000 ) {
+		mapper->regs[6] = CPU->RAM[address];
+		return 1;
+	}
+
+	if( address == 0xE001 ) {
+		mapper->regs[7] = CPU->RAM[address];
+		return 1;
+	}
 
 	return 0;
 }
