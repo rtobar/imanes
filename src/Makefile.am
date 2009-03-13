@@ -9,6 +9,7 @@ imanes_SOURCES = \
      main.c \
      mapper.c \
      mmc1.c \
+     mmc3.c \
      nrom.c \
      pad.c \
      palette.c \

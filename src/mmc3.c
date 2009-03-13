@@ -1,6 +1,6 @@
 /*  ImaNES: I'm a NES. An intelligent NES emulator
 
-    mapper.c   -    Generic mapper support for ImaNES
+    mmc3.c   -    MMC3 Mapper emulation under ImaNES
 
     Copyright (C) 2008   Rodrigo Tobar Carrizo
 
@@ -18,28 +18,31 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-#include <strings.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include "cnrom.h"
+#include "cpu.h"
+#include "debug.h"
 #include "mapper.h"
-#include "mmc1.h"
 #include "mmc3.h"
-#include "nrom.h"
-#include "unrom.h"
+#include "ppu.h"
 
-nes_mapper *mapper;
+void mmc3_initialize_mapper() {
 
-nes_mapper mapper_list[] = {
-	{ 0 , "NROM" , nrom_initialize_mapper , nrom_check_address,
-	  nrom_switch_banks , nrom_reset  } ,
-	{ 1 , "MMC1" , mmc1_initialize_mapper , mmc1_check_address,
-	  mmc1_switch_banks , mmc1_reset  } ,
-	{ 2 , "UNROM", unrom_initialize_mapper, unrom_check_address,
-	  unrom_switch_banks, unrom_reset } ,
-	{ 3 , "CNROM", cnrom_initialize_mapper, cnrom_check_address,
-	  cnrom_switch_banks, cnrom_reset } ,
-	{ 4 , "MMC3" , mmc3_initialize_mapper , mmc3_check_address,
-	  mmc3_switch_banks , mmc3_reset  } ,
-	{ -1 }
-};
+	return;
+}
+
+int  mmc3_check_address(uint16_t address) {
+
+	return 0;
+}
+
+void mmc3_switch_banks() {
+
+	return;
+}
+
+void mmc3_reset() {
+
+	return;
+}
