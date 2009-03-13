@@ -118,6 +118,22 @@ void mmc3_switch_banks() {
 
 			/* Switch VROM page */
 			if( command <= 5 ) {
+
+				/* Copy 2 1Kb VROM pages */
+				if( command <= 1 ) {
+					offset = 0x800*command;
+					printf("Copying banks %02x/%02x into %04x\n", bank, bank+1, offset);
+					memcpy(PPU->VRAM+offset,
+					       mapper->file->vrom+bank*1024, 2*1024);
+				}
+				/* Copy 1 Kb VROM page */
+				else {
+					offset = 0x1000 + (command-2)*0x400;
+
+					printf("Copying bank %02x into %04x\n", bank, offset);
+					memcpy(PPU->VRAM+offset,
+					       mapper->file->vrom+bank*1024, 1024);
+				}
 			}
 			else {
 
@@ -134,7 +150,7 @@ void mmc3_switch_banks() {
 
 				/* If we haven't changed the swapping control, then
 				   we don't need to copy again the same ROM memory */
-				if( swapping_control == (mapper->regs[0]&0x40) >> 6 )
+				if( swapping_control == (mapper->regs[0]&0x40) )
 					break;
 
 				if( mapper->regs[0] & 0x40 )
@@ -145,6 +161,7 @@ void mmc3_switch_banks() {
 				memcpy( CPU->RAM + offset,
 				   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
 				   ROM_BANK_SIZE/2);
+				swapping_control = mapper->regs[0]&0x40;
 			}
 
 			break;
