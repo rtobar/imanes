@@ -27,27 +27,43 @@
 #include "mmc3.h"
 #include "ppu.h"
 
+typedef enum _mmc3_action {
+	SetCommand,
+	SwapBanks,
+	ChangeMirroring,
+	ToogleSRAM
+} mmc3_action;
+
+/* This is the action taken when writing into the address,
+   used later to see what we should do when "switching banks" */
+static mmc3_action action;
+
 void mmc3_initialize_mapper() {
 
 	mapper->regs = (uint8_t *)malloc(8);
 	bzero(mapper->regs,8);
+
+	mapper->regs[0] = 0; /* 0x8000 and 0xA000 are switchable */
 	return;
 }
 
 int  mmc3_check_address(uint16_t address) {
 
+	/* This only set values, does not take any action */
 	if( address == 0x8000 ) {
 		mapper->regs[0] = CPU->RAM[address];
-		return 1;
+		return 0;
 	}
 
 	if( address == 0x8001 ) {
 		mapper->regs[1] = CPU->RAM[address];
+		action = SwapBanks;
 		return 1;
 	}
 
 	if( address == 0xA000 ) {
 		mapper->regs[2] = CPU->RAM[address];
+		action = ChangeMirroring;
 		return 1;
 	}
 
@@ -81,10 +97,54 @@ int  mmc3_check_address(uint16_t address) {
 
 void mmc3_switch_banks() {
 
+	uint8_t bank;
+	uint8_t command;
+	uint16_t offset;
+
+	switch( action ) {
+
+		case SwapBanks:
+			bank = mapper->regs[1];
+			command = (mapper->regs[0]&0x7);
+
+			/* Switch VROM page */
+			if( command <= 5 ) {
+			}
+			else {
+
+				offset = 0x8000;
+				if( command == 7 )
+					offset += 0x2000;
+				if( mapper->regs[0] & 0x40 )
+					offset += 0x2000;
+
+				memcpy(CPU->RAM + offset,
+				       mapper->file->rom + bank*ROM_BANK_SIZE/2,
+				       ROM_BANK_SIZE/2);
+			}
+
+			break;
+
+		case ChangeMirroring:
+			PPU->mirroring = !(mapper->regs[2] & 0x1);
+			break;
+
+		default:
+			break;
+	}
+
 	return;
 }
 
 void mmc3_reset() {
+
+	memcpy( CPU->RAM + 0x8000, mapper->file->rom, ROM_BANK_SIZE);
+	memcpy( CPU->RAM + 0xC000,
+	        mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
+	        ROM_BANK_SIZE);
+
+	if( mapper->file->vromBanks != 0 )
+		memcpy( PPU->VRAM, mapper->file->vrom, 0x2000);
 
 	return;
 }
