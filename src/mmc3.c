@@ -38,12 +38,20 @@ typedef enum _mmc3_action {
    used later to see what we should do when "switching banks" */
 static mmc3_action action;
 
+/* Are we powering on the machine? */
+static int powering_on;
+
+static int swapping_control;
+
 void mmc3_initialize_mapper() {
 
 	mapper->regs = (uint8_t *)malloc(8);
 	bzero(mapper->regs,8);
 
 	mapper->regs[0] = 0; /* 0x8000 and 0xA000 are switchable */
+	powering_on = 1;
+	swapping_control = 0;
+
 	return;
 }
 
@@ -52,7 +60,8 @@ int  mmc3_check_address(uint16_t address) {
 	/* This only set values, does not take any action */
 	if( address == 0x8000 ) {
 		mapper->regs[0] = CPU->RAM[address];
-		return 0;
+		action = SetCommand;
+		return 1;
 	}
 
 	if( address == 0x8001 ) {
@@ -118,9 +127,24 @@ void mmc3_switch_banks() {
 				if( mapper->regs[0] & 0x40 )
 					offset += 0x2000;
 
+				printf("Copying bank %02x into %04x\n", bank, offset);
 				memcpy(CPU->RAM + offset,
 				       mapper->file->rom + bank*ROM_BANK_SIZE/2,
 				       ROM_BANK_SIZE/2);
+
+				/* If we haven't changed the swapping control, then
+				   we don't need to copy again the same ROM memory */
+				if( swapping_control == (mapper->regs[0]&0x40) >> 6 )
+					break;
+
+				if( mapper->regs[0] & 0x40 )
+					offset = 0xC000;
+				else
+					offset = 0x8000;
+
+				memcpy( CPU->RAM + offset,
+				   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
+				   ROM_BANK_SIZE/2);
 			}
 
 			break;
@@ -138,10 +162,16 @@ void mmc3_switch_banks() {
 
 void mmc3_reset() {
 
-	memcpy( CPU->RAM + 0x8000, mapper->file->rom, ROM_BANK_SIZE);
-	memcpy( CPU->RAM + 0xC000,
-	        mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
-	        ROM_BANK_SIZE);
+	/* The last ROM bank is always fixed into 0xE000-0xFFFF */
+	if( powering_on ) {
+		memcpy( CPU->RAM + 0xE000,
+	      mapper->file->rom+((mapper->file->romBanks*2)-1)*ROM_BANK_SIZE/2,
+	      ROM_BANK_SIZE/2);
+		memcpy( CPU->RAM + 0x8000,
+		   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
+		   ROM_BANK_SIZE/2);
+		powering_on = 0;
+	}
 
 	if( mapper->file->vromBanks != 0 )
 		memcpy( PPU->VRAM, mapper->file->vrom, 0x2000);
