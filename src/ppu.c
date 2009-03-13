@@ -178,7 +178,7 @@ void draw_line(int line) {
 						if( tmp+tx < NES_SCREEN_WIDTH ) {
 							draw_pixel( tmp + tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 							if( back_sprites[i] == 0 )
-								drawn_back_sprites[drawn_back_sprites_idx++] = tmp+7-tx;
+								drawn_back_sprites[drawn_back_sprites_idx++] = tmp+tx;
 						}
 					}
 				}
@@ -252,8 +252,8 @@ void draw_line(int line) {
 				if( first_bg_pixel == -1 )
 					first_bg_pixel = x;
 
-				for(j=0;j!=drawn_back_sprites_idx;j++)
-					if( !(PPU->SR & HIT_FLAG) && x == drawn_back_sprites[j] ) {
+				for(j=0;j!=drawn_back_sprites_idx && !(PPU->SR & HIT_FLAG);j++)
+					if( x == drawn_back_sprites[j] ) {
 						PPU->SR |= HIT_FLAG;
 						break;
 					}
