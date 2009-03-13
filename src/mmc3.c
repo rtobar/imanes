@@ -140,8 +140,9 @@ void mmc3_switch_banks() {
 				offset = 0x8000;
 				if( command == 7 )
 					offset += 0x2000;
-				if( mapper->regs[0] & 0x40 )
-					offset += 0x2000;
+				else
+					if( mapper->regs[0] & 0x40 )
+						offset += 0x4000;
 
 				printf("Copying bank %02x into %04x\n", bank, offset);
 				memcpy(CPU->RAM + offset,
