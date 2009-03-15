@@ -31,7 +31,9 @@ typedef enum _mmc3_action {
 	SetCommand,
 	SwapBanks,
 	ChangeMirroring,
-	ToogleSRAM
+	ToogleSRAM,
+	EnableIRQ,
+	DisableIRQ
 } mmc3_action;
 
 /* This is the action taken when writing into the address,
@@ -42,6 +44,9 @@ static mmc3_action action;
 static int powering_on;
 
 static int swapping_control;
+
+static int irq_enabled;
+static int irq_tmp;
 
 void mmc3_initialize_mapper() {
 
@@ -94,11 +99,13 @@ int  mmc3_check_address(uint16_t address) {
 
 	if( address == 0xE000 ) {
 		mapper->regs[6] = CPU->RAM[address];
+		action = DisableIRQ;
 		return 1;
 	}
 
 	if( address == 0xE001 ) {
 		mapper->regs[7] = CPU->RAM[address];
+		action = EnableIRQ;
 		return 1;
 	}
 
@@ -185,6 +192,14 @@ void mmc3_switch_banks() {
 				else
 					CPU->sram_enabled &= ~SRAM_RO;
 			}
+			break;
+
+		case DisableIRQ:
+			irq_enabled = 0;
+			break;
+
+		case EnableIRQ:
+			irq_enabled = 1;
 			break;
 
 		default:
