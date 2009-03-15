@@ -32,16 +32,19 @@ void save_sram(char *file) {
 	int fd = 3;
 	ssize_t written_bytes;
 
+	if( !CPU->sram_enabled )
+		return;
+
 	fd = open(file, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 
 	if( fd == -1 ) {
-		fprintf(stderr,"Error whlie opening '%s'", file);
+		fprintf(stderr,"Error whlie opening '%s': ", file);
 		perror(NULL);
 	}
 
 	written_bytes = write(fd, CPU->RAM + 0x6000, 0x2000);
 	if( written_bytes != 0x2000 ) {
-		fprintf(stderr,"Couldn't dump SRAM data to '%s'", file);
+		fprintf(stderr,"Couldn't dump SRAM data to '%s': ", file);
 		perror(NULL);
 	}
 
@@ -53,9 +56,12 @@ void load_sram(char *file) {
 	int fd;
 	ssize_t read_bytes;
 
+	if( !CPU->sram_enabled )
+		return;
+
 	fd = open(file, O_RDONLY);
 	if( fd == -1 ) {
-		fprintf(stderr,"Error while opening '%s'", file);
+		fprintf(stderr,"Error while opening '%s': ", file);
 		perror(NULL);
 		return;
 	}
