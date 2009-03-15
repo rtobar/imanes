@@ -114,6 +114,7 @@ int main(int args, char *argv[]) {
 	/* Main loop */
 	main_loop(nes_rom);
 
+	end_screen();
 	free_ines_file(nes_rom);
 	return 0;
 }

@@ -12,4 +12,6 @@ extern pthread_mutex_t pause_mutex;
  */
 void main_loop(ines_file *);
 
+extern int run_loop;
+
 #endif /* loop_h */

@@ -25,8 +25,11 @@
 
 #include "common.h"
 #include "imaconfig.h"
+#include "loop.h"
 #include "pad.h"
 #include "screen.h"
+
+static pthread_t screen_thread;
 
 static SDL_Surface *nes_screen;
 
@@ -53,8 +56,8 @@ void *screen_loop(void *args) {
 				break;
 
 			case SDL_QUIT:
-				exit(EXIT_SUCCESS);
-				break;
+				run_loop = 0;
+				return NULL;
 		}
 	}
 
@@ -63,8 +66,6 @@ void *screen_loop(void *args) {
 
 void init_screen() {
 	
-	pthread_t screen_thread;
-
 	char window_title[30];
 
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
@@ -83,6 +84,13 @@ void init_screen() {
 
 	/* The event loop should go in a separate thread */
 	pthread_create(&screen_thread, NULL, screen_loop, NULL);
+
+}
+
+void end_screen() {
+
+	pthread_join(screen_thread,NULL);
+	SDL_Quit();
 
 }
 

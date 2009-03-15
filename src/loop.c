@@ -35,6 +35,8 @@
 
 pthread_mutex_t pause_mutex;
 
+int run_loop;
+
 void main_loop(ines_file *file) {
 
 	uint8_t opcode;
@@ -62,7 +64,7 @@ void main_loop(ines_file *file) {
 	execute_reset();
 
 	/* This is the main loop */
-	for(;;) {
+	for(run_loop = 1;run_loop;) {
 
 		/* First, of all, we check if we should pause the emulation 
 		   We do so until the mutex has been released by the user
@@ -89,8 +91,7 @@ void main_loop(ines_file *file) {
 			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
 			fprintf(stderr,"I'm exiting now... sorry :(\n");
 			fprintf(stderr,"Close the window when finished\n");
-			inst.size = scanf("%s", inst.name);
-			exit(EXIT_FAILURE);
+			return;
 		}
 
 		/* Select operand depending on the addressing node */

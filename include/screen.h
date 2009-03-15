@@ -14,6 +14,11 @@
 void init_screen(void);
 
 /**
+ * This method ends all the screen-related resources
+ */
+void end_screen(void);
+
+/**
  * Draw a pixel on the screen.
  */
 void draw_pixel(int x, int y, nes_palette color);
