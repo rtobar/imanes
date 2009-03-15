@@ -695,6 +695,15 @@ uint8_t read_cpu_ram(uint16_t address) {
 			pads[0].reads = 0;
 	}
 
+	/* SRAM area */
+	else if( 0x6000 <= address && address < 0x8000 ) {
+		/* SRAM diabled */
+		if( !(CPU->sram_enabled & SRAM_ENABLE) )
+			return 0;
+		else
+			return CPU->RAM[address];
+	}
+
 	/* Normal RAM area */
 	else
 		ret_val = CPU->RAM[address];
