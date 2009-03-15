@@ -129,5 +129,6 @@ int main(int args, char *argv[]) {
 	end_screen();
 	free_ines_file(nes_rom);
 	save_sram(save_file);
+
 	return 0;
 }
