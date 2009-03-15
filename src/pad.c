@@ -61,12 +61,12 @@ void nes_keydown(SDL_keysym keysym) {
 			break;
 
 		/* A button */
-		case SDLK_j:
+		case SDLK_k:
 			pads[0].pressed_keys |= NES_A;
 			break;
 
 		/* B button */
-		case SDLK_k:
+		case SDLK_j:
 			pads[0].pressed_keys |= NES_B;
 			break;
 
@@ -164,12 +164,12 @@ void nes_keyup(SDL_keysym keysym) {
 			break;
 
 		/* A button */
-		case SDLK_j:
+		case SDLK_k:
 			pads[0].pressed_keys &= ~NES_A;
 			break;
 
 		/* B button */
-		case SDLK_k:
+		case SDLK_j:
 			pads[0].pressed_keys &= ~NES_B;
 			break;
 
