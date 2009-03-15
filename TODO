@@ -24,7 +24,7 @@ PPU:
  * [DONE] Fix sprite drawing (they seem to be 1 pixel above)
  * [DONE] Support for vertical flip sprites feature
  * [VERTICAL MISSING] Support background scrolling
- * [BACK SPRITES MISSING] Recognize and set "pixel 0 bit"
+ * [TESTING] Recognize and set "pixel 0 bit"
  * [DONE] Add support for 8x16 sprites
  * [DONE] Fix the back and front sprites drawing
 
@@ -39,3 +39,4 @@ Mappers:
 ========
 
  * [TESTING] Finish and test MMC1
+ * [ ] Finish and test MMC3
