@@ -20,11 +20,16 @@ Hope you enjoy ImaNES!
 Compiling
 =========
 
-imaNES has been developed under Linux, using the gcc compiler. SDL libraries on
-your system should be enough to compile it without problems. A simple Makefile
-is also distributed with the source code to ease the compilation. After
-compiling, a binary called "imanes" should be generated in the same directory as
-the source code is placed.
+ImaNES has been developed under Linux, using the gcc compiler. SDL libraries on
+your system should be enough to compile it without problems. To compile ImaNES
+just do the following:
+
+$> sh build.sh
+$> ./configure
+$> make all
+$> make install
+
+Check the INSTALL file for further details
 
 
 Contact
