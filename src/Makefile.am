@@ -16,6 +16,7 @@ imanes_SOURCES = \
      parse_file.c \
      ppu.c \
      screen.c \
+     sram.c \
      unrom.c
 
 AM_CPPFLAGS = -I$(top_srcdir)/include -Wall
