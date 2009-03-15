@@ -33,6 +33,7 @@
 #include "parse_file.h"
 #include "ppu.h"
 #include "screen.h"
+#include "sram.h"
 
 void usage(FILE *file, char *argv[]) {
 	fprintf(file,"\nUsage: %s [options] <rom file>\n\n",argv[0]);
@@ -90,6 +91,9 @@ void parse_options(int args, char *argv[]) {
 
 int main(int args, char *argv[]) {
 
+	char *rom_file;
+	char *save_file;
+
 	ines_file *nes_rom;
 
 	setbuf(stdout,NULL);
@@ -106,15 +110,24 @@ int main(int args, char *argv[]) {
 	initialize_ppu();
 	initialize_pads();
 
-	nes_rom = check_ines_file(argv[optind]);
+	rom_file = (char *)malloc(strlen(argv[optind]));
+	save_file = (char *)malloc(strlen(argv[optind])+4);
+	strcpy(rom_file,argv[optind]);
+	strcpy(save_file,argv[optind]);
+	strcat(save_file,".sav");
+
+	nes_rom = check_ines_file(rom_file);
 	map_rom_memory(nes_rom);
 	init_ppu_vram(nes_rom);
 	init_screen();
+
+	load_sram(save_file);
 
 	/* Main loop */
 	main_loop(nes_rom);
 
 	end_screen();
 	free_ines_file(nes_rom);
+	save_sram(save_file);
 	return 0;
 }
