@@ -6,7 +6,13 @@
 #include "common.h"
 #include "instruction_set.h"
 
+/* SRAM has a enabled/disabled state plus a RO/RW status */
+#define SRAM_ENABLE 0x01
+#define SRAM_RO     0x02
+
 typedef struct {
+
+	/* Internal CPU registers */
 	uint16_t PC;  /* Program counter. 16 bits long, but points 8 bit code */
 	uint8_t  A;   /* Accumulator */
 	uint8_t  X;   /* X register */
@@ -20,6 +26,9 @@ typedef struct {
 
 	/* Reset button pressed */
 	uint8_t reset;
+
+	/* Enable SRAM storage */
+	uint8_t sram_enabled;
 } nes_cpu;
 
 /** SR flags */

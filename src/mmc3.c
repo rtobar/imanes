@@ -78,6 +78,7 @@ int  mmc3_check_address(uint16_t address) {
 
 	if( address == 0xA001 ) {
 		mapper->regs[3] = CPU->RAM[address];
+		action = ToogleSRAM;
 		return 1;
 	}
 
@@ -143,7 +144,7 @@ void mmc3_switch_banks() {
 					if( mapper->regs[0] & 0x40 )
 						offset += 0x4000;
 
-				printf("Copying bank %02x into %04x\n", bank, offset);
+				//printf("Copying bank %02x into %04x\n", bank, offset);
 				memcpy(CPU->RAM + offset,
 				       mapper->file->rom + bank*ROM_BANK_SIZE/2,
 				       ROM_BANK_SIZE/2);
@@ -168,6 +169,14 @@ void mmc3_switch_banks() {
 
 		case ChangeMirroring:
 			PPU->mirroring = !(mapper->regs[2] & 0x1);
+			break;
+
+		case ToogleSRAM:
+			command = (mapper->regs[3] & 0x80) >> 7;
+			if( command != CPU->sram_enabled ) {
+				DEBUG( printf("%s SRAM\n", (command ? "Enabling" : "Disabling" ) ) );
+				CPU->sram_enabled = command;
+			}
 			break;
 
 		default:

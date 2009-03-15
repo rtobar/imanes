@@ -26,6 +26,7 @@
 #include <unistd.h>
 
 #include "common.h"
+#include "cpu.h"
 #include "parse_file.h"
 #include "ppu.h"
 #include "mapper.h"
@@ -96,7 +97,7 @@ ines_file *check_ines_file(char *file_path) {
 
 	printf("Mirroring type: %d\n", PPU->mirroring);
 
-	rom_file->sram_enabled = buff[0] & 0x02;
+	CPU->sram_enabled = buff[0] & 0x02;
 	rom_file->has_trainer  = buff[0] & 0x04;
 
 	rom_file->mapper_id = (buff[1] & 0xF0) | ( (buff[0] >> 4) & 0x0F );
