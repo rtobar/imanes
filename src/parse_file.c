@@ -97,7 +97,8 @@ ines_file *check_ines_file(char *file_path) {
 
 	printf("Mirroring type: %d\n", PPU->mirroring);
 
-	CPU->sram_enabled = buff[0] & 0x02;
+	CPU->sram_enabled = (buff[0] & 0x02) >> 1;
+	printf("SRAM is %s\n", (CPU->sram_enabled ? "enabled" : "disabled") );
 	rom_file->has_trainer  = buff[0] & 0x04;
 
 	rom_file->mapper_id = (buff[1] & 0xF0) | ( (buff[0] >> 4) & 0x0F );

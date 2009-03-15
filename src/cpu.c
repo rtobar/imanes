@@ -535,7 +535,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		DEBUG( printf("%04x\n",address) );
 	}
 
-	/* SRAM can be enabled/disabled or in RO mode */
+	/* SRAM can be disabled or in RO mode */
 	if( 0x6000 <= address && address < 0x8000 && 
 	 ( !(CPU->sram_enabled&SRAM_ENABLE) || CPU->sram_enabled&SRAM_RO ) ) {
 		DEBUG( printf("Write to %04x not allowed\n", address) );
