@@ -180,10 +180,7 @@ void execute_instruction(instruction inst, operand oper) {
 			/* Set the interrupt flag, push the PC+2 (not a bug) and the SR */
 			/* Finally, jump to the interrupt vector */
 			CPU->SR |= B_FLAG;
-			stack_push( CPU->SR );
-			stack_push( (CPU->PC+2) & 0xFF );
-			stack_push( (CPU->PC+2) >> 8 );
-			CPU->PC = ( CPU->RAM[0xFFFE] | ( CPU->RAM[0xFFFF]<<8 ) );
+			execute_irq();
 			CPU->PC -= inst.size;
 			break;
 
@@ -740,4 +737,13 @@ void execute_reset() {
 	/* Now, let's search for the RESET vector and point CPU->PC there */
 	CPU->PC = *(CPU->RAM + 0xFFFC) | ( *(CPU->RAM + 0xFFFD) << 8 );
 	CPU->reset = 0;
+}
+
+/* This is called by BRK and mappers IRQ triggers */
+void execute_irq() {
+
+	stack_push( (CPU->PC+2) & 0xFF );
+	stack_push( (CPU->PC+2) >> 8 );
+	stack_push( CPU->SR );
+	CPU->PC = ( CPU->RAM[0xFFFE] | ( CPU->RAM[0xFFFF]<<8 ) );
 }

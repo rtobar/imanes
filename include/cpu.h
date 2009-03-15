@@ -96,4 +96,9 @@ void execute_nmi();
  */
 void execute_reset();
 
+/**
+ * Executes an IRQ/BRK interrupt on the NES
+ */
+void execute_irq();
+
 #endif /* cpu_h */
