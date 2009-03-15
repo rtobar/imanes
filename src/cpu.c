@@ -39,6 +39,8 @@ void initialize_cpu() {
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
 	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
 	CPU->reset = 1;
+	CPU->sram_enabled = 0;
+	CPU->sram_enabled &= ~SRAM_ENABLE;
 	CPU->SR = R_FLAG; /* It is never ever used, but always set */
 
 	return;
@@ -531,6 +533,13 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		DEBUG( printf("CPU Address mirroring: from %04x to ", address) );
 		address = address - 0x8 * ((address >> 3) & 0x7FF);
 		DEBUG( printf("%04x\n",address) );
+	}
+
+	/* SRAM can be enabled/disabled or in RO mode */
+	if( 0x6000 <= address && address < 0x8000 && 
+	 ( !(CPU->sram_enabled&SRAM_ENABLE) || CPU->sram_enabled&SRAM_RO ) ) {
+		DEBUG( printf("Write to %04x not allowed\n", address) );
+		return;
 	}
 
 	switch( address ) {

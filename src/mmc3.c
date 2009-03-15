@@ -177,6 +177,14 @@ void mmc3_switch_banks() {
 				DEBUG( printf("%s SRAM\n", (command ? "Enabling" : "Disabling" ) ) );
 				CPU->sram_enabled = command;
 			}
+			command = (mapper->regs[3] & 0x40) >> 6;
+			if( command != (CPU->sram_enabled & SRAM_RO) ) {
+				DEBUG( printf("SRAM switching to %s mode\n", (command ? "RO": "RW") ) );
+				if( command )
+					CPU->sram_enabled |= SRAM_RO;
+				else
+					CPU->sram_enabled &= ~SRAM_RO;
+			}
 			break;
 
 		default:
