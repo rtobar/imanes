@@ -559,7 +559,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 		case 0x2004:
 			XTREME( printf("Writing into SPR RAM at address %02x\n", PPU->spr_addr) );
-			*(PPU->SPR_RAM + PPU->spr_addr++) = value;
+			PPU->SPR_RAM[PPU->spr_addr++] = value;
 			break;
 
 		case 0x2005:
@@ -600,8 +600,9 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		case 0x4014:
 			address = value*0x100;
 			for(i=0;i!=256;i++) 
-				*(PPU->SPR_RAM + i) = *(CPU->RAM + address + i);
+				PPU->SPR_RAM[i] = read_cpu_ram(address+i);
 			CPU->cycles += 512;
+			CPU->RAM[address] = value;
 			break;
 
 		/* 1st joystick */			
