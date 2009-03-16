@@ -117,6 +117,7 @@ void mmc3_switch_banks() {
 	uint8_t bank;
 	uint8_t command;
 	uint16_t offset;
+	static int last_in_vrom_address[6] = {-1,-1,-1,-1,-1,-1};
 
 	switch( action ) {
 
@@ -126,6 +127,14 @@ void mmc3_switch_banks() {
 
 			/* Switch VROM page */
 			if( command <= 5 ) {
+
+				if( bank != last_in_vrom_address[command] ) {
+					INFO( printf("MMC3: Switching bank %d to %04x\n", bank,
+					       (command <= 1? 0x800*command : 0x1000+(command-2)*0x400) ) );
+					last_in_vrom_address[command] = bank;
+				}
+				else
+					return;
 
 				/* Copy 2 1Kb VROM pages */
 				if( command <= 1 ) {
