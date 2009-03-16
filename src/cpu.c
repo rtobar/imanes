@@ -602,7 +602,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			for(i=0;i!=256;i++) 
 				PPU->SPR_RAM[i] = read_cpu_ram(address+i);
 			CPU->cycles += 512;
-			CPU->RAM[address] = value;
 			break;
 
 		/* 1st joystick */			
