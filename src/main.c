@@ -102,6 +102,8 @@ int main(int args, char *argv[]) {
 	/* Parse command line options */
 	parse_options(args, argv);
 
+	load_user_configuration();
+
 	/* Initialize static data */
 	initialize_configuration();
 	initialize_palette();

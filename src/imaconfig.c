@@ -18,6 +18,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+
 #include "imaconfig.h"
 
 imanes_config config;
@@ -38,4 +43,46 @@ void initialize_configuration() {
 	if( config.video_scale == 0 )
 		config.video_scale = 1;
 
+}
+
+void load_user_configuration() {
+
+	int tmp;
+	char * user_home;
+	char * user_imanes_dir;
+	struct stat s;
+
+	user_home = getenv("HOME");
+	if( user_home == NULL ) {
+		fprintf(stderr, "Couldn't find user's home directory. Will not load user configuration");
+		return;
+	}
+
+	user_imanes_dir = (char *)malloc(strlen(user_home) + 9);
+	sprintf(user_imanes_dir,"%s/.imanes/", user_home);
+
+	/* Check if the directory exists */
+	tmp = stat(user_imanes_dir, &s);
+
+	/* Not found, let's create it (we assume that $HOME exists) */
+	if( tmp == -1 ) {
+		fprintf(stderr,"Directory '%s' not found, creating it...\n", user_imanes_dir);
+		tmp = mkdir(user_imanes_dir, S_IRWXU | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+
+		if( tmp == -1 ) {
+			fprintf(stderr,"Error while creating directory '%s': ", user_imanes_dir);
+			perror(NULL);
+			return;
+		}
+
+	}
+	else {
+		/* Found, but not a directory */
+		if( ! S_ISDIR(s.st_mode) ) {
+			fprintf(stderr,"'%s' found, but not a directory\n", user_imanes_dir);
+			return;
+		}
+	}
+
+	
 }

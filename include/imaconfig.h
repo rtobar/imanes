@@ -21,4 +21,7 @@ extern imanes_config config;
 /* Initializes imanes configuration */
 void initialize_configuration();
 
+/* Loads per-user configuration */
+void load_user_config();
+
 #endif /* imaconfig_h */
