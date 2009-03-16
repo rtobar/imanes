@@ -74,15 +74,6 @@ void load_user_configuration() {
 			perror(NULL);
 			return;
 		}
-
-	}
-	else {
-		/* Found, but not a directory */
-		if( ! S_ISDIR(s.st_mode) ) {
-			fprintf(stderr,"'%s' found, but not a directory\n", user_imanes_dir);
-			return;
-		}
 	}
 
-	
 }
