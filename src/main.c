@@ -96,6 +96,7 @@ int main(int args, char *argv[]) {
 
 	ines_file *nes_rom;
 
+	/* Print NOW everything :D */
 	setbuf(stdout,NULL);
 	setbuf(stderr,NULL);
 
@@ -118,14 +119,16 @@ int main(int args, char *argv[]) {
 	strcpy(save_file,argv[optind]);
 	strcat(save_file,".sav");
 
+	/* Read the ines file and get all the ROM/VROM */
 	nes_rom = check_ines_file(rom_file);
 	map_rom_memory(nes_rom);
-	init_ppu_vram(nes_rom);
+
+	/* Create the screen and a separate thread for the events */
 	init_screen();
 
 	load_sram(save_file);
 
-	/* Main loop */
+	/* Main execution loop */
 	main_loop(nes_rom);
 
 	end_screen();

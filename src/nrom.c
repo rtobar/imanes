@@ -21,9 +21,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "cpu.h"
+#include "debug.h"
 #include "mapper.h"
 #include "nrom.h"
-#include "cpu.h"
+#include "ppu.h"
 
 inline void nrom_initialize_mapper() {
 	return;
@@ -52,5 +54,12 @@ void nrom_reset()
       memcpy( CPU->RAM + 0x8000, mapper->file->rom, ROM_BANK_SIZE);
       memcpy( CPU->RAM + 0xC000, mapper->file->rom + ROM_BANK_SIZE, ROM_BANK_SIZE);
    }
+
+	/* Dump the VROM into the PPU VRAM area */
+	if( mapper->file->vromBanks == 1 ) {
+		INFO( printf("Copying VROM to VRAM\n") );
+		memcpy( PPU->VRAM , mapper->file->vrom, 0x2000);
+	}
+
 	return;
 }

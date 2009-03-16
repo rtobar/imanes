@@ -41,16 +41,6 @@ void initialize_ppu() {
 	PPU->first_write = 1;
 }
 
-void init_ppu_vram(ines_file *file) {
-
-	/* Dump the VROM into the PPU VRAM area */
-	if( file->vromBanks == 1 ) {
-		INFO( printf("Copying VROM to VRAM\n") );
-		memcpy( PPU->VRAM , file->vrom, 0x2000);
-	}
-
-}
-
 void dump_ppu() {
 
 	printf("CR1:%02x  ", PPU->CR1);
