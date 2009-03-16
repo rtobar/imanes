@@ -55,8 +55,10 @@ void cnrom_switch_banks() {
 
 void cnrom_reset() 
 {
-	memcpy(CPU->RAM+0x8000, mapper->file->rom, ROM_BANK_SIZE);
-	memcpy(CPU->RAM+0xC000,
-	       mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE, 
-	       ROM_BANK_SIZE);
+	if( mapper->file->romBanks == 2 )
+		memcpy(CPU->RAM+0x8000, mapper->file->rom, ROM_BANK_SIZE*2);
+	else
+		memcpy(CPU->RAM+0xC000, mapper->file->rom, ROM_BANK_SIZE);
+
+	memcpy(PPU->VRAM, mapper->file->vrom, VROM_BANK_SIZE);
 }
