@@ -8,5 +8,6 @@ void nrom_initialize_mapper();
 int  nrom_check_address(uint16_t address);
 void nrom_switch_banks();
 void nrom_reset();
+void nrom_update();
 
 #endif /* nrom_h */

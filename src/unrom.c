@@ -60,3 +60,7 @@ void unrom_reset()
 	       ROM_BANK_SIZE);
 
 }
+
+void unrom_update() {
+	return;
+}

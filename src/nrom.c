@@ -63,3 +63,7 @@ void nrom_reset()
 
 	return;
 }
+
+void nrom_update() {
+	return;
+}

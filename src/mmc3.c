@@ -47,6 +47,7 @@ static int swapping_control;
 
 static int irq_enabled;
 static int irq_tmp;
+static uint8_t irq_counter;
 
 void mmc3_initialize_mapper() {
 
@@ -56,6 +57,8 @@ void mmc3_initialize_mapper() {
 	mapper->regs[0] = 0; /* 0x8000 and 0xA000 are switchable */
 	powering_on = 1;
 	swapping_control = 0;
+
+	irq_counter = 0;
 
 	return;
 }
@@ -234,5 +237,15 @@ void mmc3_reset() {
 	if( mapper->file->vromBanks != 0 )
 		memcpy( PPU->VRAM, mapper->file->vrom, 0x2000);
 
+	return;
+}
+
+void mmc3_update() {
+
+	irq_counter--;
+
+	if( irq_counter == 0 )
+		execute_irq();
+	
 	return;
 }

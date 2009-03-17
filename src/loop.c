@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "instruction_set.h"
 #include "loop.h"
+#include "mapper.h"
 #include "ppu.h"
 #include "screen.h"
 
@@ -116,6 +117,7 @@ void main_loop(ines_file *file) {
 
 			if( lines < NES_SCREEN_HEIGHT ) {
 				draw_line(lines++);
+				mapper->update();
 			}
 			/* Start VBLANK period */
 			else if( lines == NES_SCREEN_HEIGHT ) {

@@ -25,6 +25,9 @@ typedef struct _mapper {
 	/* Performs the system memory fill at reset or at initialization */
 	void (*reset)();
 
+	/* Updates internal registers at the end of each scanline */
+	void (*update)();
+
 	/* Registers */
 	uint8_t *regs;
 

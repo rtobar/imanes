@@ -8,5 +8,6 @@ void cnrom_initialize_mapper();
 int  cnrom_check_address(uint16_t address);
 void cnrom_switch_banks();
 void cnrom_reset();
+void cnrom_update();
 
 #endif /* cnrom_h */

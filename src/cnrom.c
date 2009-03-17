@@ -62,3 +62,7 @@ void cnrom_reset()
 
 	memcpy(PPU->VRAM, mapper->file->vrom, VROM_BANK_SIZE);
 }
+
+void cnrom_update() {
+	return;
+}

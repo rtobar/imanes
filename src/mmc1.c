@@ -180,3 +180,7 @@ void mmc1_reset() {
 	       ROM_BANK_SIZE);
 
 }
+
+void mmc1_update() {
+	return;
+}
