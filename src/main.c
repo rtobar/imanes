@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "config.h"
 #include "cpu.h"
 #include "debug.h"
 #include "imaconfig.h"
@@ -36,7 +37,10 @@
 #include "sram.h"
 
 void usage(FILE *file, char *argv[]) {
-	fprintf(file,"\nUsage: %s [options] <rom file>\n\n",argv[0]);
+	fprintf(file,"\nImaNES: I'm a NES\n\n");
+	fprintf(file,"This program is licensed under the GPLv3 license.\n");
+	fprintf(file,"For bug reports, please refer to: %s\n\n", PACKAGE_BUGREPORT);
+	fprintf(file,"Usage: %s [options] <rom file>\n\n",argv[0]);
 	fprintf(file,"Options:\n");
 	fprintf(file,"  -v        Increase verbosity. More -v, more verbose. Default: 0\n");
 	fprintf(file,"  -s        Video scaling facotr. Default: 1\n");

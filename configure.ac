@@ -1,4 +1,4 @@
-AC_INIT( [imanes], [0.1] )
+AC_INIT( [imanes], [0.1], [https://csrg.inf.utfsm.cl/flyspray/index.php?project=10] )
 
 AM_INIT_AUTOMAKE
 AC_PROG_CC
