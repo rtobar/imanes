@@ -21,4 +21,4 @@ imanes_SOURCES = \
 
 imanes_LDFLAGS = -lrt
 
-AM_CPPFLAGS = -I$(top_srcdir)/include -Wall
+AM_CPPFLAGS = -I$(top_srcdir)/include -Wall -O3
