@@ -589,7 +589,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		case 0x2006:
 			/* First write */
 			if( PPU->latch ) {
-				PPU->temp_addr = (PPU->temp_addr&0xC0FF) | (value&0x3F<<8);
+				PPU->temp_addr = (PPU->temp_addr&0x00FF) | ((value&0x3F)<<8);
 				PPU->latch = 0;
 			}
 			/* Second write */
