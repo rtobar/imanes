@@ -547,6 +547,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* PPU control registers */
 		case 0x2000:
 			PPU->CR1 = value;
+			PPU->temp_addr = (PPU->temp_addr&0xF3FF) | ((value&0x3)<<10);
 			break;
 		case 0x2001:
 			PPU->CR2 = value;
@@ -563,24 +564,38 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			break;
 
 		case 0x2005:
+			/* First write */
 			if( PPU->latch ) {
-				PPU->h_offset = value;
+				PPU->x = value & 0x7;
+				PPU->temp_addr = (PPU->temp_addr&0xFFE0) | ((value&0xF8)>>3);
+
+				/* This is, anyways, still correct, since I draw
+				 * the entire line at once in the same thread. This means
+				 * that setting PPU->x will not affect at all in the
+				 * drawing of the actual line */
+				PPU->h_offset = value; 
 				PPU->latch = 0;
 			}
+			/* Second write */
 			else {
-				PPU->v_offset = value;
+				PPU->temp_addr = (PPU->temp_addr&0xFC1F) | ((value&0xF8)<<2);
+				PPU->temp_addr = (PPU->temp_addr&0x8FFF) | ((value&0x7)<<12);
+				PPU->v_offset = value; 
 				PPU->latch = 1;
 			}
 			break;
 
 		/* PPU VRAM address */
 		case 0x2006:
+			/* First write */
 			if( PPU->latch ) {
-				PPU->vram_addr = 0;
-				PPU->vram_addr = (value << 8);
+				PPU->temp_addr = (PPU->temp_addr&0xC0FF) | (value&0x3F<<8);
 				PPU->latch = 0;
-			} else {
-				PPU->vram_addr |= value;
+			}
+			/* Second write */
+			else {
+				PPU->temp_addr = (PPU->temp_addr&0xFF00) | value;
+				PPU->vram_addr = PPU->temp_addr;
 				PPU->latch = 1;
 			}
 			break;
