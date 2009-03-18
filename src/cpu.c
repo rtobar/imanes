@@ -498,7 +498,7 @@ void execute_instruction(instruction inst, operand oper) {
 
 }
 
-void update_flags(int8_t value, uint8_t flags) {
+inline void update_flags(int8_t value, uint8_t flags) {
 
 	/* 7th bit is set (negative number) */
 	if( flags & N_FLAG ) {
