@@ -158,7 +158,7 @@ void draw_line(int line) {
 
 					/* Horizontal flip? */
 					if( byte3 & SPRITE_FLIP_HORIZ ) {
-						if( tmp+7-tx < NES_SCREEN_WIDTH ) {
+						if( 0 <= tmp+7-tx && tmp+7-tx < NES_SCREEN_WIDTH ) {
 							draw_pixel( tmp + 7 - tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 							if( back_sprites[i] == 0 )
 								drawn_back_sprites[drawn_back_sprites_idx++] = tmp+7-tx;
@@ -186,7 +186,7 @@ void draw_line(int line) {
 	if( config.show_bg ) {
 
 		y = line + (PPU->v_offset - (PPU->v_offset < 240 ? 0 : 256) );
-	
+
 		if( y < 0 ) {
 			y += NES_SCREEN_HEIGHT;
 			orig_name_table += 0x800;
@@ -200,7 +200,7 @@ void draw_line(int line) {
 			orig_name_table -= 0x1000;
 		else if( orig_name_table < 0x2000 )
 			orig_name_table += 0x1000;
-	
+
 		ty = y & 0x7; /* ty = y % 8 */
 
 		for(x=0;x!=NES_SCREEN_WIDTH;x++) {
@@ -290,22 +290,24 @@ void draw_line(int line) {
 
 					/* Horizontal flip? */
 					if( byte3 & SPRITE_FLIP_HORIZ ) {
-						if( !(PPU->SR&HIT_FLAG) && tmp+7-tx == first_bg_pixel
-						    && front_sprites[i] == 0)
-							PPU->SR |= HIT_FLAG;
+						if( 0 <= tmp+7-tx && tmp+7-tx < NES_SCREEN_WIDTH ) {
+							if( !(PPU->SR&HIT_FLAG) && tmp+7-tx == first_bg_pixel
+							    && front_sprites[i] == 0)
+								PPU->SR |= HIT_FLAG;
 
-						if( tmp+7-tx < NES_SCREEN_WIDTH )
 							draw_pixel( tmp + 7 - tx, line,
-							system_palette[read_ppu_vram(0x3F10+col_index)]);
+							   system_palette[read_ppu_vram(0x3F10+col_index)]);
+						}
 					}
 					else {
-						if( !(PPU->SR&HIT_FLAG) && (tmp+tx == first_bg_pixel)
-						    && front_sprites[i] == 0)
-							PPU->SR |= HIT_FLAG;
+						if( tmp+tx < NES_SCREEN_WIDTH ) {
+							if( !(PPU->SR&HIT_FLAG) && (tmp+tx == first_bg_pixel)
+							    && front_sprites[i] == 0)
+								PPU->SR |= HIT_FLAG;
 
-						if( tmp+tx < NES_SCREEN_WIDTH )
 							draw_pixel( tmp + tx, line,
 							system_palette[read_ppu_vram(0x3F10+col_index)]);
+						}
 					}
 
 				}
