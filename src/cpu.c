@@ -549,6 +549,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			PPU->CR1 = value;
 			PPU->temp_addr = (PPU->temp_addr&0xF3FF) | ((value&0x3)<<10);
 			break;
+
 		case 0x2001:
 			PPU->CR2 = value;
 			break;
