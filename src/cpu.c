@@ -563,25 +563,25 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			break;
 
 		case 0x2005:
-			if( PPU->first_write ) {
+			if( PPU->latch ) {
 				PPU->h_offset = value;
-				PPU->first_write = 0;
+				PPU->latch = 0;
 			}
 			else {
 				PPU->v_offset = value;
-				PPU->first_write = 1;
+				PPU->latch = 1;
 			}
 			break;
 
 		/* PPU VRAM address */
 		case 0x2006:
-			if( PPU->first_write ) {
+			if( PPU->latch ) {
 				PPU->vram_addr = 0;
 				PPU->vram_addr = (value << 8);
-				PPU->first_write = 0;
+				PPU->latch = 0;
 			} else {
 				PPU->vram_addr |= value;
-				PPU->first_write = 1;
+				PPU->latch = 1;
 			}
 			break;
 
@@ -668,7 +668,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 		PPU->SR &= ~VBLANK_FLAG;
 		CPU->RAM[2005] = 0;
 		PPU->vram_addr = 0; /* FIXME: Reset the first_read counter for 0x2006 */
-		PPU->first_write = 1;
+		PPU->latch = 1;
 	}
 
 	/* SPR-RAM access */

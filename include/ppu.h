@@ -50,7 +50,7 @@ typedef struct _ppu {
 	uint8_t h_offset;  /* Horizontal offset */
 	uint8_t v_offset;  /* Vertical offset */
 
-	uint8_t first_write; /* Used simultaneously by 0x2005/6 */
+	uint8_t latch; /* Used simultaneously by 0x2005/6 */
 } nes_ppu;
 
 /* Global PPU used through all the program */
