@@ -158,17 +158,19 @@ void draw_line(int line) {
 
 					/* Horizontal flip? */
 					if( byte3 & SPRITE_FLIP_HORIZ ) {
-						if( 0 <= tmp+7-tx && tmp+7-tx < NES_SCREEN_WIDTH ) {
-							draw_pixel( tmp + 7 - tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+						x = tmp+7-tx;
+						if( 0 <= x && x < NES_SCREEN_WIDTH ) {
+							draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 							if( back_sprites[i] == 0 )
-								drawn_back_sprites[drawn_back_sprites_idx++] = tmp+7-tx;
+								drawn_back_sprites[drawn_back_sprites_idx++] = x;
 						}
 					}
 					else {
-						if( tmp+tx < NES_SCREEN_WIDTH ) {
-							draw_pixel( tmp + tx, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+						x = tmp+tx;
+						if( x < NES_SCREEN_WIDTH ) {
+							draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 							if( back_sprites[i] == 0 )
-								drawn_back_sprites[drawn_back_sprites_idx++] = tmp+tx;
+								drawn_back_sprites[drawn_back_sprites_idx++] = x;
 						}
 					}
 				}
@@ -290,22 +292,24 @@ void draw_line(int line) {
 
 					/* Horizontal flip? */
 					if( byte3 & SPRITE_FLIP_HORIZ ) {
-						if( 0 <= tmp+7-tx && tmp+7-tx < NES_SCREEN_WIDTH ) {
-							if( !(PPU->SR&HIT_FLAG) && tmp+7-tx == first_bg_pixel
+						x = tmp+7-tx;
+						if( 0 <= x && x < NES_SCREEN_WIDTH ) {
+							if( !(PPU->SR&HIT_FLAG) && x == first_bg_pixel
 							    && front_sprites[i] == 0)
 								PPU->SR |= HIT_FLAG;
 
-							draw_pixel( tmp + 7 - tx, line,
+							draw_pixel( x, line,
 							   system_palette[read_ppu_vram(0x3F10+col_index)]);
 						}
 					}
 					else {
-						if( tmp+tx < NES_SCREEN_WIDTH ) {
-							if( !(PPU->SR&HIT_FLAG) && (tmp+tx == first_bg_pixel)
+						x = tmp+tx;
+						if( x < NES_SCREEN_WIDTH ) {
+							if( !(PPU->SR&HIT_FLAG) && (x == first_bg_pixel)
 							    && front_sprites[i] == 0)
 								PPU->SR |= HIT_FLAG;
 
-							draw_pixel( tmp + tx, line,
+							draw_pixel( x, line,
 							system_palette[read_ppu_vram(0x3F10+col_index)]);
 						}
 					}
