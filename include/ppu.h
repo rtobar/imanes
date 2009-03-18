@@ -36,21 +36,27 @@
 #define SPRITE_FLIP_VERT     (0x80)
 
 typedef struct _ppu {
+
+	/* Registers */
 	uint8_t CR1;        /* Control Register 1 */
 	uint8_t CR2;        /* Control Register 2 */
 	uint8_t SR;         /* Status Register */
-	uint8_t *VRAM;      /* Video RAM. Physical memory: 0x0000 -> 0x3FFF */
+
+	/* Internal registers */
 	uint16_t vram_addr; /* Address to be written/read by 0x2007 CPU RAM */
+	uint16_t temp_addr; /* Temporal VRAM address */
+	uint8_t x;          /* Tiles X offset */
+	uint8_t h_offset;   /* Horizontal offset */
+	uint8_t v_offset;   /* Vertical offset */
+	uint8_t latch;      /* Used simultaneously by 0x2005/6 */
 
-	uint8_t *SPR_RAM; /* 256 bytes area memory for sprite attributes */
-	uint8_t spr_addr; /* Address to be written by 0x2004 CPU RAM */
+	/* Associated memory */
+	uint8_t *VRAM;      /* Video RAM. Physical memory: 0x0000 -> 0x3FFF */
+	uint8_t *SPR_RAM;   /* 256 bytes area memory for sprite attributes */
+	uint8_t spr_addr;   /* Address to be written by 0x2004 CPU RAM */
 
-	uint8_t mirroring; /* Type of mirroring */
+	uint8_t mirroring;  /* Type of mirroring */
 
-	uint8_t h_offset;  /* Horizontal offset */
-	uint8_t v_offset;  /* Vertical offset */
-
-	uint8_t latch; /* Used simultaneously by 0x2005/6 */
 } nes_ppu;
 
 /* Global PPU used through all the program */
