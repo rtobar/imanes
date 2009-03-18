@@ -116,13 +116,6 @@ void main_loop(ines_file *file) {
 		if( scanline_timeout <= 0 ) {
 
 			if( lines < NES_SCREEN_HEIGHT ) {
-
-				/* Update PPU registers */
-				if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) )
-					PPU->vram_addr = (PPU->vram_addr&0xFBE0) | (PPU->temp_addr&0x041F);
-					if( lines == 0 )
-						PPU->vram_addr = PPU->temp_addr;
-
 				draw_line(lines++);
 				mapper->update();
 			}

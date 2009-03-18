@@ -83,12 +83,28 @@ void draw_line(int line) {
 	uint16_t orig_name_table;
 	uint16_t spr_patt_table;
 	uint16_t scr_patt_table;
+	uint16_t vram_tmp;
 
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
 	orig_name_table = 0x2000 + 0x400*(PPU->CR1 & 0x03);
 	spr_patt_table  = ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
 	scr_patt_table  = ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
 	big_sprite      = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
+
+
+	/* Update PPU registers */
+	if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) )
+		if( line == 0 )
+			PPU->vram_addr = PPU->temp_addr;
+		PPU->vram_addr = (PPU->vram_addr&0xFBE0) | (PPU->temp_addr&0x041F);
+
+	printf("%03d:  ", line);
+
+	printf("PPU->vram_addr: %04x - ", PPU->vram_addr);
+	vram_tmp = (PPU->vram_addr&0x03E0);
+	PPU->h_offset = ((PPU->vram_addr&0x1F) << 3) + PPU->x;
+	PPU->v_offset = vram_tmp >> 2;
+	vram_tmp >>= 3;
 
 	/* Identify which sprites have to be drawn */
 	frt_sprites = 0;
@@ -125,7 +141,7 @@ void draw_line(int line) {
 
 	/* Draw the back sprites */
 	drawn_back_sprites_idx = 0;
-	if( config.show_back_spr ) {
+	if( config.show_back_spr && PPU->CR2&SHOW_SPRITES ) {
 		for(i=bck_sprites;i>=0;i--) {
 
 			/* Here we have color index and h/v flip */
@@ -188,22 +204,16 @@ void draw_line(int line) {
 	 * tiles come from.
 	 */
 	first_bg_pixel = -1;
-	if( config.show_bg ) {
+	if( config.show_bg && PPU->CR2&SHOW_BACKGROUND ) {
 
-		y = line + (PPU->v_offset - (PPU->v_offset < 240 ? 0 : 256) );
+		y = line + PPU->v_offset;
 
-		if( y < 0 ) {
-			y += NES_SCREEN_HEIGHT;
-			orig_name_table += 0x800;
-		}
-		else if( y >= NES_SCREEN_HEIGHT ) {
+		if( y >= NES_SCREEN_HEIGHT ) {
 			y -= NES_SCREEN_HEIGHT;
 			orig_name_table -= 0x800;
 		}
 		/* Restore the address for name table if wraps out */
-		if( orig_name_table >= 0x3000 )
-			orig_name_table -= 0x1000;
-		else if( orig_name_table < 0x2000 )
+		if( orig_name_table < 0x2000 )
 			orig_name_table += 0x1000;
 
 		ty = y & 0x7; /* ty = y % 8 */
@@ -259,7 +269,7 @@ void draw_line(int line) {
 	}
 
 	/* Draw the front sprites */
-	if( config.show_front_spr ) {
+	if( config.show_front_spr && PPU->CR2&SHOW_SPRITES ) {
 		for(i=frt_sprites;i>=0;i--) {
 
 			/* Here we have color index and h/v flip */
@@ -323,6 +333,22 @@ void draw_line(int line) {
 		}
 	}
 
+	/* Y scroll update */
+	vram_tmp++;
+	if( vram_tmp == 30 ) {
+		vram_tmp = 0;
+		PPU->vram_addr ^= 0x800;
+	}
+	else if( vram_tmp == 32 ) {
+		vram_tmp = 0;
+	}
+
+	/* X scroll update*/
+	if( PPU->vram_addr&0x1F )
+		PPU->vram_addr ^= 0x400;
+
+	printf("%04x    ", PPU->vram_addr);
+	printf("H:%02x, V:%02x\n", PPU->h_offset, PPU->v_offset);
 }
 
 uint8_t read_ppu_vram(uint16_t address) {
