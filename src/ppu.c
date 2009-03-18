@@ -38,7 +38,10 @@ void initialize_ppu() {
 	PPU->VRAM = (uint8_t *)malloc(NES_VRAM_SIZE);
 	PPU->SPR_RAM = (uint8_t *)malloc(256);
 
+	PPU->x = 0;
 	PPU->latch = 1;
+	PPU->vram_addr = 0;
+	PPU->temp_addr = 0;
 }
 
 void dump_ppu() {
