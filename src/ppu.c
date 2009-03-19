@@ -103,7 +103,7 @@ void draw_line(int line) {
 	printf("PPU->vram_addr: %04x - ", PPU->vram_addr);
 	vram_tmp = (PPU->vram_addr&0x03E0);
 	PPU->h_offset = ((PPU->vram_addr&0x1F) << 3) + PPU->x;
-	PPU->v_offset = vram_tmp >> 2;
+	PPU->v_offset = (vram_tmp >> 2) + ((PPU->vram_addr&0x7000) >> 12);
 	vram_tmp >>= 3;
 
 	/* Identify which sprites have to be drawn */

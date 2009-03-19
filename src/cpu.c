@@ -682,7 +682,6 @@ uint8_t read_cpu_ram(uint16_t address) {
 	else if( address == 0x2002 ) {
 		ret_val = PPU->SR;
 		PPU->SR &= ~VBLANK_FLAG;
-		CPU->RAM[2005] = 0;
 		PPU->latch = 1;
 	}
 
