@@ -19,6 +19,6 @@ imanes_SOURCES = \
      sram.c \
      unrom.c
 
-imanes_LDFLAGS = -lrt
+imanes_LDFLAGS = -lrt -pg
 
-AM_CPPFLAGS = -I$(top_srcdir)/include -Wall -O3
+AM_CPPFLAGS = -I$(top_srcdir)/include -Wall -O3 -pg

@@ -98,9 +98,9 @@ void draw_line(int line) {
 			PPU->vram_addr = PPU->temp_addr;
 		PPU->vram_addr = (PPU->vram_addr&0xFBE0) | (PPU->temp_addr&0x041F);
 
-	printf("%03d:  ", line);
-
-	printf("PPU->vram_addr: %04x - ", PPU->vram_addr);
+//	printf("%03d:  ", line);
+//
+//	printf("PPU->vram_addr: %04x - ", PPU->vram_addr);
 	vram_tmp = (PPU->vram_addr&0x03E0);
 	PPU->h_offset = ((PPU->vram_addr&0x1F) << 3) + PPU->x;
 	PPU->v_offset = (vram_tmp >> 2) + ((PPU->vram_addr&0x7000) >> 12);
@@ -347,8 +347,8 @@ void draw_line(int line) {
 	if( PPU->vram_addr&0x1F )
 		PPU->vram_addr ^= 0x400;
 
-	printf("%04x    ", PPU->vram_addr);
-	printf("H:%02x, V:%02x\n", PPU->h_offset, PPU->v_offset);
+	//printf("%04x    ", PPU->vram_addr);
+	//printf("H:%02x, V:%02x\n", PPU->h_offset, PPU->v_offset);
 }
 
 uint8_t read_ppu_vram(uint16_t address) {
@@ -408,6 +408,7 @@ uint8_t read_ppu_vram(uint16_t address) {
 				address -= 0x400*( ((address - 0x2000) >> 10) & 0x3);
 				DEBUG(printf("%04x\n",address));
 			}
+			break;
 
 		default:
 			break;
