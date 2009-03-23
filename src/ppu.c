@@ -84,6 +84,7 @@ void draw_line(int line) {
 	uint16_t spr_patt_table;
 	uint16_t scr_patt_table;
 	uint16_t vram_tmp;
+	uint16_t v_offset;
 
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
 	orig_name_table = 0x2000 + 0x400*(PPU->CR1 & 0x03);
@@ -97,14 +98,6 @@ void draw_line(int line) {
 		if( line == 0 )
 			PPU->vram_addr = PPU->temp_addr;
 		PPU->vram_addr = (PPU->vram_addr&0xFBE0) | (PPU->temp_addr&0x041F);
-
-//	printf("%03d:  ", line);
-//
-//	printf("PPU->vram_addr: %04x - ", PPU->vram_addr);
-	vram_tmp = (PPU->vram_addr&0x03E0);
-	PPU->h_offset = ((PPU->vram_addr&0x1F) << 3) + PPU->x;
-	PPU->v_offset = (vram_tmp >> 2) + ((PPU->vram_addr&0x7000) >> 12);
-	vram_tmp >>= 3;
 
 	/* Identify which sprites have to be drawn */
 	frt_sprites = 0;
@@ -207,34 +200,20 @@ void draw_line(int line) {
 	if( PPU->CR2&SHOW_BACKGROUND ) {
 
 		y = (PPU->vram_addr&0x03E0) >> 5;
-		orig_name_table -= (PPU->vram_addr&0x0800);
-		if( orig_name_table < 0x2000 )
-			orig_name_table += 0x1000;
-
 		ty = (PPU->vram_addr&0x7000) >> 12;
+		orig_name_table += (PPU->vram_addr&0x0800);
 
-		for(x=0;x!=NES_SCREEN_WIDTH;x++) {
+		vram_tmp = PPU->vram_addr;
 
-			/* Check which name table should be use */
-			//i  =  x+PPU->h_offset;
-			//tx = (x+PPU->h_offset) & 0x7;
-
-			//if( i >= NES_SCREEN_WIDTH ) {
-			//	name_table = orig_name_table + 0x400;
-			//	if( name_table == 0x2800 || name_table == 0x3000 )
-			//		name_table -= 0x800;
-			//	i -= NES_SCREEN_WIDTH;
-			//}
-			//else
-			//	name_table = orig_name_table;
+		for(x=0;x!=NES_SCREEN_WIDTH;) {
 
 			/* Name table*/
 			name_table = orig_name_table + (PPU->vram_addr&0x0400);
+			attr_table = name_table + 0x3C0;
 
 			/* Entry in name table */
 			i = (PPU->vram_addr&0x1F);
 
-			attr_table = name_table + 0x3C0;
 			/* Get the 8x8 pixel tile where the line is present */
 			tile = read_ppu_vram(name_table + i + y*NES_SCREEN_WIDTH/8);
 
@@ -266,18 +245,20 @@ void draw_line(int line) {
 					if( config.show_bg )
 						draw_pixel(x, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
 				}
-				printf("x:%3d  line:%3d  tx:%2d   ty:%3d\n", x, line, tx, ty);
+				printf("x:%3d  line:%3d  i:%2d,tx:%2d   y:%2d,ty:%3d\n", x, line, i, tx, y, ty);
 				x++;
 				if( x == NES_SCREEN_WIDTH )
 					break;
 			}
 
 			/* X scroll update*/
-			PPU->vram_addr++;
-			if( PPU->vram_addr&0x20 ) {
-				PPU->vram_addr ^= 0x420;
+			vram_tmp++;
+			if( vram_tmp == 0x20 ) {
+				PPU->vram_addr &= 0xFFE0;
+				PPU->vram_addr ^= 0x400;
 			}
-			x--;
+			else
+				PPU->vram_addr++;
 
 		}
 	}
@@ -348,10 +329,10 @@ void draw_line(int line) {
 	}
 
 	/* Y scroll update */
-	/* We have to add */
-	PPU->v_offset++;
-	PPU->vram_addr = (PPU->vram_addr&0x8FFF) | ((PPU->v_offset&0x07)<<12);
-	if( !(PPU->v_offset&0x7) ) {
+	vram_tmp = (PPU->vram_addr&0x03E0) >> 5;
+	v_offset = (vram_tmp << 3) + ((PPU->vram_addr&0x7000) >> 12) + 1;
+	PPU->vram_addr = (PPU->vram_addr&0x8FFF) | ((v_offset&0x07)<<12);
+	if( !(v_offset&0x7) ) {
 		vram_tmp++;
 		if( vram_tmp == 30 ) {
 			vram_tmp = 0;
@@ -363,8 +344,8 @@ void draw_line(int line) {
 		PPU->vram_addr = (PPU->vram_addr&0xFC1F) | ((vram_tmp&0x1F)<<5);
 	}
 
-	//printf("%04x    ", PPU->vram_addr);
-	//printf("H:%02x, V:%02x\n", PPU->h_offset, PPU->v_offset);
+	printf("line:%3d    %04x    ", line, PPU->vram_addr);
+	printf("V_bef:%02x, V_now:%02x\n", v_offset-1, v_offset);
 }
 
 uint8_t read_ppu_vram(uint16_t address) {
