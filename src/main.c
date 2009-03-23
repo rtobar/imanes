@@ -22,7 +22,12 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#ifndef __APPLE__
 #include "config.h"
+#else
+#define PACKAGE_BUGREPORT "https://csrg.inf.utfsm.cl/flyspray/index.php?project=10"
+#endif
+
 #include "cpu.h"
 #include "debug.h"
 #include "imaconfig.h"

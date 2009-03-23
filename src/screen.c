@@ -19,7 +19,12 @@
  */
 
 #include <pthread.h>
+#ifdef __APPLE__
+#include <SDL/SDL.h>
+#else
 #include <SDL.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
