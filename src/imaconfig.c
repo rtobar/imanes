@@ -31,8 +31,8 @@ void initialize_configuration() {
 
 	/* Emulator window */
 	config.show_bg  = 1;
-	config.show_front_spr = 0;
-	config.show_back_spr = 0;
+	config.show_front_spr = 1;
+	config.show_back_spr = 1;
 	config.show_screen_bg = 1;
 
 	/* Start on non-pause and at 60 fps */

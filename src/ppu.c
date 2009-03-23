@@ -133,7 +133,7 @@ void draw_line(int line) {
 
 	/* Draw the back sprites */
 	drawn_back_sprites_idx = 0;
-	if( config.show_back_spr && PPU->CR2&SHOW_SPRITES ) {
+	if( PPU->CR2&SHOW_SPRITES ) {
 		for(i=bck_sprites;i>=0;i--) {
 
 			/* Here we have color index and h/v flip */
@@ -171,7 +171,8 @@ void draw_line(int line) {
 					if( byte3 & SPRITE_FLIP_HORIZ ) {
 						x = tmp+7-tx;
 						if( 0 <= x && x < NES_SCREEN_WIDTH ) {
-							draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+							if( config.show_back_spr )
+								draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 							if( back_sprites[i] == 0 )
 								drawn_back_sprites[drawn_back_sprites_idx++] = x;
 						}
@@ -179,7 +180,8 @@ void draw_line(int line) {
 					else {
 						x = tmp+tx;
 						if( x < NES_SCREEN_WIDTH ) {
-							draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+							if( config.show_back_spr )
+								draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 							if( back_sprites[i] == 0 )
 								drawn_back_sprites[drawn_back_sprites_idx++] = x;
 						}
@@ -273,7 +275,7 @@ void draw_line(int line) {
 	}
 
 	/* Draw the front sprites */
-	if( config.show_front_spr && PPU->CR2&SHOW_SPRITES ) {
+	if( PPU->CR2&SHOW_SPRITES ) {
 		for(i=frt_sprites;i>=0;i--) {
 
 			/* Here we have color index and h/v flip */
@@ -315,8 +317,9 @@ void draw_line(int line) {
 							    && front_sprites[i] == 0)
 								PPU->SR |= HIT_FLAG;
 
-							draw_pixel( x, line,
-							   system_palette[read_ppu_vram(0x3F10+col_index)]);
+							if( config.show_front_spr )
+								draw_pixel( x, line,
+								   system_palette[read_ppu_vram(0x3F10+col_index)]);
 						}
 					}
 					else {
@@ -326,8 +329,9 @@ void draw_line(int line) {
 							    && front_sprites[i] == 0)
 								PPU->SR |= HIT_FLAG;
 
-							draw_pixel( x, line,
-							system_palette[read_ppu_vram(0x3F10+col_index)]);
+							if( config.show_front_spr )
+								draw_pixel( x, line,
+								   system_palette[read_ppu_vram(0x3F10+col_index)]);
 						}
 					}
 
