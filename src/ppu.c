@@ -92,10 +92,11 @@ void draw_line(int line) {
 
 
 	/* Update PPU registers */
-	if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) )
+	if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) ) {
 		if( line == 0 )
 			PPU->vram_addr = PPU->temp_addr;
 		PPU->vram_addr = (PPU->vram_addr&0xFBE0) | (PPU->temp_addr&0x041F);
+	}
 
 	/* Identify which sprites have to be drawn */
 	frt_sprites = 0;
@@ -203,7 +204,7 @@ void draw_line(int line) {
 
 		for(x=0;x!=NES_SCREEN_WIDTH;) {
 
-			/* Name table*/
+			/* Name and attribute table */
 			name_table = orig_name_table + (PPU->vram_addr&0x0400);
 			attr_table = name_table + 0x3C0;
 
@@ -241,8 +242,7 @@ void draw_line(int line) {
 					if( config.show_bg )
 						draw_pixel(x, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
 				}
-				x++;
-				if( x == NES_SCREEN_WIDTH )
+				if( ++x == NES_SCREEN_WIDTH )
 					break;
 			}
 
@@ -254,6 +254,23 @@ void draw_line(int line) {
 			else
 				PPU->vram_addr++;
 
+		}
+
+		/* Y scroll update */
+		ty = ((PPU->vram_addr&0x7000) >> 12) + 1;
+		PPU->vram_addr = (PPU->vram_addr&0x8FFF) | ((ty&0x07)<<12);
+		if( ty == 0x8 ) {
+			printf("ty: %d, switching y to ", ty);
+			y = ((PPU->vram_addr&0x03E0) >> 5) + 1;
+			printf("%d\n", y);
+			if( y == 30 ) {
+				y = 0;
+				PPU->vram_addr ^= 0x800;
+			}
+			else if( y == 32 ) {
+				y = 0;
+			}
+			PPU->vram_addr = (PPU->vram_addr&0xFC1F) | ((y&0x1F)<<5);
 		}
 	}
 
@@ -320,23 +337,6 @@ void draw_line(int line) {
 
 			}
 		}
-	}
-
-	/* Y scroll update */
-	ty = ((PPU->vram_addr&0x7000) >> 12) + 1;
-	PPU->vram_addr = (PPU->vram_addr&0x8FFF) | ((ty&0x07)<<12);
-	if( ty == 0x8 ) {
-		printf("ty: %d, switching y to ", ty);
-		y = ((PPU->vram_addr&0x03E0) >> 5) + 1;
-		printf("%d\n", y);
-		if( y == 30 ) {
-			y = 0;
-			PPU->vram_addr ^= 0x800;
-		}
-		else if( y == 32 ) {
-			y = 0;
-		}
-		PPU->vram_addr = (PPU->vram_addr&0xFC1F) | ((y&0x1F)<<5);
 	}
 
 }
@@ -408,6 +408,8 @@ uint8_t read_ppu_vram(uint16_t address) {
 }
 
 void write_ppu_vram(uint16_t address, uint8_t value) {
+
+	printf("Writing %02x into %04x PPU\n", value, address);
 
 	/* This duplicates everything else on VRAM */
 	if( 0x4000 <= address ) {
