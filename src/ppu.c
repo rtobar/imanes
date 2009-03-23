@@ -241,14 +241,12 @@ void draw_line(int line) {
 					if( config.show_bg )
 						draw_pixel(x, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
 				}
-				printf("x:%3d  line:%3d  i:%2d,tx:%2d   y:%2d,ty:%3d\n", x, line, i, tx, y, ty);
 				x++;
 				if( x == NES_SCREEN_WIDTH )
 					break;
 			}
 
 			/* X scroll update*/
-			printf("tx:%d, x:%d, switching to %04x\n", tx, i, i+1);
 			if( i+1 == 0x20 ) {
 				PPU->vram_addr &= 0xFFE0;
 				PPU->vram_addr ^= 0x400;
