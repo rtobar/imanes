@@ -102,15 +102,22 @@ void draw_pixel(int x, int y, nes_palette color) {
 	Uint32 *pixmem32;
 
 	/* This is the color that will be put in the pixel */
-	colour = SDL_MapRGB(nes_screen->format, color.red, color.green, color.blue);
+	if( config.use_sdl_colors )
+		colour = SDL_MapRGB(nes_screen->format, color.red, color.green, color.blue);
+	else
+		colour = (color.red<<16) | ((color.green)<<8) | (color.blue);
 	
 	/* x = x*4 (32 bits per pixel); y = y*WIDTH*4 for the same reason */
 
 	pixmem32 = (Uint32*)nes_screen->pixels;
 
-	for(i=0;i!=config.video_scale;i++)
-		for(j=0;j!=config.video_scale;j++) 
-			pixmem32[config.video_scale*x+i+NES_SCREEN_WIDTH*config.video_scale*(y*config.video_scale+j)] = colour;
+	if( config.video_scale != 1 ) {
+		for(i=0;i!=config.video_scale;i++)
+			for(j=0;j!=config.video_scale;j++) 
+				pixmem32[config.video_scale*x+i+NES_SCREEN_WIDTH*config.video_scale*(y*config.video_scale+j)] = colour;
+	}
+	else
+		pixmem32[x+NES_SCREEN_WIDTH*y] = colour;
 
 }
 

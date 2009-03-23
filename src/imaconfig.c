@@ -43,6 +43,8 @@ void initialize_configuration() {
 	if( config.video_scale == 0 )
 		config.video_scale = 1;
 
+	/* Use our color construction */
+	config.use_sdl_colors = 0;
 }
 
 void load_user_configuration() {

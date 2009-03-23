@@ -43,7 +43,8 @@ void usage(FILE *file, char *argv[]) {
 	fprintf(file,"Usage: %s [options] <rom file>\n\n",argv[0]);
 	fprintf(file,"Options:\n");
 	fprintf(file,"  -v        Increase verbosity. More -v, more verbose. Default: 0\n");
-	fprintf(file,"  -s        Video scaling facotr. Default: 1\n");
+	fprintf(file,"  -s <n>    Video scaling facotr. Default: 1\n");
+	fprintf(file,"  -c        Use SDL color construction. Default: no\n");
 	fprintf(file,"  -h,-?     Show this help and exit\n");
 	fprintf(file,"\n");
 }
@@ -54,7 +55,7 @@ void parse_options(int args, char *argv[]) {
 
 	config.verbosity = 0;
 
-	while( (opt = getopt(args, argv, "vhHs:?")) != -1 ) {
+	while( (opt = getopt(args, argv, "cvhHs:?")) != -1 ) {
 
 		switch(opt) {
 			case 'v':
@@ -68,6 +69,10 @@ void parse_options(int args, char *argv[]) {
 					usage(stderr, argv);
 					exit(EXIT_FAILURE);
 				}
+				break;
+
+			case 'c':
+				config.use_sdl_colors = 1;
 				break;
 
 			case '?':

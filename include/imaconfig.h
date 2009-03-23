@@ -13,6 +13,7 @@ typedef struct _config {
 	int video_scale;             /* Video scale factor */
 	int verbosity;               /* How verbose imanes should be */
 	int run_fast;                /* Run as fast as possible */
+	int use_sdl_colors;          /* Let SDL convert RGB values */
 } imanes_config;
 
 /* This is the global configuration */
