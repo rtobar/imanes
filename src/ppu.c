@@ -345,6 +345,10 @@ void draw_line(int line) {
 
 uint8_t read_ppu_vram(uint16_t address) {
 
+	/* This range has no mirroring */
+	if( address < 0x2400 )
+		return PPU->VRAM[address];
+
 	/* This duplicates everything else on VRAM */
 	if( 0x4000 <= address ) {
 		XTREME( printf("PPU Address mirroring: from %04x to ", address) );
@@ -410,6 +414,10 @@ uint8_t read_ppu_vram(uint16_t address) {
 }
 
 void write_ppu_vram(uint16_t address, uint8_t value) {
+
+	/* This range has no mirroring */
+	if( address < 0x2400 )
+		PPU->VRAM[address] = value;
 
 	/* This duplicates everything else on VRAM */
 	if( 0x4000 <= address ) {
