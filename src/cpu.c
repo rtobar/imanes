@@ -673,7 +673,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 		ret_val = PPU->CR1;
 	
 	/* PPU Control Register 1 */
-	if( address == 0x2001 )
+	else if( address == 0x2001 )
 		ret_val = PPU->CR2;
 
 	/* PPU Status Register */
@@ -683,9 +683,17 @@ uint8_t read_cpu_ram(uint16_t address) {
 		PPU->latch = 1;
 	}
 
+	/* SPR-RAM address */
+	else if( address == 0x2003 ) {
+		ret_val = PPU->spr_addr;
+	}
+
 	/* SPR-RAM access */
 	else if( address == 0x2004 ) 
 		ret_val = *(PPU->SPR_RAM + PPU->spr_addr);
+
+	else if( address == 0x2005 || address == 0x2006 )
+		ret_val = PPU->latch;
 
 	/* PPU VRAM */
 	else if( address == 0x2007 )
