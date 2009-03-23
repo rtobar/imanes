@@ -260,9 +260,7 @@ void draw_line(int line) {
 		ty = ((PPU->vram_addr&0x7000) >> 12) + 1;
 		PPU->vram_addr = (PPU->vram_addr&0x8FFF) | ((ty&0x07)<<12);
 		if( ty == 0x8 ) {
-			printf("ty: %d, switching y to ", ty);
 			y = ((PPU->vram_addr&0x03E0) >> 5) + 1;
-			printf("%d\n", y);
 			if( y == 30 ) {
 				y = 0;
 				PPU->vram_addr ^= 0x800;
@@ -408,8 +406,6 @@ uint8_t read_ppu_vram(uint16_t address) {
 }
 
 void write_ppu_vram(uint16_t address, uint8_t value) {
-
-	printf("Writing %02x into %04x PPU\n", value, address);
 
 	/* This duplicates everything else on VRAM */
 	if( 0x4000 <= address ) {
