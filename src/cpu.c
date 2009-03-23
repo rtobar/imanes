@@ -574,14 +574,12 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 				 * the entire line at once in the same thread. This means
 				 * that setting PPU->x will not affect at all in the
 				 * drawing of the actual line */
-				PPU->h_offset = value; 
 				PPU->latch = 0;
 			}
 			/* Second write */
 			else {
 				PPU->temp_addr = (PPU->temp_addr&0xFC1F) | ((value&0xF8)<<2);
 				PPU->temp_addr = (PPU->temp_addr&0x8FFF) | ((value&0x7)<<12);
-				PPU->v_offset = value; 
 				PPU->latch = 1;
 			}
 			break;

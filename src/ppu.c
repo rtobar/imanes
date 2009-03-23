@@ -204,66 +204,80 @@ void draw_line(int line) {
 	 * tiles come from.
 	 */
 	first_bg_pixel = -1;
-	if( config.show_bg && PPU->CR2&SHOW_BACKGROUND ) {
+	if( PPU->CR2&SHOW_BACKGROUND ) {
 
-		y = line + PPU->v_offset;
-
-		if( y >= NES_SCREEN_HEIGHT ) {
-			y -= NES_SCREEN_HEIGHT;
-			orig_name_table -= 0x800;
-		}
-		/* Restore the address for name table if wraps out */
+		y = (PPU->vram_addr&0x03E0) >> 5;
+		orig_name_table -= (PPU->vram_addr&0x0800);
 		if( orig_name_table < 0x2000 )
 			orig_name_table += 0x1000;
 
-		ty = y & 0x7; /* ty = y % 8 */
+		ty = (PPU->vram_addr&0x7000) >> 12;
 
 		for(x=0;x!=NES_SCREEN_WIDTH;x++) {
 
 			/* Check which name table should be use */
-			i  =  x+PPU->h_offset;
-			tx = (x+PPU->h_offset) & 0x7;
+			//i  =  x+PPU->h_offset;
+			//tx = (x+PPU->h_offset) & 0x7;
 
-			if( i >= NES_SCREEN_WIDTH ) {
-				name_table = orig_name_table + 0x400;
-				if( name_table == 0x2800 || name_table == 0x3000 )
-					name_table -= 0x800;
-				i -= NES_SCREEN_WIDTH;
-			}
-			else
-				name_table = orig_name_table;
+			//if( i >= NES_SCREEN_WIDTH ) {
+			//	name_table = orig_name_table + 0x400;
+			//	if( name_table == 0x2800 || name_table == 0x3000 )
+			//		name_table -= 0x800;
+			//	i -= NES_SCREEN_WIDTH;
+			//}
+			//else
+			//	name_table = orig_name_table;
+
+			/* Name table*/
+			name_table = orig_name_table + (PPU->vram_addr&0x0400);
 
 			/* Entry in name table */
-			i = i >> 3;
+			i = (PPU->vram_addr&0x1F);
 
 			attr_table = name_table + 0x3C0;
 			/* Get the 8x8 pixel tile where the line is present */
-			tile = read_ppu_vram(name_table + i + (y >> 3)*NES_SCREEN_WIDTH/8);
+			tile = read_ppu_vram(name_table + i + y*NES_SCREEN_WIDTH/8);
 
 			/* Bytes that participate on the lower bits for the color */
 			byte1 = read_ppu_vram(scr_patt_table + tile*0x10 + ty);
 			byte2 = read_ppu_vram(scr_patt_table + tile*0x10 + ty + 0x08);
 			/* Byte participating on the higher bits for the color */
-			byte3 = read_ppu_vram(attr_table + (i >> 2) + (y >> 5)*NES_SCREEN_WIDTH/32);
+			byte3 = read_ppu_vram(attr_table + (i >> 2) + (y >> 2)*NES_SCREEN_WIDTH/32);
 
-			/* This is from the pattern table */
-			col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
+			/* Draw the tile pixels */
+			for(tx=(x?0:PPU->x); tx!=8; tx++) {
 
-			/* And this from the attribute table */
-			tmp = (((y >> 4)&0x1)<<1) + ((i >> 1)&0x1);
-			col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
+				/* This is from the pattern table */
+				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 
-			if( col_index & 0x03 ) {
-				if( first_bg_pixel == -1 )
-					first_bg_pixel = x;
+				/* And this from the attribute table */
+				tmp = (((y >> 1)&0x1)<<1) + ((i >> 1)&0x1);
+				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
-				for(j=0;j!=drawn_back_sprites_idx && !(PPU->SR & HIT_FLAG);j++)
-					if( x == drawn_back_sprites[j] ) {
-						PPU->SR |= HIT_FLAG;
-						break;
-					}
-				draw_pixel(x, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
+				if( col_index & 0x03 ) {
+					if( first_bg_pixel == -1 )
+						first_bg_pixel = x;
+
+					for(j=0;j!=drawn_back_sprites_idx && !(PPU->SR & HIT_FLAG);j++)
+						if( x == drawn_back_sprites[j] ) {
+							PPU->SR |= HIT_FLAG;
+							break;
+						}
+					if( config.show_bg )
+						draw_pixel(x, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
+				}
+				printf("x:%3d  line:%3d  tx:%2d   ty:%3d\n", x, line, tx, ty);
+				x++;
+				if( x == NES_SCREEN_WIDTH )
+					break;
 			}
+
+			/* X scroll update*/
+			PPU->vram_addr++;
+			if( PPU->vram_addr&0x20 ) {
+				PPU->vram_addr ^= 0x420;
+			}
+			x--;
 
 		}
 	}
@@ -334,18 +348,20 @@ void draw_line(int line) {
 	}
 
 	/* Y scroll update */
-	vram_tmp++;
-	if( vram_tmp == 30 ) {
-		vram_tmp = 0;
-		PPU->vram_addr ^= 0x800;
+	/* We have to add */
+	PPU->v_offset++;
+	PPU->vram_addr = (PPU->vram_addr&0x8FFF) | ((PPU->v_offset&0x07)<<12);
+	if( !(PPU->v_offset&0x7) ) {
+		vram_tmp++;
+		if( vram_tmp == 30 ) {
+			vram_tmp = 0;
+			PPU->vram_addr ^= 0x800;
+		}
+		else if( vram_tmp == 32 ) {
+			vram_tmp = 0;
+		}
+		PPU->vram_addr = (PPU->vram_addr&0xFC1F) | ((vram_tmp&0x1F)<<5);
 	}
-	else if( vram_tmp == 32 ) {
-		vram_tmp = 0;
-	}
-
-	/* X scroll update*/
-	if( PPU->vram_addr&0x1F )
-		PPU->vram_addr ^= 0x400;
 
 	//printf("%04x    ", PPU->vram_addr);
 	//printf("H:%02x, V:%02x\n", PPU->h_offset, PPU->v_offset);
@@ -383,7 +399,7 @@ uint8_t read_ppu_vram(uint16_t address) {
 
 	/* Name table mirroring. This depends on the type of mirroring
 	 * that the ines file header states */
-	switch( PPU->mirroring) {
+	switch( PPU->mirroring ) {
 
 		case HORIZONTAL_MIRRORING:
 			if( (0x2400 <= address && address < 0x2800) ||
