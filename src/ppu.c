@@ -98,26 +98,29 @@ void draw_line(int line) {
 	}
 
 	/* Identify which sprites have to be drawn */
-	frt_sprites = 0;
-	bck_sprites = 0;
-	for(i=0;i!=64;i++) {
-		tmp = *(PPU->SPR_RAM + 4*i) + 1;
-		if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
-			if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR )
-				back_sprites[bck_sprites++] = i;
-			else
-				front_sprites[frt_sprites++] = i;
-			if( (frt_sprites + bck_sprites) == 8 )
-				break;
+	if( PPU->CR2 & SHOW_SPRITES ) {
+		frt_sprites = 0;
+		bck_sprites = 0;
+		for(i=0;i!=64;i++) {
+			tmp = *(PPU->SPR_RAM + 4*i) + 1;
+			if(i==0)
+				printf("y coord: %02x\n", tmp);
+			if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
+				if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR )
+					back_sprites[bck_sprites++] = i;
+				else
+					front_sprites[frt_sprites++] = i;
+				if( (frt_sprites + bck_sprites) == 8 )
+					break;
+			}
 		}
+		if( (frt_sprites + bck_sprites) != 8 )
+			PPU->SR &= ~MAX_SPRITES_DRAWN;
+		else
+			PPU->SR |= MAX_SPRITES_DRAWN;
+		frt_sprites--;
+		bck_sprites--;
 	}
-	if( (frt_sprites + bck_sprites) != 8 )
-		PPU->SR &= ~MAX_SPRITES_DRAWN;
-	else
-		PPU->SR |= MAX_SPRITES_DRAWN;
-	frt_sprites--;
-	bck_sprites--;
-
 
 	/* Fill all pixels with the "colour intensity" color */
 	if( config.show_screen_bg ) {
