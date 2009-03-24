@@ -236,11 +236,12 @@ void draw_line(int line) {
 					if( first_bg_pixel == -1 )
 						first_bg_pixel = x;
 
-					for(j=0;j!=drawn_back_sprites_idx && !(PPU->SR & HIT_FLAG);j++)
+					for(j=0;!(PPU->SR&HIT_FLAG)&&j!=drawn_back_sprites_idx;j++) {
 						if( x == drawn_back_sprites[j] ) {
 							PPU->SR |= HIT_FLAG;
 							break;
 						}
+					}
 					if( config.show_bg )
 						draw_pixel(x, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
 				}
@@ -255,7 +256,6 @@ void draw_line(int line) {
 			}
 			else
 				PPU->vram_addr++;
-
 		}
 
 		/* Y scroll update */
@@ -313,9 +313,11 @@ void draw_line(int line) {
 					if( byte3 & SPRITE_FLIP_HORIZ ) {
 						x = tmp+7-tx;
 						if( 0 <= x && x < NES_SCREEN_WIDTH ) {
-							if( !(PPU->SR&HIT_FLAG) && x == first_bg_pixel
-							    && front_sprites[i] == 0)
+							if( !(PPU->SR&HIT_FLAG) && (x == first_bg_pixel)
+							    && front_sprites[i] == 0) {
 								PPU->SR |= HIT_FLAG;
+								break;
+							}
 
 							if( config.show_front_spr )
 								draw_pixel( x, line,
@@ -325,9 +327,11 @@ void draw_line(int line) {
 					else {
 						x = tmp+tx;
 						if( x < NES_SCREEN_WIDTH ) {
-							if( !(PPU->SR&HIT_FLAG) && (x == first_bg_pixel)
-							    && front_sprites[i] == 0)
+							if( !(PPU->SR&HIT_FLAG) && (x == first_bg_pixel) 
+							    && front_sprites[i] == 0) {
 								PPU->SR |= HIT_FLAG;
+								break;
+							}
 
 							if( config.show_front_spr )
 								draw_pixel( x, line,
