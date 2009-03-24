@@ -780,8 +780,8 @@ void execute_reset() {
 /* This is called by BRK and mappers IRQ triggers */
 void execute_irq() {
 
-	stack_push( (CPU->PC+2) & 0xFF );
 	stack_push( (CPU->PC+2) >> 8 );
+	stack_push( (CPU->PC+2) & 0xFF );
 	stack_push( CPU->SR );
 	CPU->PC = ( CPU->RAM[0xFFFE] | ( CPU->RAM[0xFFFF]<<8 ) );
 }
