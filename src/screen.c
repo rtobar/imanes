@@ -78,7 +78,7 @@ void init_screen() {
 		exit(EXIT_FAILURE);
 	}
 
-	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*config.video_scale, NES_SCREEN_HEIGHT*config.video_scale, NES_SCREEN_BPP, 0);
+	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*config.video_scale, NES_NTSC_HEIGHT*config.video_scale, NES_SCREEN_BPP, 0);
 	if( nes_screen == NULL ) {
 		fprintf(stderr,"Error while setting video mode: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
@@ -105,6 +105,10 @@ void draw_pixel(int x, int y, nes_palette color) {
 	int j;
 	Uint32 colour;
 	Uint32 *pixmem32;
+
+	y -= 8;
+	if( y < 0 || y >= NES_NTSC_HEIGHT )
+		return;
 
 	/* This is the color that will be put in the pixel */
 	if( config.use_sdl_colors )

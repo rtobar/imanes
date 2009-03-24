@@ -6,6 +6,7 @@
 /* Screen geometry */
 #define NES_SCREEN_WIDTH  256
 #define NES_SCREEN_HEIGHT 240
+#define NES_NTSC_HEIGHT   224
 #define NES_SCREEN_BPP    32
 
 /**
