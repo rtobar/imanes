@@ -238,7 +238,6 @@ void draw_line(int line) {
 
 					for(j=0;!(PPU->SR&HIT_FLAG)&&j!=drawn_back_sprites_idx;j++) {
 						if( x == drawn_back_sprites[j] ) {
-							printf("Set HIT flag at (%d,%d)\n", x, line);
 							PPU->SR |= HIT_FLAG;
 							break;
 						}
@@ -317,7 +316,6 @@ void draw_line(int line) {
 							if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
 								for(j=drawn_background_idx;j!=0; j--) {
 									if( x == drawn_background[j] ) {
-										printf("Set HIT flag at (%d,%d)\n", x, line);
 										PPU->SR |= HIT_FLAG;
 										break;
 									}
@@ -336,7 +334,6 @@ void draw_line(int line) {
 							if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
 								for(j=drawn_background_idx;j!=0; j--) {
 									if( x == drawn_background[j] ) {
-										printf("Set HIT flag at (%d,%d)\n", x, line);
 										PPU->SR |= HIT_FLAG;
 										break;
 									}
