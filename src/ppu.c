@@ -85,7 +85,6 @@ void draw_line(int line) {
 	uint16_t scr_patt_table;
 
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
-	orig_name_table = 0x2000 + 0x400*(PPU->CR1 & 0x03);
 	spr_patt_table  = ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
 	scr_patt_table  = ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
 	big_sprite      = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
@@ -202,7 +201,7 @@ void draw_line(int line) {
 
 		y = (PPU->vram_addr&0x03E0) >> 5;
 		ty = (PPU->vram_addr&0x7000) >> 12;
-		orig_name_table += (PPU->vram_addr&0x0800);
+		orig_name_table = 0x2000 + (PPU->vram_addr&0x0800);
 
 		for(x=0;x!=NES_SCREEN_WIDTH;) {
 
