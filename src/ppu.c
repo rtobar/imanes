@@ -68,9 +68,10 @@ void draw_line(int line) {
 	int bck_sprites; /* Counters for arrays bellow */
 	int frt_sprites;
 	int second_sprite; /* For 8x16 sprites */
-	int first_bg_pixel;            /* For Sprite #0 hit flag */
 	int drawn_back_sprites_idx;    /* For Sprite #0 hit flag */
+	int drawn_background_idx;      /* For Sprite #0 hit flag */
 	uint8_t drawn_back_sprites[8]; /* For Sprite #0 hit flag */
+	uint8_t drawn_background[256]; /* For Sprite #0 hit flag */
 	uint8_t front_sprites[8];
 	uint8_t back_sprites[8];
 	uint8_t col_index;
@@ -98,13 +99,11 @@ void draw_line(int line) {
 	}
 
 	/* Identify which sprites have to be drawn */
+	frt_sprites = 0;
+	bck_sprites = 0;
 	if( PPU->CR2 & SHOW_SPRITES ) {
-		frt_sprites = 0;
-		bck_sprites = 0;
 		for(i=0;i!=64;i++) {
 			tmp = *(PPU->SPR_RAM + 4*i) + 1;
-			if(i==0)
-				printf("y coord: %02x\n", tmp);
 			if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
 				if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR )
 					back_sprites[bck_sprites++] = i;
@@ -122,7 +121,7 @@ void draw_line(int line) {
 		bck_sprites--;
 	}
 
-	/* Fill all pixels with the "colour intensity" color */
+	/* Fill all pixels with the background color */
 	if( config.show_screen_bg ) {
 		for(i=0;i!=NES_SCREEN_WIDTH;i++)
 			draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
@@ -199,7 +198,7 @@ void draw_line(int line) {
 	 * scrolling. Based on this, we choose the name table where the
 	 * tiles come from.
 	 */
-	first_bg_pixel = -1;
+	drawn_background_idx = 0;
 	if( PPU->CR2&SHOW_BACKGROUND ) {
 
 		y = (PPU->vram_addr&0x03E0) >> 5;
@@ -235,11 +234,11 @@ void draw_line(int line) {
 				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
 				if( col_index & 0x03 ) {
-					if( first_bg_pixel == -1 )
-						first_bg_pixel = x;
+					drawn_background[drawn_background_idx++] = x;
 
 					for(j=0;!(PPU->SR&HIT_FLAG)&&j!=drawn_back_sprites_idx;j++) {
 						if( x == drawn_back_sprites[j] ) {
+							printf("Set HIT flag at (%d,%d)\n", x, line);
 							PPU->SR |= HIT_FLAG;
 							break;
 						}
@@ -313,10 +312,16 @@ void draw_line(int line) {
 					if( byte3 & SPRITE_FLIP_HORIZ ) {
 						x = tmp+7-tx;
 						if( 0 <= x && x < NES_SCREEN_WIDTH ) {
-							if( !(PPU->SR&HIT_FLAG) && (x == first_bg_pixel)
-							    && front_sprites[i] == 0) {
-								PPU->SR |= HIT_FLAG;
-								break;
+
+							/* Check Sprite#0 Hit flag*/
+							if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
+								for(j=drawn_background_idx;j!=0; j--) {
+									if( x == drawn_background[j] ) {
+										printf("Set HIT flag at (%d,%d)\n", x, line);
+										PPU->SR |= HIT_FLAG;
+										break;
+									}
+								}
 							}
 
 							if( config.show_front_spr )
@@ -327,10 +332,15 @@ void draw_line(int line) {
 					else {
 						x = tmp+tx;
 						if( x < NES_SCREEN_WIDTH ) {
-							if( !(PPU->SR&HIT_FLAG) && (x == first_bg_pixel) 
-							    && front_sprites[i] == 0) {
-								PPU->SR |= HIT_FLAG;
-								break;
+
+							if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
+								for(j=drawn_background_idx;j!=0; j--) {
+									if( x == drawn_background[j] ) {
+										printf("Set HIT flag at (%d,%d)\n", x, line);
+										PPU->SR |= HIT_FLAG;
+										break;
+									}
+								}
 							}
 
 							if( config.show_front_spr )
