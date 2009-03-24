@@ -259,11 +259,9 @@ void draw_line(int line) {
 		}
 
 		/* Y scroll update */
-		ty = ((PPU->vram_addr&0x7000) >> 12) + 1;
-		PPU->vram_addr = (PPU->vram_addr&0x8FFF) | ((ty&0x07)<<12);
+		PPU->vram_addr = (PPU->vram_addr&0x8FFF) | ((++ty&0x07)<<12);
 		if( ty == 0x8 ) {
-			y = ((PPU->vram_addr&0x03E0) >> 5) + 1;
-			if( y == 30 ) {
+			if( ++y == 30 ) {
 				y = 0;
 				PPU->vram_addr ^= 0x800;
 			}
