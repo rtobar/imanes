@@ -167,7 +167,7 @@ void initialize_palette() {
 	FILL_NES_PALETTE(other_palette, 0x3E, 0x11, 0x11, 0x11);
 	FILL_NES_PALETTE(other_palette, 0x3F, 0x11, 0x11, 0x11);
 
-	system_palette = other_palette;
+	system_palette = loopy_palette;
 }
 
 void dump_palette() {

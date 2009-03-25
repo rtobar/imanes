@@ -7,8 +7,9 @@
 #define IMANES_VERSION "0.1"
 
 /* RAM sizes */
-#define NES_RAM_SIZE     (0xFFFF)
-#define NES_VRAM_SIZE    (0xFFFF)
+#define NES_RAM_SIZE     (0x10000)
+#define NES_VRAM_SIZE    (0x4000)
+#define NES_SPR_RAM_SIZE (0x100)
 
 /* ROM sizes */
 #define ROM_BANK_SIZE   (16*1024)

@@ -36,7 +36,7 @@ void initialize_ppu() {
 
 	PPU = (nes_ppu *)malloc(sizeof(nes_ppu));
 	PPU->VRAM = (uint8_t *)malloc(NES_VRAM_SIZE);
-	PPU->SPR_RAM = (uint8_t *)malloc(256);
+	PPU->SPR_RAM = (uint8_t *)malloc(NES_SPR_RAM_SIZE);
 
 	PPU->x = 0;
 	PPU->latch = 1;
@@ -437,7 +437,7 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 		PPU->VRAM[address] = value;
 
 	/* After palette mirroring */
-	if( 0x3F20 <= address && address < 0x4000) {
+	if( 0x3F20 <= address ) {
 		XTREME( printf("PPU Address mirroring: from %04x to ", address) );
 		address = address - 0x20 * ((((address - 0x3F20) >> 5) & 0x7) + 1);
 		XTREME( printf("%04x\n",address) );
