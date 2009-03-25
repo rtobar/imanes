@@ -56,6 +56,7 @@ int  mmc1_check_address(uint16_t address) {
 		}
 
 		saved |= (value&0x01) << shifts++;
+		printf("MMC1: saved:%02x\n", saved);
 
 		/* Last write is the important */
 		if( shifts == 5 ) {
@@ -116,7 +117,7 @@ void mmc1_switch_banks() {
 	 * choose of the appropiate ROM bank to switch */
 
 	/* VROM packed roms */
-	if( mapper->file->vromBanks != 0 ) {
+	if( mapper->file->vromBanks != 0 && (touched_reg == 1 || touched_reg == 2) ) {
 
 		/* Switch VROM banks. Banks sizes can be 8 Kb or 4 Kb.
 		 * In both cases we fill form 0x0000 to 0x2000. */
@@ -145,7 +146,7 @@ void mmc1_switch_banks() {
 		offset = 0;
 	}
 
-	if( touched_reg == 3 ) {
+	if( touched_reg == 0 || touched_reg == 3 ) {
 
 		offset = 0;
 		/* 512 Kb roms */
@@ -168,14 +169,14 @@ void mmc1_switch_banks() {
 			/* Select the actual bank that will be switched */
 			bank = (mapper->regs[3] & 0x0F);
 			offset += bank * ROM_BANK_SIZE*2;
-			DEBUG( printf("MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n", bank, offset) );
+			printf("MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n", bank, offset);
 			memcpy( CPU->RAM+0x8000, mapper->file->rom + offset,
 			        ROM_BANK_SIZE*2);
 		}
 		else {
 			bank = (mapper->regs[3] & 0x0F);
 			offset += bank * ROM_BANK_SIZE;
-			DEBUG( printf("MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n", bank, offset, 0x8000 + (mapper->regs[0]&0x04?0:0x4000)) );
+			printf("MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n", bank, offset, 0x8000 + (mapper->regs[0]&0x04?0:0x4000));
 			memcpy( CPU->RAM+0x8000 + ( mapper->regs[0]&0x04 ? 0 : 0x4000),
 			        mapper->file->rom + offset, ROM_BANK_SIZE);
 		}
