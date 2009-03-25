@@ -613,7 +613,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		case 0x4014:
 			address = value*0x100;
 			for(i=0;i!=256;i++)
-				PPU->SPR_RAM[i] = read_cpu_ram(address+i);
+				PPU->SPR_RAM[PPU->spr_addr++] = read_cpu_ram(address+i);
 			CPU->cycles += 512;
 			break;
 
@@ -700,8 +700,10 @@ uint8_t read_cpu_ram(uint16_t address) {
 			ret_val = buffer;
 			buffer = read_ppu_vram(PPU->vram_addr++);
 		}
-		else
+		else {
 			ret_val = read_ppu_vram(PPU->vram_addr++);
+			buffer = ret_val;
+		}
 	}
 
 	/* 1st Joystick */
