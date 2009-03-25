@@ -13,10 +13,10 @@ typedef struct _palette {
 } nes_palette;
 
 
-#define FILL_NES_PALETTE(INDEX, RED, GREEN, BLUE) \
-   system_palette[INDEX].red = RED; \
-   system_palette[INDEX].green = GREEN; \
-   system_palette[INDEX].blue = BLUE;
+#define FILL_NES_PALETTE(PALETTE, INDEX, RED, GREEN, BLUE) \
+   PALETTE[INDEX].red = RED; \
+   PALETTE[INDEX].green = GREEN; \
+   PALETTE[INDEX].blue = BLUE;
 
 /* System palette with the actual colors */
 extern nes_palette *system_palette;
