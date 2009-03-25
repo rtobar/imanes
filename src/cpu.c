@@ -560,7 +560,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			break;
 
 		case 0x2004:
-			XTREME( printf("Writing into SPR RAM at address %02x\n", PPU->spr_addr) );
 			PPU->SPR_RAM[PPU->spr_addr++] = value;
 			break;
 
@@ -613,7 +612,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* Sprite DMA */
 		case 0x4014:
 			address = value*0x100;
-			for(i=0;i!=256;i++) 
+			for(i=0;i!=256;i++)
 				PPU->SPR_RAM[i] = read_cpu_ram(address+i);
 			CPU->cycles += 512;
 			break;
@@ -654,6 +653,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 uint8_t read_cpu_ram(uint16_t address) {
 
 	uint8_t ret_val = 0;
+	static uint8_t buffer = 0; /* Buffer when reading from 0x2007 */
 
 	/* Convert the address to handle mirroring */
 	if( 0x0800 <= address && address < 0x2000 ) {
@@ -684,20 +684,25 @@ uint8_t read_cpu_ram(uint16_t address) {
 	}
 
 	/* SPR-RAM address */
-	else if( address == 0x2003 ) {
+	else if( address == 0x2003 )
 		ret_val = PPU->spr_addr;
-	}
 
 	/* SPR-RAM access */
-	else if( address == 0x2004 ) 
+	else if( address == 0x2004 )
 		ret_val = *(PPU->SPR_RAM + PPU->spr_addr);
 
 	else if( address == 0x2005 || address == 0x2006 )
 		ret_val = PPU->latch;
 
 	/* PPU VRAM */
-	else if( address == 0x2007 )
-		ret_val = read_ppu_vram(PPU->vram_addr);
+	else if( address == 0x2007 ) {
+		if( PPU->vram_addr < 0x3F00 ) {
+			ret_val = buffer;
+			buffer = read_ppu_vram(PPU->vram_addr++);
+		}
+		else
+			ret_val = read_ppu_vram(PPU->vram_addr++);
+	}
 
 	/* 1st Joystick */
 	else if( address == 0x4016 ) {
