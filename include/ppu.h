@@ -43,12 +43,10 @@ typedef struct _ppu {
 	uint8_t SR;         /* Status Register */
 
 	/* Internal registers */
+	uint8_t x;          /* Tiles X offset */
+	uint8_t latch;      /* Used simultaneously by 0x2005/6 */
 	uint16_t vram_addr; /* Address to be written/read by 0x2007 CPU RAM */
 	uint16_t temp_addr; /* Temporal VRAM address */
-	uint8_t x;          /* Tiles X offset */
-	uint8_t h_offset;   /* Horizontal offset */
-	uint8_t v_offset;   /* Vertical offset */
-	uint8_t latch;      /* Used simultaneously by 0x2005/6 */
 
 	/* Associated memory */
 	uint8_t *VRAM;      /* Video RAM. Physical memory: 0x0000 -> 0x3FFF */
