@@ -27,6 +27,8 @@
 #include "mmc1.h"
 #include "ppu.h"
 
+static int touched_reg;
+
 void mmc1_initialize_mapper() {
 
 	mapper->regs = (uint8_t *)malloc(4);
@@ -70,6 +72,7 @@ int  mmc1_check_address(uint16_t address) {
 			else if( 0xE000 <= address )
 				mapper->regs[3] = saved;
 
+			touched_reg = (address-0x8000) >> 13;
 			shifts = 0;
 			saved = 0;
 			return 1;
@@ -92,73 +95,76 @@ void mmc1_switch_banks() {
 	printf("\n");
 	);
 
-	/* First register has changed */
-	//if( touched_regs[0] == 1 ) {
-	if( 1 ) {
-
-		DEBUG( printf("MMC1: Switching banks...\n") );
-
+	/* Reg 0 only has bank switching options,
+	 * but changes the mirroring type */
+	if( touched_reg == 0 ) {
 		PPU->mirroring = !(mapper->regs[0] & 0x01);
 		if( !(mapper->regs[0] & 0x02 ) )
 			PPU->mirroring = SINGLE_SCREEN_MIRRORING;
+		return;
+	}
 
-		/* We have three major options:
-		 *  1) VROM packed catridges
-		 *  2) 512 Kb packed catridges
-		 *  3) 1024 Kb packed catridges.
-		 *
-		 * This distinction is for the usage of bit 4 of register 0
-		 * and the usage of register 1 and 2. In the first case they are
-		 * used to switch VROM banks, while in the second to help in the
-		 * choose of the appropiate ROM bank to switch */
+	DEBUG( printf("MMC1: Switching banks...\n") );
+	/* We have three major options:
+	 *  1) VROM packed catridges
+	 *  2) 512 Kb packed catridges
+	 *  3) 1024 Kb packed catridges.
+	 *
+	 * This distinction is for the usage of bit 4 of register 0
+	 * and the usage of register 1 and 2. In the first case they are
+	 * used to switch VROM banks, while in the second to help in the
+	 * choose of the appropiate ROM bank to switch */
 
-		/* VROM packed roms */
-		if( mapper->file->vromBanks != 0 ) {
+	/* VROM packed roms */
+	if( mapper->file->vromBanks != 0 ) {
 
-			/* Switch VROM banks. Banks sizes can be 8 Kb or 4 Kb.
-			 * In both cases we fill form 0x0000 to 0x2000. */
-			if( !(mapper->regs[0] & 0x10) ) {
-				bank = mapper->regs[1]&0x0F;
-				DEBUG( printf("MMC1: Switching 8 Kb VROM bank %d. Offset is ",  bank) );
-				offset = bank * VROM_BANK_SIZE;
-				DEBUG( printf("%04x\n", offset) );
-				memcpy( PPU->VRAM, mapper->file->vrom+offset, VROM_BANK_SIZE);
-			}
-			else {
-				bank = mapper->regs[1]&0x0F;
-				DEBUG( printf("MMC1: Switching 4 Kb VROM banks %d/%d. Offsets are ", bank, mapper->regs[2]&0x0F) );
+		/* Switch VROM banks. Banks sizes can be 8 Kb or 4 Kb.
+		 * In both cases we fill form 0x0000 to 0x2000. */
+		if( !(mapper->regs[0] & 0x10) ) {
+			bank = mapper->regs[1]&0x0F;
+			DEBUG( printf("MMC1: Switching 8 Kb VROM bank %d. Offset is ",  bank) );
+			offset = bank * VROM_BANK_SIZE;
+			DEBUG( printf("%04x\n", offset) );
+			memcpy( PPU->VRAM, mapper->file->vrom+offset, VROM_BANK_SIZE);
+		}
+		else {
+			bank = mapper->regs[1]&0x0F;
+			DEBUG( printf("MMC1: Switching 4 Kb VROM banks %d/%d. Offsets are ", bank, mapper->regs[2]&0x0F) );
 
-				offset = bank * VROM_BANK_SIZE/2;
-				DEBUG( printf("%04x/", offset) );
-				memcpy( PPU->VRAM, mapper->file->vrom + offset,
-				        VROM_BANK_SIZE/2);
-				bank = (mapper->regs[2] & 0x0F);
-				offset = bank * VROM_BANK_SIZE/2;
-				DEBUG( printf("%04x\n", offset) );
-				memcpy( PPU->VRAM+0x1000, mapper->file->vrom + offset,
-				        VROM_BANK_SIZE/2);
-			}
-
-			offset = 0;
+			offset = bank * VROM_BANK_SIZE/2;
+			DEBUG( printf("%04x/", offset) );
+			memcpy( PPU->VRAM, mapper->file->vrom + offset,
+			        VROM_BANK_SIZE/2);
+			bank = (mapper->regs[2] & 0x0F);
+			offset = bank * VROM_BANK_SIZE/2;
+			DEBUG( printf("%04x\n", offset) );
+			memcpy( PPU->VRAM+0x1000, mapper->file->vrom + offset,
+			        VROM_BANK_SIZE/2);
 		}
 
-		/* 512 Kb roms */
-		else if( mapper->file->romBanks == 32 && (mapper->regs[1] & 0x10) )
-			offset = 0x40000;
+		offset = 0;
+	}
 
+	if( touched_reg == 3 ) {
+
+		offset = 0;
+		/* 512 Kb roms */
+		if( mapper->file->romBanks == 32 && (mapper->regs[1] & 0x10) )
+			offset = 0x40000;
+	
 		/* 1024 Kb roms */
 		else if( mapper->file->romBanks == 64 ) {
 			if( !(mapper->regs[0] & 0x10 ) && mapper->regs[1] & 0x10 )
 				offset = 0x80000;
-
+	
 			else if( mapper->regs[0] & 0x10 )
 				offset = 0x40000 * ( (mapper->regs[1]&0x10) | (mapper->regs[2]&0x10) );
 		}
-
+	
 		/* Switch ROM banks. If swap 32 Kb, fill from 0x8000, 
 		 * if 16 Kb, check which should be fill */
 		if( !(mapper->regs[0] & 0x08 ) ) {
-
+	
 			/* Select the actual bank that will be switched */
 			bank = (mapper->regs[3] & 0x0F);
 			offset += bank * ROM_BANK_SIZE*2;
@@ -175,7 +181,6 @@ void mmc1_switch_banks() {
 		}
 	}
 
-	return;
 }
 
 void mmc1_reset() {
