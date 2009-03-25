@@ -356,15 +356,18 @@ void draw_line(int line) {
 
 uint8_t read_ppu_vram(uint16_t address) {
 
+	/* Bound addresses up to 0x3FFF */
+	address &= 0x3FFF;
+
 	/* This range has no mirroring */
-	if( address < 0x2400 )
+	if( address < 0x2000 )
 		return PPU->VRAM[address];
 
 	/* This duplicates everything else on VRAM */
 	if( 0x4000 <= address ) {
-		XTREME( printf("PPU Address mirroring: from %04x to ", address) );
+		printf("PPU Address mirroring: from %04x to ", address);
 		address = address - 0x4000 * ((address >> 14) & 0x3);
-		XTREME( printf("%04x\n",address) );
+		printf("%04x\n",address);
 	}
 
 	/* After palette mirroring */
@@ -426,16 +429,12 @@ uint8_t read_ppu_vram(uint16_t address) {
 
 void write_ppu_vram(uint16_t address, uint8_t value) {
 
-	/* This range has no mirroring */
-	if( address < 0x2400 )
-		PPU->VRAM[address] = value;
+	/* Bound addresses up to 0x3FFF */
+	address &= 0x3FFF;
 
-	/* This duplicates everything else on VRAM */
-	if( 0x4000 <= address ) {
-		XTREME( printf("PPU Address mirroring: from %04x to ", address) );
-		address = address - 0x4000 * ((address >> 14) & 0x3);
-		XTREME( printf("%04x\n",address) );
-	}
+	/* This range has no mirroring */
+	if( address < 0x2000 )
+		PPU->VRAM[address] = value;
 
 	/* After palette mirroring */
 	if( 0x3F20 <= address && address < 0x4000) {
