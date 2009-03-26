@@ -56,7 +56,6 @@ int  mmc1_check_address(uint16_t address) {
 		}
 
 		saved |= (value&0x01) << shifts++;
-		printf("MMC1: saved:%02x\n", saved);
 
 		/* Last write is the important */
 		if( shifts == 5 ) {
@@ -169,14 +168,14 @@ void mmc1_switch_banks() {
 			/* Select the actual bank that will be switched */
 			bank = (mapper->regs[3] & 0x0F);
 			offset += bank * ROM_BANK_SIZE*2;
-			printf("MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n", bank, offset);
+			DEBUG( printf("MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n", bank, offset) );
 			memcpy( CPU->RAM+0x8000, mapper->file->rom + offset,
 			        ROM_BANK_SIZE*2);
 		}
 		else {
 			bank = (mapper->regs[3] & 0x0F);
 			offset += bank * ROM_BANK_SIZE;
-			printf("MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n", bank, offset, 0x8000 + (mapper->regs[0]&0x04?0:0x4000));
+			DEBUG( printf("MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n", bank, offset, 0x8000 + (mapper->regs[0]&0x04?0:0x4000)) );
 
 			/* Depending where we switch banks, the other remains hard-wired */
 			memcpy( CPU->RAM+0x8000 + ( mapper->regs[0]&0x04 ? 0 : 0x4000),
