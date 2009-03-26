@@ -65,6 +65,11 @@ void mmc3_initialize_mapper() {
 
 int  mmc3_check_address(uint16_t address) {
 
+	if( address < 0x8000 )
+		return 0;
+
+	//printf("MMC3: Writing %02x into %04x\n", CPU->RAM[address], address);
+
 	/* This only set values, does not take any action */
 	if( address == 0x8000 ) {
 		mapper->regs[0] = CPU->RAM[address];
@@ -120,7 +125,6 @@ void mmc3_switch_banks() {
 	uint8_t bank;
 	uint8_t command;
 	uint16_t offset;
-	static int last_in_vrom_address[6] = {-1,-1,-1,-1,-1,-1};
 
 	switch( action ) {
 
@@ -131,23 +135,17 @@ void mmc3_switch_banks() {
 			/* Switch VROM page */
 			if( command <= 5 ) {
 
-				if( bank != last_in_vrom_address[command] ) {
-					INFO( printf("MMC3: Switching bank %d to %04x\n", bank,
-					       (command <= 1? 0x800*command : 0x1000+(command-2)*0x400) ) );
-					last_in_vrom_address[command] = bank;
-				}
-				else
-					return;
+				//printf("MMC3: Switching VROM bank %d to %04x\n", bank,(command <= 1? 0x800*command : (command-2)*0x400) +  (!(mapper->regs[0]&0x80))*0x1000);
 
 				/* Copy 2 1Kb VROM pages */
 				if( command <= 1 ) {
-					offset = 0x800*command;
+					offset = 0x800*command + (mapper->regs[0]&0x80)*0x1000;
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 2*1024);
 				}
 				/* Copy 1 Kb VROM page */
 				else {
-					offset = 0x1000 + (command-2)*0x400;
+					offset = (command-2)*0x400 + (!(mapper->regs[0]&0x80))*0x1000;
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 1024);
 				}
@@ -163,7 +161,7 @@ void mmc3_switch_banks() {
 					if( mapper->regs[0] & 0x40 )
 						offset += 0x4000;
 
-				//printf("Copying bank %02x into %04x\n", bank, offset);
+				//printf("MMC3: Switching ROM bank %02x into %04x\n", bank, offset);
 				memcpy(CPU->RAM + offset,
 				       mapper->file->rom + bank*ROM_BANK_SIZE/2,
 				       ROM_BANK_SIZE/2);
@@ -187,7 +185,8 @@ void mmc3_switch_banks() {
 			break;
 
 		case ChangeMirroring:
-			PPU->mirroring = !(mapper->regs[2] & 0x1);
+			if( PPU->mirroring != FOUR_SCREEN_MIRRORING )
+				PPU->mirroring = !(mapper->regs[2] & 0x1);
 			break;
 
 		case ToogleSRAM:
@@ -244,8 +243,8 @@ void mmc3_update() {
 
 	irq_counter--;
 
-	if( irq_counter == 0 )
-		execute_irq();
+	//if( irq_counter == 0 )
+	//	execute_irq();
 	
 	return;
 }
