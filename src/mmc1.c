@@ -177,7 +177,12 @@ void mmc1_switch_banks() {
 			bank = (mapper->regs[3] & 0x0F);
 			offset += bank * ROM_BANK_SIZE;
 			printf("MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n", bank, offset, 0x8000 + (mapper->regs[0]&0x04?0:0x4000));
+
+			/* Depending where we switch banks, the other remains hard-wired */
 			memcpy( CPU->RAM+0x8000 + ( mapper->regs[0]&0x04 ? 0 : 0x4000),
+			        mapper->file->rom + offset, ROM_BANK_SIZE);
+			offset = ( mapper->regs[0]&0x04 ? mapper->file->romBanks-1 : 0) * ROM_BANK_SIZE;
+			memcpy( CPU->RAM+0xC000 - ( mapper->regs[0]&0x04 ? 0 : 0x4000),
 			        mapper->file->rom + offset, ROM_BANK_SIZE);
 		}
 	}
