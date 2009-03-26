@@ -121,21 +121,21 @@ void mmc1_switch_banks() {
 		/* Switch VROM banks. Banks sizes can be 8 Kb or 4 Kb.
 		 * In both cases we fill form 0x0000 to 0x2000. */
 		if( !(mapper->regs[0] & 0x10) ) {
-			bank = mapper->regs[1]&0x0F;
+			bank = mapper->regs[1]&0x1F;
 			DEBUG( printf("MMC1: Switching 8 Kb VROM bank %d. Offset is ",  bank) );
-			offset = bank * VROM_BANK_SIZE;
+			offset = bank * VROM_BANK_SIZE/2;
 			DEBUG( printf("%04x\n", offset) );
 			memcpy( PPU->VRAM, mapper->file->vrom+offset, VROM_BANK_SIZE);
 		}
 		else {
-			bank = mapper->regs[1]&0x0F;
+			bank = mapper->regs[1]&0x1F;
 			DEBUG( printf("MMC1: Switching 4 Kb VROM banks %d/%d. Offsets are ", bank, mapper->regs[2]&0x0F) );
 
 			offset = bank * VROM_BANK_SIZE/2;
 			DEBUG( printf("%04x/", offset) );
 			memcpy( PPU->VRAM, mapper->file->vrom + offset,
 			        VROM_BANK_SIZE/2);
-			bank = (mapper->regs[2] & 0x0F);
+			bank = (mapper->regs[2] & 0x1F);
 			offset = bank * VROM_BANK_SIZE/2;
 			DEBUG( printf("%04x\n", offset) );
 			memcpy( PPU->VRAM+0x1000, mapper->file->vrom + offset,
