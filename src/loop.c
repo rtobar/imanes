@@ -126,7 +126,7 @@ void main_loop(ines_file *file) {
 					CPU->cycles += 7;
 					execute_nmi();
 				}
-				if( !config.run_fast || (frames%2) )
+				if( !config.run_fast || !(frames%2) )
 					redraw_screen();
 				lines++;
 				frames++;
