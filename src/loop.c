@@ -116,7 +116,7 @@ void main_loop(ines_file *file) {
 		if( scanline_timeout <= 0 ) {
 
 			if( lines < NES_SCREEN_HEIGHT ) {
-				draw_line(lines++);
+				draw_line(lines++, frames);
 				mapper->update();
 			}
 			/* Start VBLANK period */
@@ -126,7 +126,8 @@ void main_loop(ines_file *file) {
 					CPU->cycles += 7;
 					execute_nmi();
 				}
-				redraw_screen();
+				if( frames%2 )
+					redraw_screen();
 				lines++;
 				frames++;
 				standard_lines = 0;

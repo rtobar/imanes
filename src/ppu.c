@@ -55,7 +55,7 @@ void dump_ppu() {
 
 }
 
-void draw_line(int line) {
+void draw_line(int line, int frame) {
 
 	int x;  /* Final x pixel coordinate */
 	int y;  /* Final y pixel coordinate */
@@ -124,11 +124,13 @@ void draw_line(int line) {
 	/* Fill all pixels with the background color */
 	if( config.show_screen_bg ) {
 		for(i=0;i!=NES_SCREEN_WIDTH;i++)
-			draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
+			if( frame%2 )
+				draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
 	}
 	else {
 		for(i=0;i!=NES_SCREEN_WIDTH;i++)
-			draw_pixel(i, line, system_palette[0]);
+			if( frame%2)
+				draw_pixel(i, line, system_palette[0]);
 	}
 
 
@@ -172,7 +174,7 @@ void draw_line(int line) {
 					if( byte3 & SPRITE_FLIP_HORIZ ) {
 						x = tmp+7-tx;
 						if( 0 <= x && x < NES_SCREEN_WIDTH ) {
-							if( config.show_back_spr )
+							if( config.show_back_spr && (frame%2) )
 								draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 							if( back_sprites[i] == 0 )
 								drawn_back_sprites[drawn_back_sprites_idx++] = x;
@@ -181,7 +183,7 @@ void draw_line(int line) {
 					else {
 						x = tmp+tx;
 						if( x < NES_SCREEN_WIDTH ) {
-							if( config.show_back_spr )
+							if( config.show_back_spr && (frame%2) )
 								draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 							if( back_sprites[i] == 0 )
 								drawn_back_sprites[drawn_back_sprites_idx++] = x;
@@ -242,7 +244,7 @@ void draw_line(int line) {
 							break;
 						}
 					}
-					if( config.show_bg )
+					if( config.show_bg && (frame%2) )
 						draw_pixel(x, line, system_palette[read_ppu_vram(0x3F00+col_index)]);
 				}
 				if( ++x == NES_SCREEN_WIDTH )
@@ -322,7 +324,7 @@ void draw_line(int line) {
 								}
 							}
 
-							if( config.show_front_spr )
+							if( config.show_front_spr && (frame%2) )
 								draw_pixel( x, line,
 								   system_palette[read_ppu_vram(0x3F10+col_index)]);
 						}
@@ -340,7 +342,7 @@ void draw_line(int line) {
 								}
 							}
 
-							if( config.show_front_spr )
+							if( config.show_front_spr && (frame%2) )
 								draw_pixel( x, line,
 								   system_palette[read_ppu_vram(0x3F10+col_index)]);
 						}

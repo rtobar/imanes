@@ -68,7 +68,7 @@ void initialize_ppu();
 /**
  * Function called every time that we need to draw a scanline
  */
-void draw_line(int line);
+void draw_line(int line, int frame);
 
 /**
  * Reads a value from a given PPU VRAM address. This method should
