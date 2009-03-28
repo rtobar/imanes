@@ -48,7 +48,6 @@ static int powering_on;
 static int swapping_control;
 
 static int irq_enabled;
-static int irq_pending;
 static uint8_t irq_tmp;
 static uint8_t irq_counter;
 
@@ -220,7 +219,6 @@ void mmc3_switch_banks() {
 
 		case DisableIRQ:
 			irq_enabled = 0;
-			irq_pending = 0;
 			break;
 
 		case EnableIRQ:
