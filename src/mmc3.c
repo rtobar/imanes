@@ -161,8 +161,7 @@ void mmc3_switch_banks() {
 				/* 0xA000 is present in both regions */
 				if( command == 7 )
 					offset += 0x2000;
-				else
-					if( mapper->regs[0] & 0x40 )
+				else if( mapper->regs[0] & 0x40 )
 						offset += 0x4000;
 
 				//printf("MMC3: Switching ROM bank %02x into %04x\n", bank, offset);
@@ -171,7 +170,7 @@ void mmc3_switch_banks() {
 				       ROM_BANK_SIZE/2);
 
 				/* If we haven't changed the swapping control, then
-				   we don't need to copy again the same ROM memory */
+				   we don't need to copy again the same {-2} ROM memory */
 				if( swapping_control == (mapper->regs[0]&0x40) )
 					break;
 
@@ -239,7 +238,7 @@ void mmc3_reset() {
 		memcpy( CPU->RAM + 0xE000,
 	      mapper->file->rom+((mapper->file->romBanks*2)-1)*ROM_BANK_SIZE/2,
 	      ROM_BANK_SIZE/2);
-		memcpy( CPU->RAM + 0x8000,
+		memcpy( CPU->RAM + 0xC000,
 		   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
 		   ROM_BANK_SIZE/2);
 		powering_on = 0;
