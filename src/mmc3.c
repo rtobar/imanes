@@ -32,8 +32,10 @@ typedef enum _mmc3_action {
 	SwapBanks,
 	ChangeMirroring,
 	ToogleSRAM,
+	SetIRQ,
 	EnableIRQ,
-	DisableIRQ
+	DisableIRQ,
+	ResetIRQ
 } mmc3_action;
 
 /* This is the action taken when writing into the address,
@@ -46,7 +48,8 @@ static int powering_on;
 static int swapping_control;
 
 static int irq_enabled;
-static int irq_tmp;
+static int irq_pending;
+static uint8_t irq_tmp;
 static uint8_t irq_counter;
 
 void mmc3_initialize_mapper() {
@@ -97,11 +100,13 @@ int  mmc3_check_address(uint16_t address) {
 
 	if( address == 0xC000 ) {
 		mapper->regs[4] = CPU->RAM[address];
+		action = SetIRQ;
 		return 1;
 	}
 
 	if( address == 0xC001 ) {
 		mapper->regs[5] = CPU->RAM[address];
+		action = ResetIRQ;
 		return 1;
 	}
 
@@ -205,8 +210,17 @@ void mmc3_switch_banks() {
 			}
 			break;
 
+		case SetIRQ:
+			irq_tmp = mapper->regs[4];
+			break;
+
+		case ResetIRQ:
+			irq_counter = 0;
+			break;
+
 		case DisableIRQ:
 			irq_enabled = 0;
+			irq_pending = 0;
 			break;
 
 		case EnableIRQ:
@@ -241,10 +255,15 @@ void mmc3_reset() {
 
 void mmc3_update() {
 
-	irq_counter--;
+	if( irq_counter == 0 )
+		irq_counter = irq_tmp;
+	else {
+		if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) )
+			irq_counter--;
 
-	//if( irq_counter == 0 )
-	//	execute_irq();
-	
+		if( irq_counter == 0 && irq_enabled )
+			execute_irq();
+	}
+
 	return;
 }
