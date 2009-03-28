@@ -702,8 +702,8 @@ uint8_t read_cpu_ram(uint16_t address) {
 		}
 		/* Palette reads don't use the read buffer */
 		else {
-			ret_val = read_ppu_vram(PPU->vram_addr++);
-			buffer = ret_val;
+			ret_val = read_ppu_vram(PPU->vram_addr);
+			buffer  = read_ppu_vram(PPU->vram_addr++ - 0x1000);
 		}
 	}
 
