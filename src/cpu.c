@@ -139,18 +139,24 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case BCC:
-			if( ~CPU->SR & C_FLAG )
+			if( ~CPU->SR & C_FLAG ) {
+				add_cycles(CYCLE_BRANCH, oper.value);
 				CPU->PC += (int8_t)oper.value;
+			}
 			break;
 
 		case BCS:
-			if( CPU->SR & C_FLAG )
+			if( CPU->SR & C_FLAG ) {
+				add_cycles(CYCLE_BRANCH, oper.value);
 				CPU->PC +=(int8_t)oper.value;
+			}
 			break;
 
 		case BEQ:
-			if( CPU->SR & Z_FLAG )
+			if( CPU->SR & Z_FLAG ) {
+				add_cycles(CYCLE_BRANCH, oper.value);
 				CPU->PC += (int8_t)oper.value;
+			}
 			break;
 
 		case BIT:
@@ -164,18 +170,24 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case BMI:
-			if( CPU->SR & N_FLAG )
+			if( CPU->SR & N_FLAG ) {
+				add_cycles(CYCLE_BRANCH, oper.value);
 				CPU->PC += (int8_t)oper.value;
+			}
 			break;
 
 		case BNE:
-			if( ~CPU->SR & Z_FLAG )
+			if( ~CPU->SR & Z_FLAG ) {
+				add_cycles(CYCLE_BRANCH, oper.value);
 				CPU->PC += (int8_t)oper.value;
+			}
 			break;
 
 		case BPL:
-			if( ~CPU->SR & N_FLAG )
+			if( ~CPU->SR & N_FLAG ) {
+				add_cycles(CYCLE_BRANCH, oper.value);
 				CPU->PC += (int8_t)oper.value;
+			}
 			break;
 
 		case BRK:
@@ -187,13 +199,17 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case BVC:
-			if( ~CPU->SR & V_FLAG )
+			if( ~CPU->SR & V_FLAG ) {
+				add_cycles(CYCLE_BRANCH, oper.value);
 				CPU->PC += (int8_t)oper.value;
+			}
 			break;
 
 		case BVS:
-			if( CPU->SR & V_FLAG )
+			if( CPU->SR & V_FLAG ) {
+				add_cycles(CYCLE_BRANCH, oper.value);
 				CPU->PC += (int8_t)oper.value;
+			}
 			break;
 
 		case CLC:
@@ -792,4 +808,19 @@ void execute_irq() {
 	stack_push( (CPU->PC+2) & 0xFF );
 	stack_push( CPU->SR );
 	CPU->PC = ( CPU->RAM[0xFFFE] | ( CPU->RAM[0xFFFF]<<8 ) );
+}
+
+void add_cycles(uint8_t type, int8_t value) {
+
+	if( type == CYCLE_BRANCH ) {
+		if( (CPU->PC&0x100) == ((CPU->PC + value)&0x100) )
+			CPU->cycles++;
+		else
+			CPU->cycles += 2;
+	}
+
+	else if( type == CYCLE_PAGE ) {
+		if( (CPU->PC&0x100) != ((CPU->PC + value)&0x100) )
+			CPU->cycles++;
+	}
 }

@@ -110,4 +110,10 @@ void execute_reset();
  */
 void execute_irq();
 
+/**
+ * Add cycles to certain opcodes executions
+ * when crossing page bounds
+ */
+void add_cycles(uint8_t type, int8_t value);
+
 #endif /* cpu_h */
