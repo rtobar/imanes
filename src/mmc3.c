@@ -135,21 +135,23 @@ void mmc3_switch_banks() {
 		case SwapBanks:
 			bank = mapper->regs[1];
 			command = (mapper->regs[0]&0x7);
+			printf("MMC3: bank:%02x   command:%02x   reg0:%02x\n", bank, command, mapper->regs[0]);
 
 			/* Switch VROM page */
 			if( command <= 5 ) {
 
-				//printf("MMC3: Switching VROM bank %d to %04x\n", bank,(command <= 1? 0x800*command : (command-2)*0x400) +  (!(mapper->regs[0]&0x80))*0x1000);
 
 				/* Copy 2 1Kb VROM pages */
 				if( command <= 1 ) {
-					offset = 0x800*command + (mapper->regs[0]&0x80)*0x1000;
+					offset = 0x800*command + ((mapper->regs[0]&0x80) << 5);
+					printf("MMC3: Switching VROM bank %d to %04x\n", bank,offset);
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 2*1024);
 				}
 				/* Copy 1 Kb VROM page */
 				else {
 					offset = (command-2)*0x400 + (!(mapper->regs[0]&0x80))*0x1000;
+					printf("MMC3: Switching VROM bank %d to %04x\n", bank,offset);
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 1024);
 				}
@@ -164,7 +166,7 @@ void mmc3_switch_banks() {
 				else if( mapper->regs[0] & 0x40 )
 						offset += 0x4000;
 
-				//printf("MMC3: Switching ROM bank %02x into %04x\n", bank, offset);
+				printf("MMC3: Switching ROM bank %02x into %04x\n", bank, offset);
 				memcpy(CPU->RAM + offset,
 				       mapper->file->rom + bank*ROM_BANK_SIZE/2,
 				       ROM_BANK_SIZE/2);
@@ -241,6 +243,13 @@ void mmc3_reset() {
 		memcpy( CPU->RAM + 0xC000,
 		   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
 		   ROM_BANK_SIZE/2);
+
+		if( mapper->file->vromBanks != 0 ) {
+			memcpy( PPU->VRAM ,
+			   mapper->file->rom,
+			   VROM_BANK_SIZE);
+		}
+
 		powering_on = 0;
 	}
 
