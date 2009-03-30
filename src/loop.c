@@ -45,7 +45,9 @@ void main_loop(ines_file *file) {
 	int lines, standard_lines;
 	int frames;
 	int i;
+	int loops;
 	long tmp;
+	unsigned long long cycles;
 	struct timespec sleepTime = { 0, 2e7 };
 	struct timespec startTime;
 	struct timespec endTime;
@@ -56,6 +58,7 @@ void main_loop(ines_file *file) {
 	frames = 0;
 	lines = -1;
 	standard_lines = 0;
+	cycles = 0;
 
 	pthread_mutex_init(&pause_mutex, NULL);
 
@@ -106,7 +109,8 @@ void main_loop(ines_file *file) {
 
 		CPU->PC += inst.size;
 		CPU->cycles += inst.cycles;
-		scanline_timeout -= inst.cycles;
+		scanline_timeout -= (CPU->cycles - cycles);
+		cycles = CPU->cycles;
 
 		for(i=0;i!=DUMPS;i++)
 			if(CPU->PC == pc_dumps[i])
@@ -141,6 +145,7 @@ void main_loop(ines_file *file) {
 				lines++;
 				frames++;
 				standard_lines = 0;
+				loops = CPU->cycles;
 			}
 			/* VBLANK period */
 			else {
@@ -149,7 +154,7 @@ void main_loop(ines_file *file) {
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
-					printf("Ending VBLANK!\n");
+					printf("Ending VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
 					lines = -1;
 					PPU->SR &= ~VBLANK_FLAG;
 					PPU->SR &= ~HIT_FLAG;
