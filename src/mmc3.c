@@ -132,6 +132,23 @@ void mmc3_switch_banks() {
 
 	switch( action ) {
 
+		case SetCommand:
+			/* If we haven't changed the swapping control, then
+			   we don't need to copy again the same {-2} ROM memory */
+			if( swapping_control == (mapper->regs[0]&0x40) )
+				break;
+
+			if( mapper->regs[0] & 0x40 )
+				offset = 0xC000;
+			else
+				offset = 0x8000;
+
+			memcpy( CPU->RAM + offset,
+			   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
+			   ROM_BANK_SIZE/2);
+			swapping_control = mapper->regs[0]&0x40;
+			break;
+
 		case SwapBanks:
 			bank = mapper->regs[1];
 			command = (mapper->regs[0]&0x7);
@@ -171,20 +188,6 @@ void mmc3_switch_banks() {
 				       mapper->file->rom + bank*ROM_BANK_SIZE/2,
 				       ROM_BANK_SIZE/2);
 
-				/* If we haven't changed the swapping control, then
-				   we don't need to copy again the same {-2} ROM memory */
-				if( swapping_control == (mapper->regs[0]&0x40) )
-					break;
-
-				if( mapper->regs[0] & 0x40 )
-					offset = 0xC000;
-				else
-					offset = 0x8000;
-
-				memcpy( CPU->RAM + offset,
-				   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
-				   ROM_BANK_SIZE/2);
-				swapping_control = mapper->regs[0]&0x40;
 			}
 
 			break;
