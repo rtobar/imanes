@@ -54,7 +54,7 @@ void main_loop(ines_file *file) {
 	instruction inst;
 
 	frames = 0;
-	lines = 0;
+	lines = -1;
 	standard_lines = 0;
 
 	pthread_mutex_init(&pause_mutex, NULL);
@@ -115,12 +115,21 @@ void main_loop(ines_file *file) {
 		/* A line has ended its scanning, draw it */
 		if( scanline_timeout <= 0 ) {
 
+			/* One scanline where nothing is done at the beggining */
+			if( lines == -1 ) {
+				lines++;
+			}
 			if( lines < NES_SCREEN_HEIGHT ) {
 				draw_line(lines++, frames);
 				mapper->update();
 			}
-			/* Start VBLANK period */
+			/* One scanline where nothing is done at the end */
 			else if( lines == NES_SCREEN_HEIGHT ) {
+				lines++;
+			}
+			/* Start VBLANK period */
+			else if( lines == NES_SCREEN_HEIGHT + 1 ) {
+
 				PPU->SR |= VBLANK_FLAG;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					CPU->cycles += 7;
@@ -138,7 +147,7 @@ void main_loop(ines_file *file) {
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
-					lines = 0;
+					lines = -1;
 					PPU->SR &= ~VBLANK_FLAG;
 					PPU->SR &= ~HIT_FLAG;
 
