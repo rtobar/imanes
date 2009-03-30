@@ -135,6 +135,7 @@ void main_loop(ines_file *file) {
 			/* Start VBLANK period */
 			else if( lines == NES_SCREEN_HEIGHT + 1 ) {
 
+				loops = CPU->cycles;
 				PPU->SR |= VBLANK_FLAG;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					CPU->cycles += 7;
@@ -145,7 +146,6 @@ void main_loop(ines_file *file) {
 				lines++;
 				frames++;
 				standard_lines = 0;
-				loops = CPU->cycles;
 			}
 			/* VBLANK period */
 			else {
