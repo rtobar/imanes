@@ -138,7 +138,6 @@ void main_loop(ines_file *file) {
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
-					standard_lines = 0;
 					lines = 0;
 					PPU->SR &= ~VBLANK_FLAG;
 					PPU->SR &= ~HIT_FLAG;
@@ -179,7 +178,7 @@ void main_loop(ines_file *file) {
 			}
 
 			/* Finally, we set again the timeout to check the scanline */
-			scanline_timeout = CYCLES_PER_SCANLINE;
+			scanline_timeout += CYCLES_PER_SCANLINE;
 		}
 
 	}
