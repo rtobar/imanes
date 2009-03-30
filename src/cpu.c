@@ -789,6 +789,7 @@ void execute_nmi() {
 	stack_push( CPU->SR );
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
+	CPU->cycles += 7;
 }
 
 void execute_reset() {

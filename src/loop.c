@@ -137,10 +137,9 @@ void main_loop(ines_file *file) {
 
 				loops = CPU->cycles;
 				PPU->SR |= VBLANK_FLAG;
-				if( PPU->CR1 & VBLANK_ENABLE ) {
-					CPU->cycles += 7;
+				if( PPU->CR1 & VBLANK_ENABLE )
 					execute_nmi();
-				}
+
 				if( !config.run_fast || !(frames%2) )
 					redraw_screen();
 				lines++;
