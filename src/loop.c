@@ -120,6 +120,7 @@ void main_loop(ines_file *file) {
 				lines++;
 			}
 			if( lines < NES_SCREEN_HEIGHT ) {
+				printf("Drawing line %d\n", lines);
 				draw_line(lines++, frames);
 				mapper->update();
 			}
@@ -143,10 +144,12 @@ void main_loop(ines_file *file) {
 			}
 			/* VBLANK period */
 			else {
+				printf("We're on scanline %d\n", standard_lines);
 				standard_lines++;
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
+					printf("Ending VBLANK!\n");
 					lines = -1;
 					PPU->SR &= ~VBLANK_FLAG;
 					PPU->SR &= ~HIT_FLAG;
