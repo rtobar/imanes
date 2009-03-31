@@ -169,24 +169,18 @@ void draw_line(int line, int frame) {
 				if( col_index & 0x03 ) {
 
 					/* Horizontal flip? */
-					if( byte3 & SPRITE_FLIP_HORIZ ) {
+					if( byte3 & SPRITE_FLIP_HORIZ )
 						x = tmp+7-tx;
-						if( 0 <= x && x < NES_SCREEN_WIDTH ) {
-							if( config.show_back_spr && ( !config.run_fast || !(frame%2) ))
-								draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
-							if( back_sprites[i] == 0 )
-								drawn_back_sprites[drawn_back_sprites_idx++] = x;
-						}
-					}
-					else {
+					else
 						x = tmp+tx;
-						if( x < NES_SCREEN_WIDTH ) {
-							if( config.show_back_spr && ( !config.run_fast || !(frame%2) ) )
-								draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
-							if( back_sprites[i] == 0 )
-								drawn_back_sprites[drawn_back_sprites_idx++] = x;
-						}
+
+					if( x < NES_SCREEN_WIDTH ) {
+						if( config.show_back_spr && ( !config.run_fast || !(frame%2) ))
+							draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
+						if( back_sprites[i] == 0 )
+							drawn_back_sprites[drawn_back_sprites_idx++] = x;
 					}
+					
 				}
 
 			}
@@ -308,43 +302,28 @@ void draw_line(int line, int frame) {
 				if( col_index & 0x03 ) {
 
 					/* Horizontal flip? */
-					if( byte3 & SPRITE_FLIP_HORIZ ) {
+					if( byte3 & SPRITE_FLIP_HORIZ )
 						x = tmp+7-tx;
-						if( 0 <= x && x < NES_SCREEN_WIDTH ) {
-
-							/* Check Sprite#0 Hit flag*/
-							if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
-								for(j=drawn_background_idx;j!=0; j--) {
-									if( x == drawn_background[j] ) {
-										PPU->SR |= HIT_FLAG;
-										break;
-									}
-								}
-							}
-
-							if( config.show_front_spr && ( !config.run_fast || !(frame%2) ) )
-								draw_pixel( x, line,
-								   system_palette[read_ppu_vram(0x3F10+col_index)]);
-						}
-					}
-					else {
+					else
 						x = tmp+tx;
-						if( x < NES_SCREEN_WIDTH ) {
 
-							if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
-								for(j=drawn_background_idx;j!=0; j--) {
-									if( x == drawn_background[j] ) {
-										PPU->SR |= HIT_FLAG;
-										break;
-									}
+					if( x < NES_SCREEN_WIDTH ) {
+
+						/* Check Sprite#0 Hit flag*/
+						if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
+							for(j=drawn_background_idx;j!=0; j--) {
+								if( x == drawn_background[j] ) {
+									PPU->SR |= HIT_FLAG;
+									break;
 								}
 							}
-
-							if( config.show_front_spr && ( !config.run_fast || !(frame%2) ) )
-								draw_pixel( x, line,
-								   system_palette[read_ppu_vram(0x3F10+col_index)]);
 						}
+
+						if( config.show_front_spr && ( !config.run_fast || !(frame%2) ) )
+							draw_pixel( x, line,
+							   system_palette[read_ppu_vram(0x3F10+col_index)]);
 					}
+					
 
 				}
 
