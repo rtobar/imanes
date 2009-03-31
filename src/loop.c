@@ -111,6 +111,8 @@ void main_loop(ines_file *file) {
 		CPU->cycles += inst.cycles;
 		scanline_timeout -= (CPU->cycles - cycles);
 		cycles = CPU->cycles;
+		if( standard_lines >= 0 )
+			printf("%d cycles from NMI\n", (int)(CPU->cycles - loops) );
 
 		for(i=0;i!=DUMPS;i++)
 			if(CPU->PC == pc_dumps[i])
@@ -119,26 +121,54 @@ void main_loop(ines_file *file) {
 		/* A line has ended its scanning, draw it */
 		if( scanline_timeout <= 0 ) {
 
+			/* First, we set again the timeout to check the scanline */
+			scanline_timeout += CYCLES_PER_SCANLINE;
+
+			/* Every three lines, we should add one required cycle too
+			 * (i.e., CYCLES_PER_SCANLINE != 113, but == 113.66666... */
+			if( lines == -1 )
+				scanline_timeout++;
+
+			else if( 0 <= lines && lines < NES_SCREEN_HEIGHT )
+				scanline_timeout += ( ((lines + 1)%3) ? 1 : 0 );
+
+			else if( lines == NES_SCREEN_HEIGHT )
+				scanline_timeout++;
+
+			else if( NES_SCREEN_HEIGHT + 1 <= lines )
+				scanline_timeout += ( ((lines-20)%3) ? 1: 0 );
+
+
+			/* The NTSC screen works as follows:
+			 *
+			 * 1) 1 first useless scanline
+			 * 2) 240 scanlines where pixels are drawn
+			 *    (only 224 are actually shown)
+			 * 3) 1 useless scanline
+			 * 4) VBlank period
+			 **/
 			/* One scanline where nothing is done at the beggining */
-			if( lines == -1 ) {
+			if( lines == -1 )
 				lines++;
-			}
+
 			if( lines < NES_SCREEN_HEIGHT ) {
-				printf("Drawing line %d\n", lines);
+			//	printf("Drawing line %d\n", lines);
 				draw_line(lines++, frames);
 				mapper->update();
 			}
 			/* One scanline where nothing is done at the end */
-			else if( lines == NES_SCREEN_HEIGHT ) {
+			else if( lines == NES_SCREEN_HEIGHT )
 				lines++;
-			}
+
 			/* Start VBLANK period */
 			else if( lines == NES_SCREEN_HEIGHT + 1 ) {
 
 				loops = CPU->cycles;
 				PPU->SR |= VBLANK_FLAG;
-				if( PPU->CR1 & VBLANK_ENABLE )
+				if( PPU->CR1 & VBLANK_ENABLE ) {
 					execute_nmi();
+					scanline_timeout -= (CPU->cycles - cycles);
+				}
 
 				if( !config.run_fast || !(frames%2) )
 					redraw_screen();
@@ -192,9 +222,6 @@ void main_loop(ines_file *file) {
 						nanosleep(&sleepTime, NULL);
 				}
 			}
-
-			/* Finally, we set again the timeout to check the scanline */
-			scanline_timeout += CYCLES_PER_SCANLINE;
 		}
 
 	}
