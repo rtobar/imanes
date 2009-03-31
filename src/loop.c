@@ -59,6 +59,7 @@ void main_loop(ines_file *file) {
 	lines = -1;
 	standard_lines = 0;
 	cycles = 0;
+	loops = 0;
 
 	pthread_mutex_init(&pause_mutex, NULL);
 
@@ -126,18 +127,8 @@ void main_loop(ines_file *file) {
 
 			/* Every three lines, we should add one required cycle too
 			 * (i.e., CYCLES_PER_SCANLINE != 113, but == 113.66666... */
-			if( lines == -1 )
-				scanline_timeout++;
-
-			else if( 0 <= lines && lines < NES_SCREEN_HEIGHT )
-				scanline_timeout += ( ((lines + 1)%3) ? 1 : 0 );
-
-			else if( lines == NES_SCREEN_HEIGHT )
-				scanline_timeout++;
-
-			else if( NES_SCREEN_HEIGHT + 1 <= lines )
-				scanline_timeout += ( ((lines-20)%3) ? 1: 0 );
-
+			if( lines <= NES_SCREEN_HEIGHT + 5)
+				scanline_timeout += !(lines%3) ? 2: 0;
 
 			/* The NTSC screen works as follows:
 			 *
@@ -167,7 +158,7 @@ void main_loop(ines_file *file) {
 				PPU->SR |= VBLANK_FLAG;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					execute_nmi();
-					scanline_timeout -= (CPU->cycles - cycles);
+					scanline_timeout -= 7;
 				}
 
 				if( !config.run_fast || !(frames%2) )
@@ -178,12 +169,12 @@ void main_loop(ines_file *file) {
 			}
 			/* VBLANK period */
 			else {
-				printf("We're on scanline %d\n", standard_lines);
 				standard_lines++;
+				lines++;
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
-					printf("Ending VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
+					printf("\nEnding VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
 					lines = -1;
 					PPU->SR &= ~VBLANK_FLAG;
 					PPU->SR &= ~HIT_FLAG;
