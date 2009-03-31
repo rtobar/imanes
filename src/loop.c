@@ -112,8 +112,6 @@ void main_loop(ines_file *file) {
 		CPU->cycles += inst.cycles;
 		scanline_timeout -= (CPU->cycles - cycles);
 		cycles = CPU->cycles;
-		if( standard_lines >= 0 )
-			printf("%d cycles from NMI\n", (int)(CPU->cycles - loops) );
 
 		for(i=0;i!=DUMPS;i++)
 			if(CPU->PC == pc_dumps[i])
@@ -174,7 +172,7 @@ void main_loop(ines_file *file) {
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
-					printf("\nEnding VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
+					//printf("\nEnding VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
 					lines = -1;
 					PPU->SR &= ~VBLANK_FLAG;
 					PPU->SR &= ~HIT_FLAG;
