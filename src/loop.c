@@ -141,7 +141,6 @@ void main_loop(ines_file *file) {
 				lines++;
 
 			if( lines < NES_SCREEN_HEIGHT ) {
-			//	printf("Drawing line %d\n", lines);
 				draw_line(lines++, frames);
 				mapper->update();
 			}

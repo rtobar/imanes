@@ -161,6 +161,7 @@ void mmc3_switch_banks() {
 				/* Copy 2 1Kb VROM pages */
 				if( command <= 1 ) {
 					offset = 0x800*command + ((mapper->regs[0]&0x80) << 5);
+					bank &= 0xFE;
 					printf("MMC3: Switching VROM bank %d to %04x\n", bank,offset);
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 2*1024);
