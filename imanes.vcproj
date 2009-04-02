@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)\win32&quot;;$(ProjectDir)\include"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)win32&quot;;&quot;$(ProjectDir)include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -169,7 +169,83 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\include\cnrom.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\cpu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\debug.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\imaconfig.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\instruction_set.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\loop.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\mapper.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\mmc1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\mmc3.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\nrom.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\pad.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\palette.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\parse_file.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\ppu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\screen.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\sram.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\unrom.h"
+				>
+			</File>
+			<File
 				RelativePath=".\win32\XGetopt.h"
+				>
+			</File>
+			<File
+				RelativePath=".\win32\stdint.h"
 				>
 			</File>
 		</Filter>

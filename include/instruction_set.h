@@ -113,6 +113,7 @@ typedef struct _operand {
 	uint8_t  value;     /* Store the value of the operand if needed */
 } operand;
 
+#ifdef _MSC_VER
 #define SET_INSTRUCTION_ADDR_DATA( INST, ADDR_MODE, OPCODE, SIZE, CYCLES, \
                                    CHANGE ) \
    instructions[OPCODE].opcode       = OPCODE; \
@@ -121,8 +122,20 @@ typedef struct _operand {
    instructions[OPCODE].size         = SIZE;   \
    instructions[OPCODE].cycles       = CYCLES; \
    instructions[OPCODE].cycle_change = CYCLE_##CHANGE; \
-	instructions[OPCODE].executed     = 0; \
-	strncpy(instructions[OPCODE].name,#INST,3); \
+   instructions[OPCODE].executed     = 0; \
+   strncpy_s(instructions[OPCODE].name,4,#INST,3);
+#else
+#define SET_INSTRUCTION_ADDR_DATA( INST, ADDR_MODE, OPCODE, SIZE, CYCLES, \
+                                   CHANGE ) \
+   instructions[OPCODE].opcode       = OPCODE; \
+   instructions[OPCODE].instr_id     = INST;   \
+   instructions[OPCODE].addr_mode    = ADDR_##ADDR_MODE;   \
+   instructions[OPCODE].size         = SIZE;   \
+   instructions[OPCODE].cycles       = CYCLES; \
+   instructions[OPCODE].cycle_change = CYCLE_##CHANGE; \
+   instructions[OPCODE].executed     = 0; \
+   strncpy(instructions[OPCODE].name,#INST,3);
+#endif
 
 /**
  * Initializes the instruction set with the corresponding opcodes,
