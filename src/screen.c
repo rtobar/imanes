@@ -84,7 +84,12 @@ void init_screen() {
 		exit(EXIT_FAILURE);
 	}
 
+#ifdef _MSC_VER
+	sprintf_s(window_title,30,"ImaNES emulator version %s",IMANES_VERSION);
+#else
 	sprintf(window_title,"ImaNES emulator version %s",IMANES_VERSION);
+#endif
+
 	SDL_WM_SetCaption(window_title,NULL);
 
 	/* The event loop should go in a separate thread */

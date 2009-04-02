@@ -20,7 +20,15 @@
 
 #include <fcntl.h>
 #include <stdio.h>
+
+#ifdef _MSC_VER
+#include <io.h>
+#include <share.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#else
 #include <unistd.h>
+#endif
 
 #include "cpu.h"
 #include "debug.h"
@@ -30,19 +38,33 @@
 void save_sram(char *file) {
 
 	int fd = 3;
+
+#ifdef _MSC_VER
+	int written_bytes;
+#else
 	ssize_t written_bytes;
+#endif
 
 	if( !CPU->sram_enabled )
 		return;
 
+#ifdef _MSC_VER
+	fd = _sopen_s(&fd,file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+#else
 	fd = open(file, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+#endif
 
 	if( fd == -1 ) {
 		fprintf(stderr,"Error whlie opening '%s': ", file);
 		perror(NULL);
 	}
 
+#ifdef _MSC_VER
+	written_bytes = _write(fd, CPU->RAM + 0x6000, 0x2000);
+#else
 	written_bytes = write(fd, CPU->RAM + 0x6000, 0x2000);
+#endif
+
 	if( written_bytes != 0x2000 ) {
 		fprintf(stderr,"Couldn't dump SRAM data to '%s': ", file);
 		perror(NULL);
@@ -54,19 +76,33 @@ void save_sram(char *file) {
 void load_sram(char *file) {
 
 	int fd;
+
+#ifdef _MSC_VER
+	int read_bytes;
+#else
 	ssize_t read_bytes;
+#endif
 
 	if( !CPU->sram_enabled )
 		return;
-
+#ifdef _MSC_VER
+	fd = _sopen_s(&fd,file, O_RDONLY, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+#else
 	fd = open(file, O_RDONLY);
+#endif
+
 	if( fd == -1 ) {
 		fprintf(stderr,"Error while opening '%s': ", file);
 		perror(NULL);
 		return;
 	}
 
+#ifdef _MSC_VER
+	read_bytes = _read(fd, CPU->RAM + 0x6000, 0x2000);
+#else
 	read_bytes = read(fd, CPU->RAM + 0x6000, 0x2000);
+#endif
+
 	if( read_bytes != 0x2000 )
 		fprintf(stderr,"File '%s' is not a valid SRAM dump file\n", file);
 

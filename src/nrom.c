@@ -27,16 +27,16 @@
 #include "nrom.h"
 #include "ppu.h"
 
-inline void nrom_initialize_mapper() {
+void nrom_initialize_mapper() {
 	return;
 }
 
-inline int nrom_check_address(uint16_t address) {
+int nrom_check_address(uint16_t address) {
 	return 0;
 }
 
 /* This shouldn't be called never, anyways */
-inline void nrom_switch_banks() {
+void nrom_switch_banks() {
 	return;
 }
 

@@ -20,9 +20,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
-#ifndef __APPLE__
+#ifdef _MSC_VER
+#include "XGetopt.h"
+#endif
+
+#if !defined(__APPLE__) &&  !defined(_MSC_VER)
 #include "config.h"
 #else
 #define PACKAGE_BUGREPORT "https://csrg.inf.utfsm.cl/flyspray/index.php?project=10"
@@ -111,8 +114,13 @@ int main(int args, char *argv[]) {
 	ines_file *nes_rom;
 
 	/* Print NOW everything :D */
+#ifdef _MSC_VER
+	setvbuf(stdout,NULL,_IONBF,0);
+	setvbuf(stderr,NULL,_IONBF,0);
+#else
 	setbuf(stdout,NULL);
 	setbuf(stderr,NULL);
+#endif
 
 	/* Parse command line options */
 	parse_options(args, argv);
@@ -127,11 +135,18 @@ int main(int args, char *argv[]) {
 	initialize_ppu();
 	initialize_pads();
 
-	rom_file = (char *)malloc(strlen(argv[optind]));
-	save_file = (char *)malloc(strlen(argv[optind])+4);
+	rom_file = (char *)malloc(strlen(argv[optind])+1);
+	save_file = (char *)malloc(strlen(argv[optind])+5);
+	
+#ifdef _MSC_VER
+	strcpy_s(rom_file,  strlen(argv[optind])+1,   argv[optind]);
+	strcpy_s(save_file, strlen(argv[optind])+5, argv[optind]);
+	strcat_s(save_file,strlen(argv[optind])+5,".sav");
+#else
 	strcpy(rom_file,argv[optind]);
 	strcpy(save_file,argv[optind]);
 	strcat(save_file,".sav");
+#endif
 
 	/* Read the ines file and get all the ROM/VROM */
 	nes_rom = check_ines_file(rom_file);

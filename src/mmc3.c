@@ -54,7 +54,7 @@ static uint8_t irq_counter;
 void mmc3_initialize_mapper() {
 
 	mapper->regs = (uint8_t *)malloc(8);
-	bzero(mapper->regs,8);
+	memset(mapper->regs,0,8);
 
 	mapper->regs[0] = 0; /* 0x8000 and 0xA000 are switchable */
 	powering_on = 1;

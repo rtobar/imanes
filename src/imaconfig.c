@@ -23,6 +23,10 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#ifdef _WIN32
+#include <direct.h>
+#endif
+
 #include "imaconfig.h"
 
 imanes_config config;
@@ -53,15 +57,28 @@ void load_user_configuration() {
 	char * user_home;
 	char * user_imanes_dir;
 	struct stat s;
+#ifdef _WIN32
+	size_t size;
+#endif
 
+#ifdef _WIN32
+	_dupenv_s(&user_home, &size, "APPDATA");
+	printf("Data directory is %s\n", user_home);
+#else
 	user_home = getenv("HOME");
+#endif
+
 	if( user_home == NULL ) {
-		fprintf(stderr, "Couldn't find user's home directory. Will not load user configuration");
+		fprintf(stderr, "Couldn't find user's home directory. Will not load user configuration\n");
 		return;
 	}
 
 	user_imanes_dir = (char *)malloc(strlen(user_home) + 9);
+#ifdef _WIN32
+	sprintf_s(user_imanes_dir,strlen(user_home)+9,"%s/Imanes/",user_home);
+#else
 	sprintf(user_imanes_dir,"%s/.imanes/", user_home);
+#endif
 
 	/* Check if the directory exists */
 	tmp = stat(user_imanes_dir, &s);
@@ -69,7 +86,11 @@ void load_user_configuration() {
 	/* Not found, let's create it (we assume that $HOME exists) */
 	if( tmp == -1 ) {
 		fprintf(stderr,"Directory '%s' not found, creating it...\n", user_imanes_dir);
+#ifdef _WIN32
+		tmp = _mkdir(user_imanes_dir);
+#else
 		tmp = mkdir(user_imanes_dir, S_IRWXU | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+#endif
 
 		if( tmp == -1 ) {
 			fprintf(stderr,"Error while creating directory '%s': ", user_imanes_dir);

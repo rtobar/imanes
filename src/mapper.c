@@ -19,7 +19,9 @@
  */
 
 #include <string.h>
+#ifndef _MSC_VER
 #include <strings.h>
+#endif
 
 #include "cnrom.h"
 #include "mapper.h"

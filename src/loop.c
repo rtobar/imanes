@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>
 
 #include "common.h"
 #include "cpu.h"
@@ -45,10 +44,10 @@ void main_loop(ines_file *file) {
 	int lines, standard_lines;
 	int frames;
 	int i;
-	int loops;
 	long tmp;
 	unsigned long long cycles;
-	struct timespec sleepTime = { 0, 2e7 };
+	unsigned long long loops;
+	struct timespec sleepTime = { 0, (long)2e7 };
 	struct timespec startTime;
 	struct timespec endTime;
 	uint16_t pc_dumps[DUMPS] = { 0xffff };
@@ -64,7 +63,9 @@ void main_loop(ines_file *file) {
 	pthread_mutex_init(&pause_mutex, NULL);
 
 	/* Get the initial time for the first screen drawing */
+#ifndef _MSC_VER
 	clock_gettime(CLOCK_REALTIME, &startTime);
+#endif
 
 	execute_reset();
 
@@ -110,7 +111,7 @@ void main_loop(ines_file *file) {
 
 		CPU->PC += inst.size;
 		CPU->cycles += inst.cycles;
-		scanline_timeout -= (CPU->cycles - cycles);
+		scanline_timeout -= (int)(CPU->cycles - cycles);
 		cycles = CPU->cycles;
 
 		for(i=0;i!=DUMPS;i++)
@@ -180,12 +181,13 @@ void main_loop(ines_file *file) {
 					/* For this, we calculate the next "start" time,    */
 					/* and then we calculate the different between it   */
 					/* the actual time                                  */
+#ifndef _MSC_VER
 					tmp = endTime.tv_sec;
 					clock_gettime(CLOCK_REALTIME, &endTime);
-					startTime.tv_nsec += 1.666666e7;
+					startTime.tv_nsec += (long)1.666666e7;
 					if( startTime.tv_nsec > 1e9 ) {
 						startTime.tv_sec++;
-						startTime.tv_nsec -= 1e9;
+						startTime.tv_nsec -= (long)1e9;
 					}
 	
 					if( endTime.tv_sec != tmp ) {
@@ -197,7 +199,7 @@ void main_loop(ines_file *file) {
 					sleepTime.tv_sec  = startTime.tv_sec  - endTime.tv_sec;
 					if( sleepTime.tv_nsec < 0 ) {
 						sleepTime.tv_sec--;
-						sleepTime.tv_nsec += 1e9;
+						sleepTime.tv_nsec += (long)1e9;
 					}
 
 					/* We were on pause or in fast run */
@@ -208,6 +210,7 @@ void main_loop(ines_file *file) {
 					}
 					if( sleepTime.tv_sec >= 0 && !config.run_fast )
 						nanosleep(&sleepTime, NULL);
+#endif
 				}
 			}
 		}

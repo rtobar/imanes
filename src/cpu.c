@@ -30,6 +30,10 @@
 #include "palette.h"
 #include "ppu.h"
 
+#ifdef _MSC_VER
+#define inline __inline
+#endif
+
 nes_cpu *CPU;
 
 void initialize_cpu() {

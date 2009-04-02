@@ -32,7 +32,7 @@ static int touched_reg;
 void mmc1_initialize_mapper() {
 
 	mapper->regs = (uint8_t *)malloc(4);
-	bzero(mapper->regs,4);
+	memset(mapper->regs,0,4);
 
 	mapper->regs[0] = 0x04; /* Swap 0x8000 by default */
 	return;
