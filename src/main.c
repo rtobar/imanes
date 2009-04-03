@@ -23,6 +23,8 @@
 
 #ifdef _MSC_VER
 #include "XGetopt.h"
+#else
+#include <unistd.h>
 #endif
 
 #if !defined(__APPLE__) &&  !defined(_MSC_VER)

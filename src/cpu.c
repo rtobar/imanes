@@ -511,6 +511,15 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
+		/** Illegal opcodes **/
+		case LAX:
+			if( inst.addr_mode != ADDR_IMMEDIATE )
+				oper.value = read_cpu_ram(oper.address);
+			CPU->A = oper.value;
+			CPU->X = oper.value;
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
+
 		default:
 			fprintf(stderr,"%s: Still unimplemented\n", inst.name);
 			break;
@@ -518,7 +527,7 @@ void execute_instruction(instruction inst, operand oper) {
 
 }
 
-inline void update_flags(int8_t value, uint8_t flags) {
+void update_flags(int8_t value, uint8_t flags) {
 
 	/* 7th bit is set (negative number) */
 	if( flags & N_FLAG ) {

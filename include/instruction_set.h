@@ -5,7 +5,7 @@
 #include <string.h>
 
 /* 6502 instructions IDs */
-#define INSTRUCTIONS_NUMBER 56
+#define INSTRUCTIONS_NUMBER 57
 
 #define ADC 0
 #define AND 1
@@ -63,6 +63,9 @@
 #define TXA 53
 #define TXS 54
 #define TYA 55
+
+/* Illegal opcodes */
+#define LAX 56
 
 /* Addressing modes */
 #define ADDR_MODES_NUMBER 13
