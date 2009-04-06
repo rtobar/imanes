@@ -169,7 +169,7 @@ void main_loop(ines_file *file) {
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
-					printf("\nEnding VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
+					//printf("\nEnding VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
 					lines = -1;
 					PPU->SR &= ~VBLANK_FLAG;
 					PPU->SR &= ~HIT_FLAG;
