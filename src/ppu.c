@@ -364,13 +364,6 @@ uint8_t read_ppu_vram(uint16_t address) {
 	if( address < 0x2000 )
 		return PPU->VRAM[address];
 
-	/* This duplicates everything else on VRAM */
-	if( 0x4000 <= address ) {
-		printf("PPU Address mirroring: from %04x to ", address);
-		address = address - 0x4000 * ((address >> 14) & 0x3);
-		printf("%04x\n",address);
-	}
-
 	/* After palette mirroring */
 	if( 0x3F20 <= address && address < 0x4000) {
 		XTREME( printf("PPU Address mirroring: from %04x to ", address) );
