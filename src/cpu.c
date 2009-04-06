@@ -718,7 +718,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 
 	/* SPR-RAM access */
 	else if( address == 0x2004 )
-		ret_val = *(PPU->SPR_RAM + PPU->spr_addr);
+		ret_val = PPU->SPR_RAM[PPU->spr_addr++];
 
 	else if( address == 0x2005 || address == 0x2006 )
 		ret_val = PPU->latch;
