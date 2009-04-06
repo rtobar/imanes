@@ -554,13 +554,13 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 	/* Convert the address to handle mirroring */
 	if( 0x0800 <= address && address < 0x2000 ) {
 		DEBUG( printf("CPU Address mirroring: from %04x to ", address) );
-		address = address - 0x800 * ((address >> 11) & 0x3);
+		address &= 0x7FF;
 		DEBUG( printf("%04x\n",address) );
 	}
 
 	if( 0x2008 <= address && address < 0x4000 ) {
 		DEBUG( printf("CPU Address mirroring: from %04x to ", address) );
-		address = address - 0x8 * ((address >> 3) & 0x7FF);
+		address = (address&0x7) + 0x2000;
 		DEBUG( printf("%04x\n",address) );
 	}
 
@@ -687,13 +687,13 @@ uint8_t read_cpu_ram(uint16_t address) {
 	/* Convert the address to handle mirroring */
 	if( 0x0800 <= address && address < 0x2000 ) {
 		DEBUG( printf("CPU Adress mirroring: from %04x to ", address) );
-		address = address - 0x800 * ((address >> 11) & 0x3);
+		address &= 0x7FF;
 		DEBUG( printf("%04x\n",address) );
 	}
 
 	if( 0x2008 <= address && address < 0x4000 ) {
 		DEBUG( printf("CPU Address mirroring: from %04x to ", address) );
-		address = address - 0x8 * ((address >> 3) & 0x7FF);
+		address = (address&0x7) + 0x2000;
 		DEBUG( printf("%04x\n",address) );
 	}
 
