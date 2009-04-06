@@ -55,6 +55,28 @@ void dump_ppu() {
 
 }
 
+void dump_spr_ram() {
+
+	int i;
+	int j;
+
+	/* Header */
+	printf("   ");
+	for(i=0;i!=0x10;i++) {
+		printf(" %02x", i);
+	}
+	printf("\n");
+
+	for(j=0;j!=0x10;j++) {
+		printf("%02x ", j);
+		for(i=0;i!=0x10;i++)
+			printf(" %02x", PPU->SPR_RAM[i+j*0x10]);
+		printf("\n");
+	}
+
+	return;
+}
+
 void draw_line(int line, int frame) {
 
 	int x;  /* Final x pixel coordinate */

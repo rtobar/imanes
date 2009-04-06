@@ -87,4 +87,9 @@ void write_ppu_vram(uint16_t address, uint8_t value);
  */
 void dump_ppu();
 
+/**
+ * Dumps the contents of the SPR_RAM to the stdout
+ */
+void dump_spr_ram();
+
 #endif /* ppu_h */

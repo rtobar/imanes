@@ -12,6 +12,7 @@ CPU:
  * [DONE] Handle the mirroring by means of this separate method
  * [DONE] Fix the ADC/SBC instructions (recognize the C flag change)
  * [DONE] Check ASL
+ * [    ] Add illegal opcodes
 
 PPU:
 ====
