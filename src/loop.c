@@ -90,8 +90,7 @@ void main_loop(ines_file *file) {
 		inst = instructions[opcode];
 		instructions[opcode].executed++;
 
-		XTREME( dump_cpu(); );
-		DEBUG( printf("CPU->PC: 0x%04x - %02x: %s ", CPU->PC, opcode, inst.name) );
+		DEBUG( printf("%04d 0x%04x - %02x: ",(int)(CPU->cycles - loops), CPU->PC, opcode) );
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
 			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
@@ -102,9 +101,6 @@ void main_loop(ines_file *file) {
 
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, CPU->PC);
-
-		DEBUG( printf("operand: %04x / %02x\n", operand.address, operand.value) );
-		XTREME( printf("\n\n") );
 
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
@@ -157,6 +153,7 @@ void main_loop(ines_file *file) {
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					execute_nmi();
 					scanline_timeout -= 7;
+					cycles = CPU->cycles;
 				}
 
 				if( !config.run_fast || !(frames%2) )
@@ -172,7 +169,7 @@ void main_loop(ines_file *file) {
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
-					//printf("\nEnding VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
+					printf("\nEnding VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
 					lines = -1;
 					PPU->SR &= ~VBLANK_FLAG;
 					PPU->SR &= ~HIT_FLAG;

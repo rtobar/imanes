@@ -22,9 +22,21 @@
 #include <stdlib.h>
 
 #include "cpu.h"
+#include "debug.h"
 #include "instruction_set.h"
 
 instruction *instructions;
+
+void inst_lowercase(char *inst_name, char *ret) {
+
+	int i;
+
+	for(i=0;i!=3;i++)
+		ret[i] = inst_name[i] + 32;
+	ret[3] = '\0';
+
+	return;
+}
 
 void initialize_instruction_set() {
 
@@ -313,20 +325,27 @@ void initialize_instruction_set() {
 operand get_operand(instruction inst, uint16_t inst_address) {
 
 	uint16_t address;
+	char lower_name[4];
 	operand oper = { 0xDEAD, 0xBE};
+
+	DEBUG( inst_lowercase(inst.name, lower_name) );
+	DEBUG( printf("%s", lower_name) );
 
 	switch( inst.addr_mode ) {
 
 		case ADDR_IMMEDIATE:
 			oper.value = CPU->RAM[inst_address+1];
+			DEBUG( printf(" #$%02x", oper.value) );
 			break;
 
 		case ADDR_ABSOLUTE:
 			oper.address = CPU->RAM[inst_address+1] | (CPU->RAM[inst_address + 2]  << 8);
+			DEBUG( printf(" $%04x", oper.address) );
 			break;
 
 		case ADDR_ZEROPAGE:
 			oper.address = CPU->RAM[inst_address+1];
+			DEBUG( printf(" $%02x", oper.address) );
 			break;
 
 		case ADDR_IMPLIED:
@@ -335,9 +354,10 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 		/* For indirect addressing, we need to use read_cpu_ram*/
 		case ADDR_INDIRECT:
 			address = CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8);
+			DEBUG( printf(" ($%04x)", address) );
 			oper.address =  read_cpu_ram(address);
 
-			/* 6502 bug: if address is $xxFF, the next read wraps page */
+			/* If address is $xxFF, the next read wraps page */
 			if( address%0x100 == 0xFF )
 				address -= 0x100;
 			oper.address |= (read_cpu_ram(address+1) << 8);
@@ -345,14 +365,17 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 
 		case ADDR_ABS_INDX:
 			oper.address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) ) + CPU->X;
+			DEBUG( printf(" $%04x,X", oper.address) );
 			break;
 
 		case ADDR_ABS_INDY:
 			oper.address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) ) + CPU->Y;
+			DEBUG( printf(" $%04x,Y", oper.address) );
 			break;
 
 		case ADDR_IND_INDIR:
 			address = CPU->RAM[inst_address+1] + CPU->X;
+			DEBUG( printf(" ($%02x,X)", address - CPU->X) );
 			if( address > 0xFF )
 				address -= 0x100;
 			oper.address = read_cpu_ram(address);
@@ -363,6 +386,7 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 
 		case ADDR_INDIR_IND:
 			address = CPU->RAM[inst_address+1];
+			DEBUG( printf(" ($%02x),Y", address) );
 			oper.address = read_cpu_ram(address);
 			if( address == 0xFF )
 				address -= 0x100;
@@ -372,20 +396,24 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 
 		case ADDR_RELATIVE:
 			oper.value = CPU->RAM[inst_address+1];
+			DEBUG( printf(" $%02x", oper.value) );
 			break;
 
 		case ADDR_ACCUM:
+			DEBUG( printf(" A") );
 			break;
 
 		/* Wrap around if resulting address is out of zeropage */
 		case ADDR_ZERO_INDX:
 			oper.address = CPU->RAM[inst_address+1] + CPU->X;
+			DEBUG( printf(" $%02x,X", oper.address - CPU->X) );
 			if( oper.address >= 0x0100 )
 				oper.address -= 0x100;
 			break;
 
 		case ADDR_ZERO_INDY:
 			oper.address = CPU->RAM[inst_address+1] + CPU->Y;
+			DEBUG( printf(" $%02x,X", oper.address - CPU->Y) );
 			if( oper.address >= 0x0100 )
 				oper.address -= 0x100;
 			break;
@@ -394,5 +422,7 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 			fprintf(stderr,"Hey!!! You haven't written the %d addressing mode!!!\n", inst.addr_mode);
 	}
 
+	DEBUG( printf("\n") );
 	return oper;
 }
+
