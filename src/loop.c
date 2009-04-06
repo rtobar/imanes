@@ -105,6 +105,7 @@ void main_loop(ines_file *file) {
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 
+		XTREME( dump_cpu() );
 		CPU->PC += inst.size;
 		CPU->cycles += inst.cycles;
 		scanline_timeout -= (int)(CPU->cycles - cycles);
