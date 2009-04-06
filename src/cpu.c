@@ -727,13 +727,17 @@ uint8_t read_cpu_ram(uint16_t address) {
 	else if( address == 0x2007 ) {
 		if( PPU->vram_addr < 0x3F00 ) {
 			ret_val = buffer;
-			buffer = read_ppu_vram(PPU->vram_addr++);
+			buffer = read_ppu_vram(PPU->vram_addr);
 		}
 		/* Palette reads don't use the read buffer */
 		else {
 			ret_val = read_ppu_vram(PPU->vram_addr);
-			buffer  = read_ppu_vram(PPU->vram_addr++ - 0x1000);
+			buffer  = read_ppu_vram(PPU->vram_addr - 0x1000);
 		}
+		if( PPU->CR1 & VERTICAL_WRITE)
+			PPU->vram_addr += 32;
+		else
+			PPU->vram_addr++;
 	}
 
 	/* 1st Joystick */
