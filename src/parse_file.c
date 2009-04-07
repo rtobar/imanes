@@ -81,7 +81,6 @@ ines_file *check_ines_file(char *file_path) {
 	read_bytes = read(rom_file->fd, buff, 4);
 #endif
 
-	printf("%c%c%c%d. Read bytes: %d\n", buff[0], buff[1], buff[2],buff[3], read_bytes);
 	if( strncmp(buff,"NES\032",4) || read_bytes != 4 ) {
 		printf("FD is %d\n", rom_file->fd);
 		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
