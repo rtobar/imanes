@@ -135,7 +135,7 @@ void draw_line(int line, int frame) {
 					break;
 			}
 		}
-		if( (frt_sprites + bck_sprites) != 8 )
+		if( (frt_sprites + bck_sprites) == 8 )
 			PPU->SR &= ~MAX_SPRITES_DRAWN;
 		else
 			PPU->SR |= MAX_SPRITES_DRAWN;

@@ -46,7 +46,6 @@ void main_loop(ines_file *file) {
 	int i;
 	long tmp;
 	unsigned long long cycles;
-	unsigned long long loops;
 	struct timespec sleepTime = { 0, (long)2e7 };
 	struct timespec startTime;
 	struct timespec endTime;
@@ -58,7 +57,6 @@ void main_loop(ines_file *file) {
 	lines = -1;
 	standard_lines = 0;
 	cycles = 0;
-	loops = 0;
 
 	pthread_mutex_init(&pause_mutex, NULL);
 
@@ -90,7 +88,7 @@ void main_loop(ines_file *file) {
 		inst = instructions[opcode];
 		instructions[opcode].executed++;
 
-		DEBUG( printf("%04d 0x%04x - %02x: ",(int)(CPU->cycles - loops), CPU->PC, opcode) );
+		DEBUG( printf("%04d 0x%04x - %02x: ",CPU->nmi_cycles, CPU->PC, opcode) );
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
 			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
@@ -102,12 +100,20 @@ void main_loop(ines_file *file) {
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, CPU->PC);
 
+		if( (CPU->nmi_cycles + inst.cycles) >= 2270 &&
+		    (PPU->SR&VBLANK_FLAG) ) {
+			end_vblank();
+		}
+
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
 
 		XTREME( dump_cpu() );
 		CPU->PC += inst.size;
+
+		/* Update cycles count */
 		CPU->cycles += inst.cycles;
+		CPU->nmi_cycles  += (CPU->cycles - cycles);
 		scanline_timeout -= (int)(CPU->cycles - cycles);
 		cycles = CPU->cycles;
 
@@ -149,8 +155,8 @@ void main_loop(ines_file *file) {
 			/* Start VBLANK period */
 			else if( lines == NES_SCREEN_HEIGHT + 1 ) {
 
-				loops = CPU->cycles;
 				PPU->SR |= VBLANK_FLAG;
+				CPU->nmi_cycles = 0;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					execute_nmi();
 					scanline_timeout -= 7;
@@ -170,10 +176,9 @@ void main_loop(ines_file *file) {
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
-					//printf("\nEnding VBLANK! VBLANK lasted %d cycles\n", (int)(CPU->cycles - loops) );
+
 					lines = -1;
-					PPU->SR &= ~VBLANK_FLAG;
-					PPU->SR &= ~HIT_FLAG;
+					end_vblank();
 
 					/* Calculate how much we should sleep for 50/60 FPS */
 					/* For this, we calculate the next "start" time,    */
@@ -215,4 +220,12 @@ void main_loop(ines_file *file) {
 
 	}
 
+}
+
+void end_vblank() {
+
+	PPU->SR &= ~VBLANK_FLAG;
+	PPU->SR &= ~HIT_FLAG;
+
+	return;
 }

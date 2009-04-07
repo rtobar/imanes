@@ -19,7 +19,10 @@ typedef struct {
 	uint8_t  Y;   /* Y register */
 	uint8_t  SR;  /* Status register */
 	uint8_t  SP;  /* Stack pointer */
-	unsigned long long cycles; /* How many cycles has it given */
+
+	/* Cycles stuff */
+	unsigned long long cycles;  /* How many cycles has it given in total */
+	unsigned int nmi_cycles;    /* Cycles given since the last NMI */
 
 	/* Memory */
 	uint8_t *RAM;

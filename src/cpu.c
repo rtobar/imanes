@@ -40,6 +40,7 @@ void initialize_cpu() {
 
 	CPU = (nes_cpu *)malloc(sizeof(nes_cpu));
 	CPU->cycles = 0;
+	CPU->nmi_cycles = 0;
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
 	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
 	CPU->reset = 1;
@@ -718,7 +719,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 
 	/* SPR-RAM access */
 	else if( address == 0x2004 )
-		ret_val = PPU->SPR_RAM[PPU->spr_addr++];
+		ret_val = PPU->SPR_RAM[PPU->spr_addr];
 
 	else if( address == 0x2005 || address == 0x2006 )
 		ret_val = PPU->latch;
@@ -807,6 +808,7 @@ void execute_nmi() {
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
 	CPU->cycles += 7;
+	CPU->nmi_cycles = 7;
 }
 
 void execute_reset() {
