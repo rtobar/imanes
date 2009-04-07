@@ -139,17 +139,15 @@ void main_loop(ines_file *file) {
 			 * 3) 1 useless scanline
 			 * 4) VBlank period
 			 **/
-			/* One scanline where nothing is done at the beggining */
-			if( lines == -1 )
+
+			/* One empty scanline at the beggining and the end */
+			if( lines == -1 || lines == NES_SCREEN_WIDTH )
 				lines++;
 
 			if( lines < NES_SCREEN_HEIGHT ) {
 				draw_line(lines++, frames);
 				mapper->update();
 			}
-			/* One scanline where nothing is done at the end */
-			else if( lines == NES_SCREEN_HEIGHT )
-				lines++;
 
 			/* Start VBLANK period */
 			else if( lines == NES_SCREEN_HEIGHT + 1 ) {
