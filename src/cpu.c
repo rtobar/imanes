@@ -831,14 +831,15 @@ void execute_irq() {
 void add_cycles(uint8_t type, int8_t value) {
 
 	if( type == CYCLE_BRANCH ) {
-		if( (CPU->PC&0x100) == ((CPU->PC + value)&0x100) )
+		if( (CPU->PC&0x100) == ((CPU->PC + value + 2)&0x100) )
 			CPU->cycles++;
 		else
 			CPU->cycles += 2;
 	}
 
 	else if( type == CYCLE_PAGE ) {
-		if( (CPU->PC&0x100) != ((CPU->PC + value)&0x100) )
+		if( (CPU->PC&0x100) != ((CPU->PC + value + 2)&0x100) )
 			CPU->cycles++;
 	}
+
 }
