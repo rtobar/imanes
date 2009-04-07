@@ -196,8 +196,6 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case BRK:
-			/* Set the interrupt flag, push the PC+2 (not a bug) and the SR */
-			/* Finally, jump to the interrupt vector */
 			CPU->SR |= B_FLAG;
 			execute_irq();
 			CPU->PC -= inst.size;
