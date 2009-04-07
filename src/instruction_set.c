@@ -49,10 +49,10 @@ void initialize_instruction_set() {
 	SET_INSTRUCTION_ADDR_DATA( ADC, ZEROPAGE,  0x65, 2, 3, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( ADC, ZERO_INDX, 0x75, 2, 4, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( ADC, ABSOLUTE,  0x6D, 3, 4, NORMAL);
-	SET_INSTRUCTION_ADDR_DATA( ADC, ABS_INDX,  0x7D, 3, 4, NORMAL);
-	SET_INSTRUCTION_ADDR_DATA( ADC, ABS_INDY,  0x79, 3, 4, NORMAL);
+	SET_INSTRUCTION_ADDR_DATA( ADC, ABS_INDX,  0x7D, 3, 4, PAGE);
+	SET_INSTRUCTION_ADDR_DATA( ADC, ABS_INDY,  0x79, 3, 4, PAGE);
 	SET_INSTRUCTION_ADDR_DATA( ADC, IND_INDIR, 0x61, 2, 6, NORMAL);
-	SET_INSTRUCTION_ADDR_DATA( ADC, INDIR_IND, 0x71, 2, 5, NORMAL);
+	SET_INSTRUCTION_ADDR_DATA( ADC, INDIR_IND, 0x71, 2, 5, PAGE);
 
 	/* AND instruction */
 	SET_INSTRUCTION_ADDR_DATA( AND, IMMEDIATE, 0x29, 2, 2, NORMAL);
@@ -364,13 +364,21 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 			break;
 
 		case ADDR_ABS_INDX:
-			oper.address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) ) + CPU->X;
-			DEBUG( printf(" $%04x,X", oper.address) );
+			address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) );
+			DEBUG( printf(" $%04x,X", address) );
+			oper.address = address + CPU->X;
+			if( ((address&0x100) != (oper.address&0x100)) &&
+			    inst.cycle_change == CYCLE_PAGE )
+				CPU->cycles++;
 			break;
 
 		case ADDR_ABS_INDY:
-			oper.address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) ) + CPU->Y;
-			DEBUG( printf(" $%04x,Y", oper.address) );
+			address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) );
+			DEBUG( printf(" $%04x,Y", address) );
+			oper.address = address + CPU->Y;
+			if( ((address&0x100) != (oper.address&0x100)) &&
+			    inst.cycle_change == CYCLE_PAGE )
+				CPU->cycles++;
 			break;
 
 		case ADDR_IND_INDIR:
@@ -391,6 +399,9 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 			if( address == 0xFF )
 				address -= 0x100;
 			oper.address |= read_cpu_ram(address+1) << 8;
+			if( ((oper.address&0x100) != ((oper.address+CPU->Y)&0x100)) &&
+			    inst.cycle_change == CYCLE_PAGE )
+				CPU->cycles++;
 			oper.address += CPU->Y;
 			break;
 
@@ -413,7 +424,7 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 
 		case ADDR_ZERO_INDY:
 			oper.address = CPU->RAM[inst_address+1] + CPU->Y;
-			DEBUG( printf(" $%02x,X", oper.address - CPU->Y) );
+			DEBUG( printf(" $%02x,Y", oper.address - CPU->Y) );
 			if( oper.address >= 0x0100 )
 				oper.address -= 0x100;
 			break;
