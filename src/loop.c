@@ -129,8 +129,7 @@ void main_loop(ines_file *file) {
 
 			/* Every three lines, we should add one required cycle too
 			 * (i.e., CYCLES_PER_SCANLINE != 113, but == 113.66666... */
-			if( lines <= NES_SCREEN_HEIGHT + 5)
-				scanline_timeout += !(lines%3) ? 2: 0;
+			scanline_timeout += !(lines%3) ? 2: 0;
 
 			/* The NTSC screen works as follows:
 			 *
