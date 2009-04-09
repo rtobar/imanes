@@ -29,6 +29,8 @@
 
 static int touched_reg;
 
+uint8_t prev[4] = {0,0,0,0};
+
 void mmc1_initialize_mapper() {
 
 	mapper->regs = (uint8_t *)malloc(4);
@@ -72,6 +74,25 @@ int  mmc1_check_address(uint16_t address) {
 
 			else if( 0xE000 <= address )
 				mapper->regs[3] = saved;
+
+			DEBUG( 
+			if( mapper->regs[0] != prev[0] ) {
+				printf("MMC1: reg0: Changed from %02x to %02x\n", prev[0], mapper->regs[0]);
+				prev[0] = mapper->regs[0];
+			}
+			if( mapper->regs[1] != prev[1] ) {
+				printf("MMC1: reg1: Changed from %02x to %02x\n", prev[1], mapper->regs[1]);
+				prev[1] = mapper->regs[1];
+			}
+			if( mapper->regs[2] != prev[2] ) {
+				printf("MMC1: reg2: Changed from %02x to %02x\n", prev[2], mapper->regs[2]);
+				prev[2] = mapper->regs[2];
+			}
+			if( mapper->regs[3] != prev[3] ) {
+				printf("MMC1: reg3: Changed from %02x to %02x\n", prev[3], mapper->regs[3]);
+				prev[3] = mapper->regs[3];
+			}
+			);
 
 			touched_reg = (address-0x8000) >> 13;
 			shifts = 0;
