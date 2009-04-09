@@ -25,10 +25,11 @@
 #define VBLANK_FLAG          (0x80)
 
 /** Mirroring types */
-#define HORIZONTAL_MIRRORING     0
-#define VERTICAL_MIRRORING       1
-#define SINGLE_SCREEN_MIRRORING  2
-#define FOUR_SCREEN_MIRRORING    3
+#define HORIZONTAL_MIRRORING       0
+#define VERTICAL_MIRRORING         1
+#define SINGLE_SCREEN_MIRRORING_A  2
+#define SINGLE_SCREEN_MIRRORING_B  3
+#define FOUR_SCREEN_MIRRORING      4
 
 /* Sprite attributes */
 #define SPRITE_BACK_PRIOR    (0x20)

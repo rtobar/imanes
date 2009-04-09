@@ -117,14 +117,26 @@ void mmc1_switch_banks() {
 	printf("\n");
 	);
 
-	/* Reg 0 only has bank switching options,
-	 * but changes the mirroring type */
-	//if( touched_reg == 0 ) {
-		PPU->mirroring = (mapper->regs[0] & 0x01) ? HORIZONTAL_MIRRORING : VERTICAL_MIRRORING;
-		if( !(mapper->regs[0] & 0x02 ) )
-			PPU->mirroring = SINGLE_SCREEN_MIRRORING;
-	//	return;
-	//}
+	/* Chech mirroring type */
+	switch (mapper->regs[0] & 0x03) {
+
+		case 0x00:
+			PPU->mirroring = SINGLE_SCREEN_MIRRORING_A;
+			break;
+
+		case 0x01:
+			PPU->mirroring = SINGLE_SCREEN_MIRRORING_B;
+			break;
+
+		case 0x02:
+			PPU->mirroring = VERTICAL_MIRRORING;
+			break;
+
+		case 0x03:
+			PPU->mirroring = HORIZONTAL_MIRRORING;
+			break;
+
+	}
 
 	/* We have three major options:
 	 *  1) VROM packed catridges
