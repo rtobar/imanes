@@ -37,7 +37,7 @@ int cnrom_check_address(uint16_t address) {
 	/* It is not necessary to check <= 0xFFFF because of the data range
 	 * of a uint16_t :) */
 	if( 0x8000 <= address ) {
-		mapper->regs[0] = CPU->RAM[address];
+		mapper->regs[0] = CPU->RAM[address] & 0x7;
 		return 1;
 	}
 

@@ -52,6 +52,7 @@ int  mmc1_check_address(uint16_t address) {
 		if( value & 0x80 ) {
 			shifts = 0;
 			saved = 0;
+			mapper->regs[0] |= 0x06;
 			return 0;
 		}
 
@@ -89,22 +90,21 @@ void mmc1_switch_banks() {
 	int bank;
 	uint32_t offset = 0;
 
-	DEBUG( printf("\nMMC1: ");
+	DEBUG( printf("MMC1:");
 	for(i=0;i!=4;i++)
-		printf("reg[%d]:%02x ", i, mapper->regs[i]);
+		printf(" reg[%d]:%02x", i, mapper->regs[i]);
 	printf("\n");
 	);
 
 	/* Reg 0 only has bank switching options,
 	 * but changes the mirroring type */
-	if( touched_reg == 0 ) {
+	//if( touched_reg == 0 ) {
 		PPU->mirroring = !(mapper->regs[0] & 0x01);
 		if( !(mapper->regs[0] & 0x02 ) )
 			PPU->mirroring = SINGLE_SCREEN_MIRRORING;
-		return;
-	}
+	//	return;
+	//}
 
-	DEBUG( printf("MMC1: Switching banks...\n") );
 	/* We have three major options:
 	 *  1) VROM packed catridges
 	 *  2) 512 Kb packed catridges
@@ -116,7 +116,7 @@ void mmc1_switch_banks() {
 	 * choose of the appropiate ROM bank to switch */
 
 	/* VROM packed roms */
-	if( mapper->file->vromBanks != 0 && (touched_reg == 1 || touched_reg == 2) ) {
+	if( mapper->file->vromBanks != 0 ) {
 
 		/* Switch VROM banks. Banks sizes can be 8 Kb or 4 Kb.
 		 * In both cases we fill form 0x0000 to 0x2000. */
@@ -145,7 +145,7 @@ void mmc1_switch_banks() {
 		offset = 0;
 	}
 
-	if( touched_reg == 0 || touched_reg == 3 ) {
+	if( 1 ) {
 
 		offset = 0;
 		/* 512 Kb roms */
@@ -166,8 +166,8 @@ void mmc1_switch_banks() {
 		if( !(mapper->regs[0] & 0x08 ) ) {
 	
 			/* Select the actual bank that will be switched */
-			bank = (mapper->regs[3] & 0x0F);
-			offset += bank * ROM_BANK_SIZE*2;
+			bank = (mapper->regs[3] & 0x0E);
+			offset += bank * ROM_BANK_SIZE;
 			DEBUG( printf("MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n", bank, offset) );
 			memcpy( CPU->RAM+0x8000, mapper->file->rom + offset,
 			        ROM_BANK_SIZE*2);
