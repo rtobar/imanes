@@ -99,7 +99,7 @@ void mmc1_switch_banks() {
 	/* Reg 0 only has bank switching options,
 	 * but changes the mirroring type */
 	//if( touched_reg == 0 ) {
-		PPU->mirroring = !(mapper->regs[0] & 0x01);
+		PPU->mirroring = (mapper->regs[0] & 0x01) ? HORIZONTAL_MIRRORING : VERTICAL_MIRRORING;
 		if( !(mapper->regs[0] & 0x02 ) )
 			PPU->mirroring = SINGLE_SCREEN_MIRRORING;
 	//	return;
