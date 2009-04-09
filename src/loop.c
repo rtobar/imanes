@@ -144,7 +144,7 @@ void main_loop(ines_file *file) {
 			if( lines == -1 || lines == NES_SCREEN_WIDTH )
 				lines++;
 
-			if( lines < NES_SCREEN_HEIGHT ) {
+			else if( lines < NES_SCREEN_HEIGHT ) {
 				draw_line(lines++, frames);
 				mapper->update();
 			}
@@ -177,11 +177,11 @@ void main_loop(ines_file *file) {
 					lines = -1;
 					end_vblank();
 
+#ifndef _MSC_VER
 					/* Calculate how much we should sleep for 50/60 FPS */
 					/* For this, we calculate the next "start" time,    */
 					/* and then we calculate the different between it   */
 					/* the actual time                                  */
-#ifndef _MSC_VER
 					tmp = endTime.tv_sec;
 					clock_gettime(CLOCK_REALTIME, &endTime);
 					startTime.tv_nsec += (long)1.666666e7;
