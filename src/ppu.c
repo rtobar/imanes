@@ -393,10 +393,19 @@ uint8_t read_ppu_vram(uint16_t address) {
 	switch( PPU->mirroring ) {
 
 		case HORIZONTAL_MIRRORING:
-			if( (0x2400 <= address && address < 0x2800) ||
-			    (0x2C00 <= address && address < 0x3000)) {
+			if( (0x2400 <= address && address < 0x2800) ) {
 				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
 				address -= 0x400;
+				DEBUG(printf("%04x\n",address));
+			}
+			if( (0x2800 <= address && address < 0x2C00) ) {
+				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				address -= 0x400;
+				DEBUG(printf("%04x\n",address));
+			}
+			if( (0x2C00 <= address && address < 0x3000) ) {
+				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				address -= 0x800;
 				DEBUG(printf("%04x\n",address));
 			}
 			break;
@@ -404,7 +413,7 @@ uint8_t read_ppu_vram(uint16_t address) {
 		case VERTICAL_MIRRORING:
 			if( 0x2800 <= address && address < 0x3000 ) {
 				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
-				address -= 0x800;
+				address &= 0x27FF;
 				DEBUG(printf("%04x\n",address));
 			}
 			break;
@@ -459,10 +468,19 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 	switch( PPU->mirroring ) {
 
 		case HORIZONTAL_MIRRORING:
-			if( (0x2400 <= address && address < 0x2800) ||
-			    (0x2C00 <= address && address < 0x3000)) {
+			if( (0x2400 <= address && address < 0x2800) ) {
 				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
 				address -= 0x400;
+				DEBUG(printf("%04x\n",address));
+			}
+			if( (0x2800 <= address && address < 0x2C00) ) {
+				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				address -= 0x400;
+				DEBUG(printf("%04x\n",address));
+			}
+			if( (0x2C00 <= address && address < 0x3000) ) {
+				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				address -= 0x800;
 				DEBUG(printf("%04x\n",address));
 			}
 			break;
@@ -470,7 +488,7 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 		case VERTICAL_MIRRORING:
 			if( 0x2800 <= address && address < 0x3000 ) {
 				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
-				address -= 0x800;
+				address &= 0x27FF;
 				DEBUG(printf("%04x\n",address));
 			}
 			break;
