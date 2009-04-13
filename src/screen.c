@@ -62,6 +62,7 @@ void *screen_loop(void *args) {
 
 			case SDL_QUIT:
 				run_loop = 0;
+				pthread_mutex_unlock(&pause_mutex);
 				return NULL;
 		}
 	}
