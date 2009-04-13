@@ -139,10 +139,11 @@ void mmc3_switch_banks() {
 				break;
 
 			if( mapper->regs[0] & 0x40 )
-				offset = 0xC000;
-			else
 				offset = 0x8000;
+			else
+				offset = 0xC000;
 
+			printf("MMC3: Reg0:%02x, Swapping {-2} bank to %04x\n", mapper->regs[0], offset);
 			memcpy( CPU->RAM + offset,
 			   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
 			   ROM_BANK_SIZE/2);
@@ -182,7 +183,7 @@ void mmc3_switch_banks() {
 				if( command == 7 )
 					offset += 0x2000;
 				else if( mapper->regs[0] & 0x40 )
-						offset += 0x4000;
+					offset += 0x4000;
 
 				printf("MMC3: Switching ROM bank %02x into %04x\n", bank, offset);
 				memcpy(CPU->RAM + offset,
@@ -271,8 +272,10 @@ void mmc3_update() {
 		if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) )
 			irq_counter--;
 
-		if( irq_counter == 0 && irq_enabled )
+		if( irq_counter == 0 && irq_enabled ) {
+			printf("MMC3: Triggering IRQ\n");
 			execute_irq();
+		}
 	}
 
 	return;
