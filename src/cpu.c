@@ -519,6 +519,10 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
+		case SAX:
+			write_cpu_ram(oper.address, CPU->A & CPU->X );
+			break;
+
 		default:
 			fprintf(stderr,"%s: Still unimplemented\n", inst.name);
 			break;
