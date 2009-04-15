@@ -114,11 +114,11 @@ void nes_keydown(SDL_keysym keysym) {
 		case SDLK_F6:
 			INFO( printf("%s emulation\n", (config.pause ? "Resuming" : "Pausing")) );
 			if( !config.pause ) {
-				pthread_mutex_lock(&pause_mutex);
+				SDL_mutexP(pause_mutex);
 				config.pause = 1;
 			}
 			else {
-				pthread_mutex_unlock(&pause_mutex);
+				SDL_mutexV(pause_mutex);
 				config.pause = 0;
 			}
 			break;

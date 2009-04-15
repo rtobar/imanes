@@ -1,11 +1,15 @@
 #ifndef loop_h
 #define loop_h
 
-#include <pthread.h>
+#ifdef __APPLE__
+#include <SDL/SDL_thread.h>
+#else
+#include <SDL_thread.h>
+#endif
 
 #include "common.h"
 
-extern pthread_mutex_t pause_mutex;
+extern SDL_mutex *pause_mutex;
 
 /**
  * This is the main program loop

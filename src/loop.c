@@ -33,7 +33,7 @@
 
 #define DUMPS   1
 
-pthread_mutex_t pause_mutex;
+SDL_mutex *pause_mutex;
 
 int run_loop;
 
@@ -60,7 +60,7 @@ void main_loop(ines_file *file) {
 	standard_lines = 0;
 	cycles = 0;
 
-	pthread_mutex_init(&pause_mutex, NULL);
+	pause_mutex = SDL_CreateMutex();
 
 	/* Get the initial time for the first screen drawing */
 #ifndef _MSC_VER
@@ -76,8 +76,8 @@ void main_loop(ines_file *file) {
 		   We do so until the mutex has been released by the user
 		   Anyways, we don't hold it locked, so the user can pause the
 		   emulation again */
-		pthread_mutex_lock(&pause_mutex);
-		pthread_mutex_unlock(&pause_mutex);
+		SDL_mutexP(pause_mutex);
+		SDL_mutexV(pause_mutex);
 
 		/* If we need to reset, call the reset routine */
 		if( CPU->reset )

@@ -18,11 +18,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <pthread.h>
 #ifdef __APPLE__
 #include <SDL/SDL.h>
+#include <SDL/SDL_thread.h>
 #else
 #include <SDL.h>
+#include <SDL_thread.h>
 #endif
 
 #include <stdio.h>
@@ -34,11 +35,10 @@
 #include "pad.h"
 #include "screen.h"
 
-static pthread_t screen_thread;
-
+static SDL_Thread  *screen_thread;
 static SDL_Surface *nes_screen;
 
-void *screen_loop(void *args) {
+int screen_loop(void *args) {
 
 	SDL_Event event;
 
@@ -62,8 +62,8 @@ void *screen_loop(void *args) {
 
 			case SDL_QUIT:
 				run_loop = 0;
-				pthread_mutex_unlock(&pause_mutex);
-				return NULL;
+				SDL_mutexV(pause_mutex);
+				return 0;
 		}
 	}
 
@@ -94,13 +94,13 @@ void init_screen() {
 	SDL_WM_SetCaption(window_title,NULL);
 
 	/* The event loop should go in a separate thread */
-	pthread_create(&screen_thread, NULL, screen_loop, NULL);
+	screen_thread = SDL_CreateThread(screen_loop, NULL);
 
 }
 
 void end_screen() {
 
-	pthread_join(screen_thread,NULL);
+	SDL_WaitThread(screen_thread,NULL);
 	SDL_Quit();
 
 }
