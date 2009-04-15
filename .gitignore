@@ -14,3 +14,10 @@ missing
 stamp-h1
 config.h.in~
 compile
+imanes_d.*
+imanes.exe
+imanes.ncb
+imanes.pdb
+imanes.suo
+imanes.vcproj.*
+gmon.out
