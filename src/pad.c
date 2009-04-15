@@ -23,6 +23,7 @@
 #include "imaconfig.h"
 #include "loop.h"
 #include "pad.h"
+#include "ppu.h"
 
 nes_pad pads[2];
 
@@ -123,6 +124,7 @@ void nes_keydown(SDL_keysym keysym) {
 			break;
 
 		case SDLK_F7:
+			dump_spr_ram();
 			INFO( printf("Instructions never executed:\n") );
 			for(i=0;i!=INSTRUCTIONS_NUMBER;i++)
 				if(instructions[i].size != 0 && !instructions[i].executed )
