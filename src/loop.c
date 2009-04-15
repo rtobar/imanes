@@ -44,14 +44,16 @@ void main_loop(ines_file *file) {
 	int lines, standard_lines;
 	int frames;
 	int i;
-	long tmp;
 	unsigned long long cycles;
 	struct timespec sleepTime = { 0, (long)2e7 };
-	struct timespec startTime;
-	struct timespec endTime;
 	uint16_t pc_dumps[DUMPS] = { 0xffff };
 	operand operand = { 0, 0 };
 	instruction inst;
+#ifndef _MSC_VER
+	long tmp;
+	struct timespec startTime;
+	struct timespec endTime;
+#endif
 
 	frames = 0;
 	lines = -1;
@@ -113,7 +115,7 @@ void main_loop(ines_file *file) {
 
 		/* Update cycles count */
 		CPU->cycles += inst.cycles;
-		CPU->nmi_cycles  += (CPU->cycles - cycles);
+		CPU->nmi_cycles  += (unsigned int)(CPU->cycles - cycles);
 		scanline_timeout -= (int)(CPU->cycles - cycles);
 		cycles = CPU->cycles;
 
