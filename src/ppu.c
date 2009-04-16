@@ -106,13 +106,14 @@ void draw_line(int line, int frame) {
 	uint16_t orig_name_table;
 	uint16_t spr_patt_table;
 	uint16_t scr_patt_table;
+	uint8_t prev_hit;
 
 	/* Name table depends on the 1st and 2nd bit of PPU CR1 */
 	spr_patt_table  = ((PPU->CR1&SPR_PATTERN_ADDRESS)>>3)*0x1000;
 	scr_patt_table  = ((PPU->CR1&SCR_PATTERN_ADDRESS)>>4)*0x1000;
 	big_sprite      = (PPU->CR1 & SPRITE_SIZE_8x16)>>5;
 
-
+	prev_hit = PPU->SR & HIT_FLAG;
 	/* Update PPU registers */
 	if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) ) {
 		if( line == 0 )
@@ -123,6 +124,7 @@ void draw_line(int line, int frame) {
 	/* Identify which sprites have to be drawn */
 	frt_sprites = 0;
 	bck_sprites = 0;
+	PPU->SR &= ~MAX_SPRITES_DRAWN;
 	if( PPU->CR2 & SHOW_SPRITES ) {
 		for(i=0;i!=64;i++) {
 			tmp = *(PPU->SPR_RAM + 4*i) + 1;
@@ -131,14 +133,12 @@ void draw_line(int line, int frame) {
 					back_sprites[bck_sprites++] = i;
 				else
 					front_sprites[frt_sprites++] = i;
-				if( (frt_sprites + bck_sprites) == 8 )
+				if( (frt_sprites + bck_sprites) == 8 ) {
+					PPU->SR |= MAX_SPRITES_DRAWN;
 					break;
+				}
 			}
 		}
-		if( (frt_sprites + bck_sprites) == 8 )
-			PPU->SR &= ~MAX_SPRITES_DRAWN;
-		else
-			PPU->SR |= MAX_SPRITES_DRAWN;
 		frt_sprites--;
 		bck_sprites--;
 	}
@@ -197,7 +197,6 @@ void draw_line(int line, int frame) {
 						x = tmp+tx;
 
 					if( x < NES_SCREEN_WIDTH ) {
-						//printf("Back sprite #0 at (%d,%d)\n", x, line);
 						if( config.show_back_spr && ( !config.run_fast || !(frame%2) ))
 							draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 						if( back_sprites[i] == 0 )
@@ -252,7 +251,6 @@ void draw_line(int line, int frame) {
 
 				if( col_index & 0x03 ) {
 					drawn_background[drawn_background_idx++] = x;
-					//printf("Background at (%d,%d)\n", x, line);
 
 					for(j=0;!(PPU->SR&HIT_FLAG)&&j!=drawn_back_sprites_idx;j++) {
 						if( x == drawn_back_sprites[j] ) {
@@ -289,6 +287,7 @@ void draw_line(int line, int frame) {
 			PPU->vram_addr = (PPU->vram_addr&0xFC1F) | ((y&0x1F)<<5);
 		}
 	}
+	drawn_background_idx--;
 
 	/* Draw the front sprites */
 	if( PPU->CR2&SHOW_SPRITES ) {
@@ -333,7 +332,6 @@ void draw_line(int line, int frame) {
 
 					if( x < NES_SCREEN_WIDTH ) {
 
-						//printf("Front sprite at (%d,%d)\n", x, line);
 						/* Check Sprite#0 Hit flag*/
 						if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
 							for(j=drawn_background_idx;j>=0; j--) {
@@ -355,6 +353,11 @@ void draw_line(int line, int frame) {
 			}
 		}
 	}
+
+	DEBUG(
+	if( prev_hit != (PPU->SR & HIT_FLAG) && (PPU->SR & HIT_FLAG) )
+		printf("Set Hit flag at scanline %d\n", line);
+	);
 
 }
 
