@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL.lib SDLmain.lib pthreadVC2.lib"
+				AdditionalDependencies="SDL.lib SDLmain.lib"
 				OutputFile="$(ProjectName)_d.exe"
 				LinkIncremental="0"
 				GenerateManifest="true"
@@ -119,6 +119,7 @@
 				Optimization="3"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\win32&quot;;&quot;$(ProjectDir)\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -136,14 +137,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="SDL.lib SDLmain.lib pthreadVC2.lib"
+				AdditionalDependencies="SDL.lib SDLmain.lib"
 				OutputFile="$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateManifest="false"
 				IgnoreAllDefaultLibraries="false"
 				AddModuleNamesToAssembly=""
 				GenerateDebugInformation="false"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
