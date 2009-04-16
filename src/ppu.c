@@ -196,7 +196,8 @@ void draw_line(int line, int frame) {
 					else
 						x = tmp+tx;
 
-					if( x < NES_SCREEN_WIDTH ) {
+					if( (8 <= x && x < NES_SCREEN_WIDTH) ||
+					    (x < 8 && (PPU->CR2&DONTCLIP_SPRITES)) ){
 						if( config.show_back_spr && ( !config.run_fast || !(frame%2) ))
 							draw_pixel( x, line, system_palette[read_ppu_vram(0x3F10+col_index)]);
 						if( back_sprites[i] == 0 )
@@ -249,7 +250,8 @@ void draw_line(int line, int frame) {
 				tmp = (((y >> 1)&0x1)<<1) + ((i >> 1)&0x1);
 				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
 
-				if( col_index & 0x03 ) {
+				if( (col_index & 0x03) &&
+				    ( (x >= 8) || (x < 8 && (PPU->CR2&DONTCLIP_BACKGROUND)) ) ){
 					drawn_background[drawn_background_idx++] = x;
 
 					for(j=0;!(PPU->SR&HIT_FLAG)&&j!=drawn_back_sprites_idx;j++) {
@@ -330,7 +332,8 @@ void draw_line(int line, int frame) {
 					else
 						x = tmp+tx;
 
-					if( x < NES_SCREEN_WIDTH ) {
+					if( (8 <= x && x < NES_SCREEN_WIDTH) ||
+					    (x < 8 && (PPU->CR2&DONTCLIP_SPRITES)) ){
 
 						/* Check Sprite#0 Hit flag*/
 						if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
