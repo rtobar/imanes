@@ -547,6 +547,10 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 			break;
 	}
 
+	/* Palette values ignore bits 6 and 7 */
+	if( 0x3F00 <= address && address < 0x3F20 )
+		value &= 0x3F;
+
 	PPU->VRAM[address] = value;
 
 	return;
