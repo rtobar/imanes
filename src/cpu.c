@@ -797,6 +797,8 @@ uint8_t stack_pull() {
 /* Note: NMI is executed after inscreasing the PC! */
 void execute_nmi() {
 
+	/* This interrupt is not maskable, so we don't check
+	 * the interrupt flag on the processor status register */
 	DEBUG( printf("Executing NMI!\n") );
 
 	/* NMI clears the B_FLAG from CPU status */
@@ -815,6 +817,10 @@ void execute_nmi() {
 
 void execute_reset() {
 
+	/* If the interrupt flag is cleared, we reject the interrupt */
+	if( CPU->SR & I_FLAG )
+		return;
+
 	/* Let the mapper do its stuff */
 	mapper->reset();
 
@@ -825,6 +831,10 @@ void execute_reset() {
 
 /* This is called by BRK and mappers IRQ triggers */
 void execute_irq() {
+
+	/* If the interrupt flag is cleared, we reject the interrupt */
+	if( CPU->SR & I_FLAG )
+		return;
 
 	stack_push( (CPU->PC+2) >> 8 );
 	stack_push( (CPU->PC+2) & 0xFF );
