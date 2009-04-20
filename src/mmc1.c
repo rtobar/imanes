@@ -2,7 +2,7 @@
 
     mmc1.c   -    MMC1 Mapper emulation under ImaNES
 
-    Copyright (C) 2008   Rodrigo Tobar Carrizo
+    Copyright (C) 2009   Rodrigo Tobar Carrizo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
