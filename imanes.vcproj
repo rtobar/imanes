@@ -241,6 +241,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\src\states.c"
+			>
+		</File>
+		<File
 			RelativePath=".\src\unrom.c"
 			>
 		</File>

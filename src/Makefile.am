@@ -17,6 +17,7 @@ imanes_SOURCES = \
      ppu.c \
      screen.c \
      sram.c \
+     states.c \
      unrom.c
 
 imanes_LDFLAGS = -lrt -pg

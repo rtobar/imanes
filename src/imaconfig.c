@@ -53,6 +53,13 @@ void initialize_configuration() {
 
 void load_user_configuration() {
 
+	get_imanes_dir();
+
+	return;
+}
+
+char *get_imanes_dir() {
+
 	int tmp;
 	char * user_home;
 	char * user_imanes_dir;
@@ -70,7 +77,7 @@ void load_user_configuration() {
 
 	if( user_home == NULL ) {
 		fprintf(stderr, "Couldn't find user's home directory. Will not load user configuration\n");
-		return;
+		return NULL;
 	}
 
 	user_imanes_dir = (char *)malloc(strlen(user_home) + 9);
@@ -95,8 +102,10 @@ void load_user_configuration() {
 		if( tmp == -1 ) {
 			fprintf(stderr,"Error while creating directory '%s': ", user_imanes_dir);
 			perror(NULL);
-			return;
+			return NULL;
 		}
 	}
+
+	return user_imanes_dir;
 
 }

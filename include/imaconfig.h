@@ -25,4 +25,8 @@ void initialize_configuration();
 /* Loads per-user configuration */
 void load_user_configuration();
 
+/* Checks the existence (and creates) of per-user imanes config di
+ * and returns its name */
+char *get_imanes_dir();
+
 #endif /* imaconfig_h */
