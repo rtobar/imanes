@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define NROM_ID (0)
+
 /* Implementation of the "no mapper" mapper */
 void nrom_initialize_mapper();
 int  nrom_check_address(uint16_t address);

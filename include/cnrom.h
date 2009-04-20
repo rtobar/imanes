@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define CNROM_ID (3)
+
 /* Implementation of mapper struct function pointers */
 void cnrom_initialize_mapper();
 int  cnrom_check_address(uint16_t address);

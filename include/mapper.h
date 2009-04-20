@@ -12,6 +12,7 @@ typedef struct _mapper {
 
 	int id;                             /* Mapper id */
 	char name[MAX_MAPPER_NAME_SIZE];    /* Mapper name */
+	unsigned int reg_count;             /* Number of registers */
 
 	/* Initializes the mapper */
 	void (*initialize_mapper)();

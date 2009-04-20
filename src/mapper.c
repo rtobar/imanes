@@ -33,15 +33,15 @@
 nes_mapper *mapper;
 
 nes_mapper mapper_list[] = {
-	{ 0 , "NROM" , nrom_initialize_mapper , nrom_check_address,
+	{ NROM_ID , "NROM" , 0, nrom_initialize_mapper , nrom_check_address,
 	  nrom_switch_banks , nrom_reset,  nrom_update } ,
-	{ 1 , "MMC1" , mmc1_initialize_mapper , mmc1_check_address,
+	{ MMC1_ID , "MMC1" , 4, mmc1_initialize_mapper , mmc1_check_address,
 	  mmc1_switch_banks , mmc1_reset,  mmc1_update } ,
-	{ 2 , "UNROM", unrom_initialize_mapper, unrom_check_address,
+	{ UNROM_ID, "UNROM", 1, unrom_initialize_mapper, unrom_check_address,
 	  unrom_switch_banks, unrom_reset, unrom_update } ,
-	{ 3 , "CNROM", cnrom_initialize_mapper, cnrom_check_address,
+	{ CNROM_ID, "CNROM", 1, cnrom_initialize_mapper, cnrom_check_address,
 	  cnrom_switch_banks, cnrom_reset, cnrom_update } ,
-	{ 4 , "MMC3" , mmc3_initialize_mapper , mmc3_check_address,
+	{ MMC3_ID , "MMC3" , 8, mmc3_initialize_mapper , mmc3_check_address,
 	  mmc3_switch_banks , mmc3_reset,  mmc3_update } ,
 	{ -1 }
 };

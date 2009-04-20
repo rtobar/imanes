@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define MMC3_ID (4)
+
 /* Implementation of mapper struct function pointers */
 void mmc3_initialize_mapper();
 int  mmc3_check_address(uint16_t address);

@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define UNROM_ID (2)
+
 /* Implementation of mapper struct function pointers */
 void unrom_initialize_mapper();
 int  unrom_check_address(uint16_t address);
