@@ -55,6 +55,7 @@ typedef struct _ppu {
 	uint8_t spr_addr;   /* Address to be written by 0x2004 CPU RAM */
 
 	uint8_t mirroring;  /* Type of mirroring */
+	unsigned int lines; /* Current scanline */
 
 } nes_ppu;
 
