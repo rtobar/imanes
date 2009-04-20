@@ -18,24 +18,81 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
+
 #include "imaconfig.h"
 #include "states.h"
 
-imanes_state *load_state(int i) {
+void load_state(int i) {
 
 	char *user_imanes_dir;
-	imanes_state *state;
 
 	user_imanes_dir = get_imanes_dir();
-	state = (imanes_state *)malloc(sizeof(imanes_state));
 
-	return state;
+	free(user_imanes_dir);
+	return;
 }
 
-void save_state(imanes_state *s, int i) {
+void save_state(int i) {
 
 	char *user_imanes_dir;
+	void *buffer, *buffer_start;
 
 	user_imanes_dir = get_imanes_dir();
 
+	/* Memory allocation for state information */
+	buffer = malloc(
+	/* CPU registers*/  7 + sizeof(unsigned long long) +
+	/* RAM dump */      0x10000 +
+	/* PPU registers */ 12 + sizeof(unsigned int) +
+	/* VRAM dump */     0x4000 +
+	/* SPR-RAM dump */  0x100 +
+	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count 
+	         );
+	buffer_start = buffer;
+
+	/* CPU dumping */
+	memcpy(buffer, &(CPU->A),  1); buffer++;
+	memcpy(buffer, &(CPU->X),  1); buffer++;
+	memcpy(buffer, &(CPU->Y),  1); buffer++;
+	memcpy(buffer, &(CPU->SP), 1); buffer++;
+	memcpy(buffer, &(CPU->SR), 1); buffer++;
+	memcpy(buffer, &(CPU->PC), 2); buffer += 2;
+	memcpy(buffer, &(CPU->cycles), sizeof(unsigned long long));
+   buffer += sizeof(unsigned long long);
+
+	/* RAM dumping */
+	memcpy(buffer, CPU->RAM, 0x10000);
+	buffer += 0x10000;
+
+	/* PPU dumping */
+	memcpy(buffer, &(PPU->CR1), 1);       buffer++;
+	memcpy(buffer, &(PPU->CR2), 1);       buffer++;
+	memcpy(buffer, &(PPU->SR), 1);        buffer++;
+	memcpy(buffer, &(PPU->mirroring), 1); buffer++;
+	memcpy(buffer, &(PPU->x), 1);         buffer++;
+	memcpy(buffer, &(PPU->latch), 1);     buffer++;
+	memcpy(buffer, &(PPU->vram_addr), 2); buffer += 2;
+	memcpy(buffer, &(PPU->temp_addr), 2); buffer += 2;
+	memcpy(buffer, &(PPU->spr_addr), 2);  buffer += 2;
+	memcpy(buffer, &(PPU->lines), sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
+
+	/* VRAM dumping */
+	memcpy(buffer, PPU->VRAM, 0x4000);
+	buffer += 0x4000;
+
+	/* SPR-RAM dumping */
+	memcpy(buffer, PPU->SPR_RAM, 0x100);
+	buffer += 0x100;
+
+	/* Mapper dumping */
+	memcpy(buffer, &(mapper->id), 1);  buffer++;
+	memcpy(buffer, &(mapper->reg_count), sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
+	memcpy(buffer, mapper->regs, mapper->reg_count);
+	buffer += mapper->reg_count;
+
+	free(user_imanes_dir);
+	return;
 }
