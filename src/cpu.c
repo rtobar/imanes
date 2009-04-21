@@ -511,6 +511,16 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		/** Illegal opcodes **/
+		case DCP:
+			tmp = read_cpu_ram(oper.address) - 1;
+			write_cpu_ram(oper.address, tmp);
+			if( CPU->A >= tmp)
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+			update_flags(CPU->A - tmp, N_FLAG | Z_FLAG);
+			break;
+
 		case LAX:
 			if( inst.addr_mode != ADDR_IMMEDIATE )
 				oper.value = read_cpu_ram(oper.address);
