@@ -40,7 +40,6 @@ int run_loop;
 void main_loop(ines_file *file) {
 
 	uint8_t opcode;
-	int scanline_timeout = CYCLES_PER_SCANLINE;
 	int standard_lines;
 	int frames;
 	int i;
@@ -57,8 +56,9 @@ void main_loop(ines_file *file) {
 
 	frames = 0;
 	cycles = 0;
-	PPU->lines = -1;
 	standard_lines = 0;
+	PPU->lines = -1;
+	PPU->scanline_timeout = CYCLES_PER_SCANLINE;
 
 	pause_mutex = SDL_CreateMutex();
 
@@ -116,7 +116,7 @@ void main_loop(ines_file *file) {
 		/* Update cycles count */
 		CPU->cycles += inst.cycles;
 		CPU->nmi_cycles  += (unsigned int)(CPU->cycles - cycles);
-		scanline_timeout -= (int)(CPU->cycles - cycles);
+		PPU->scanline_timeout -= (int)(CPU->cycles - cycles);
 		cycles = CPU->cycles;
 
 		for(i=0;i!=DUMPS;i++)
@@ -124,14 +124,14 @@ void main_loop(ines_file *file) {
 				DEBUG( dump_cpu() );
 
 		/* A line has ended its scanning, draw it */
-		if( scanline_timeout <= 0 ) {
+		if( PPU->scanline_timeout <= 0 ) {
 
 			/* First, we set again the timeout to check the scanline */
-			scanline_timeout += CYCLES_PER_SCANLINE;
+			PPU->scanline_timeout += CYCLES_PER_SCANLINE;
 
 			/* Every three lines, we should add one required cycle too
 			 * (i.e., CYCLES_PER_SCANLINE != 113, but == 113.66666... */
-			scanline_timeout += !(PPU->lines%3) ? 2: 0;
+			PPU->scanline_timeout += !(PPU->lines%3) ? 2: 0;
 
 			/* The NTSC screen works as follows:
 			 *
@@ -161,7 +161,7 @@ void main_loop(ines_file *file) {
 				CPU->nmi_cycles = 0;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					execute_nmi();
-					scanline_timeout -= 7;
+					PPU->scanline_timeout -= 7;
 					cycles = CPU->cycles;
 				}
 

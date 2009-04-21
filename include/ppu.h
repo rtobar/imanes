@@ -54,8 +54,9 @@ typedef struct _ppu {
 	uint8_t *SPR_RAM;   /* 256 bytes area memory for sprite attributes */
 	uint8_t spr_addr;   /* Address to be written by 0x2004 CPU RAM */
 
-	uint8_t mirroring;  /* Type of mirroring */
-	unsigned int lines; /* Current scanline */
+	uint8_t mirroring;             /* Type of mirroring */
+	unsigned int lines;            /* Current scanline */
+	unsigned int scanline_timeout; /* CPU cycles to next scanline */
 
 } nes_ppu;
 
