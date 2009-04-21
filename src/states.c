@@ -35,10 +35,10 @@ void load_state(int i) {
 
 void save_state(int i) {
 
-	char *user_imanes_dir;
+	char *states_dir;
 	void *buffer, *buffer_start;
 
-	user_imanes_dir = get_imanes_dir(States);
+	states_dir = get_imanes_dir(States);
 
 	/* Memory allocation for state information */
 	buffer = malloc(
@@ -93,6 +93,6 @@ void save_state(int i) {
 	memcpy(buffer, mapper->regs, mapper->reg_count);
 	buffer += mapper->reg_count;
 
-	free(user_imanes_dir);
+	free(states_dir);
 	return;
 }
