@@ -533,6 +533,18 @@ void execute_instruction(instruction inst, operand oper) {
 			write_cpu_ram(oper.address, CPU->A & CPU->X );
 			break;
 
+		case SLO:
+			oper.value = read_cpu_ram(oper.address);
+			if( oper.value & 0x80 )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+			oper.value <<= 1;
+			write_cpu_ram(oper.address, oper.value);
+			CPU->A |= oper.value;
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
+
 		default:
 			fprintf(stderr,"%s: Still unimplemented\n", inst.name);
 			break;
