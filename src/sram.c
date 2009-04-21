@@ -20,6 +20,7 @@
 
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -35,9 +36,10 @@
 #include "sram.h"
 
 
-void save_sram(char *file) {
+void save_sram(char *rom_file) {
 
 	int fd = 3;
+	char *save_file;
 
 #ifdef _MSC_VER
 	int written_bytes;
@@ -48,14 +50,15 @@ void save_sram(char *file) {
 	if( !CPU->sram_enabled )
 		return;
 
+	return;
 #ifdef _MSC_VER
-	fd = _sopen_s(&fd,file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+	fd = _sopen_s(&fd,save_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
 #else
-	fd = open(file, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+	fd = open(save_file, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 #endif
 
 	if( fd == -1 ) {
-		fprintf(stderr,"Error whlie opening '%s': ", file);
+		fprintf(stderr,"Error while opening '%s': ", save_file);
 		perror(NULL);
 	}
 
@@ -66,34 +69,74 @@ void save_sram(char *file) {
 #endif
 
 	if( written_bytes != 0x2000 ) {
-		fprintf(stderr,"Couldn't dump SRAM data to '%s': ", file);
+		fprintf(stderr,"Couldn't dump SRAM data to '%s': ", save_file);
 		perror(NULL);
 	}
 
 	return;
 }
 
-void load_sram(char *file) {
+void load_sram(char *rom_file) {
 
+	int i;
 	int fd;
-
+	char *save_file;
+	char *save_dir;
+	char *tmp;
 #ifdef _MSC_VER
+#define SEP '\\'
 	int read_bytes;
 #else
+#define SEP '/'
 	ssize_t read_bytes;
 #endif
 
 	if( !CPU->sram_enabled )
 		return;
+
+	/* Get just the name of the file */
+	for(i=strlen(rom_file); i>=0; i--) {
+		if( rom_file[i] == SEP )
+			break;
+	}
+	tmp = (char *)malloc(strlen(rom_file) - i);
+	memcpy(tmp, rom_file + i + 1, strlen(rom_file) - i);
+
+	/* Find where the extension of the file begins */
+	printf("Given file is '%s'\n", tmp);
+	for(i=strlen(tmp); i>=0; i--) {
+		if( tmp[i] == '.' )
+			break;
+	}
+
+	save_file = (char *)malloc(i+5);
 #ifdef _MSC_VER
-	fd = _sopen_s(&fd,file, O_RDONLY, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+	sprintf_s(save_file, strlen(file)+5, "%s.sav", tmp);
 #else
-	fd = open(file, O_RDONLY);
+	strncpy(save_file, tmp, i);
+	strcat(save_file, ".sav");
+#endif
+	free(tmp);
+	printf("Saving file is '%s'\n", save_file);
+
+	save_dir = get_imanes_dir(Saves);
+
+	if( save_dir == NULL ) {
+		fprintf(stderr,"Couldn't load SRAM because saves direcory cannot be accessed\n");
+		free(save_dir);
+		return;
+	}
+
+#ifdef _MSC_VER
+	fd = _sopen_s(&fd,save_file, O_RDONLY, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+#else
+	fd = open(save_file, O_RDONLY);
 #endif
 
 	if( fd == -1 ) {
-		fprintf(stderr,"Error while opening '%s': ", file);
+		fprintf(stderr,"Error while opening '%s': ", save_file);
 		perror(NULL);
+		free(save_file);
 		return;
 	}
 
@@ -104,7 +147,8 @@ void load_sram(char *file) {
 #endif
 
 	if( read_bytes != 0x2000 )
-		fprintf(stderr,"File '%s' is not a valid SRAM dump file\n", file);
+		fprintf(stderr,"File '%s' is not a valid SRAM dump file\n", save_file);
 
+	free(save_file);
 	return;
 }

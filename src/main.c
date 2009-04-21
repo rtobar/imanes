@@ -109,9 +109,6 @@ void parse_options(int args, char *argv[]) {
 
 int main(int args, char *argv[]) {
 
-	char *rom_file;
-	char *save_file;
-
 	ines_file *nes_rom;
 
 	/* Print NOW everything :D */
@@ -136,34 +133,20 @@ int main(int args, char *argv[]) {
 	initialize_ppu();
 	initialize_pads();
 
-	rom_file = (char *)malloc(strlen(argv[optind])+1);
-	save_file = (char *)malloc(strlen(argv[optind])+5);
-	
-#ifdef _MSC_VER
-	strcpy_s(rom_file,  strlen(argv[optind])+1,   argv[optind]);
-	strcpy_s(save_file, strlen(argv[optind])+5, argv[optind]);
-	strcat_s(save_file,strlen(argv[optind])+5,".sav");
-#else
-	strcpy(rom_file,argv[optind]);
-	strcpy(save_file,argv[optind]);
-	strcat(save_file,".sav");
-#endif
-
 	/* Read the ines file and get all the ROM/VROM */
-	nes_rom = check_ines_file(rom_file);
+	nes_rom = check_ines_file(argv[optind]);
 	map_rom_memory(nes_rom);
+	load_sram(argv[optind]);
 
 	/* Create the screen and a separate thread for the events */
 	init_screen();
-
-	load_sram(save_file);
 
 	/* Main execution loop */
 	main_loop();
 
 	end_screen();
 	free_ines_file(nes_rom);
-	save_sram(save_file);
+	save_sram(argv[optind]);
 
 	return 0;
 }
