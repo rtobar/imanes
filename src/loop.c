@@ -30,6 +30,7 @@
 #include "mapper.h"
 #include "ppu.h"
 #include "screen.h"
+#include "states.h"
 
 #define DUMPS   1
 
@@ -78,6 +79,17 @@ void main_loop(ines_file *file) {
 		   emulation again */
 		SDL_mutexP(pause_mutex);
 		SDL_mutexV(pause_mutex);
+
+		/* If we want to save our current state or load a new one,
+		 * now is the time to do it! */
+		if( config.save_state == 1 ) {
+			save_state(config.current_state);
+			config.save_state = 0;
+		}
+		if( config.load_state == 1 ) {
+			load_state(config.current_state);
+			config.load_state = 0;
+		}
 
 		/* If we need to reset, call the reset routine */
 		if( CPU->reset )

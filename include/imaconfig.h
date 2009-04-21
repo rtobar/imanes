@@ -9,7 +9,11 @@ typedef struct _config {
 	uint8_t show_bg;             /* Should we display the background */
 	uint8_t show_screen_bg;      /* Background color behind everything */
 	uint8_t pause;               /* Pause emulation */
+
+	/* State-related */
 	uint8_t current_state;       /* State to be loaded/saved */
+	uint8_t save_state;          /* Flag to save our current state */
+	uint8_t load_state;          /* Flag to load a state */
 
 	int video_scale;             /* Video scale factor */
 	int verbosity;               /* How verbose imanes should be */

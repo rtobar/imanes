@@ -24,7 +24,6 @@
 #include "loop.h"
 #include "pad.h"
 #include "ppu.h"
-#include "states.h"
 
 nes_pad pads[2];
 
@@ -105,9 +104,10 @@ void nes_keydown(SDL_keysym keysym) {
 			config.show_screen_bg = ( !config.show_screen_bg );
 			break;
 
-		/* Save a state */
+		/* Save a state. We just set a flag, since the actual
+		 * loading is done in the main thread. */
 		case SDLK_F2:
-			save_state(config.current_state);
+			config.save_state = 1;
 			break;
 
 		/* Choose which state to use */
@@ -117,9 +117,10 @@ void nes_keydown(SDL_keysym keysym) {
 				config.current_state = 0;
 			break;
 
-		/* Load a state */
+		/* LoaLoadstate. We just set a flag, since the actual
+		 * loading is done in the main thread. */
 		case SDLK_F4:
-			load_state(config.current_state);
+			config.load_state = 1;
 			break;
 
 		/* Reset */

@@ -23,11 +23,59 @@
 #include "imaconfig.h"
 #include "states.h"
 
+void *tmp;
+
 void load_state(int i) {
 
 	char *user_imanes_dir;
+	void *buffer;
 
 	user_imanes_dir = get_user_imanes_dir();
+
+	buffer = tmp;
+
+	/* CPU dumping */
+	memcpy(&(CPU->A),      buffer, 1); buffer++;
+	memcpy(&(CPU->X),      buffer, 1); buffer++;
+	memcpy(&(CPU->Y),      buffer, 1); buffer++;
+	memcpy(&(CPU->SP),     buffer, 1); buffer++;
+	memcpy(&(CPU->SR),     buffer, 1); buffer++;
+	memcpy(&(CPU->PC),     buffer, 2); buffer += 2;
+	memcpy(&(CPU->cycles), buffer, sizeof(unsigned long long));
+   buffer += sizeof(unsigned long long);
+
+	/* RAM dumping */
+	memcpy(buffer, CPU->RAM, 0x10000);
+	buffer += 0x10000;
+
+	/* PPU dumping */
+	memcpy(&(PPU->CR1), buffer, 1);       buffer++;
+	memcpy(&(PPU->CR2), buffer, 1);       buffer++;
+	memcpy(&(PPU->SR), buffer, 1);        buffer++;
+	memcpy(&(PPU->mirroring), buffer, 1); buffer++;
+	memcpy(&(PPU->x), buffer, 1);         buffer++;
+	memcpy(&(PPU->latch), buffer, 1);     buffer++;
+	memcpy(&(PPU->vram_addr), buffer, 2); buffer += 2;
+	memcpy(&(PPU->temp_addr), buffer, 2); buffer += 2;
+	memcpy(&(PPU->spr_addr), buffer, 2);  buffer += 2;
+	memcpy(&(PPU->lines), buffer, sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
+	memcpy(&(PPU->scanline_timeout), buffer, sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
+
+	/* VRAM dumping */
+	memcpy(PPU->VRAM, buffer, 0x4000);
+	buffer += 0x4000;
+
+	/* SPR-RAM dumping */
+	memcpy(PPU->SPR_RAM, buffer, 0x100);
+	buffer += 0x100;
+
+	/* Mapper dumping */
+	memcpy(&(mapper->id), buffer, 1);  buffer++;
+	memcpy(&(mapper->reg_count), buffer, sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
+	memcpy(mapper->regs, buffer, mapper->reg_count);
 
 	free(user_imanes_dir);
 	return;
@@ -44,12 +92,13 @@ void save_state(int i) {
 	buffer = malloc(
 	/* CPU registers*/  7 + sizeof(unsigned long long) +
 	/* RAM dump */      0x10000 +
-	/* PPU registers */ 12 + sizeof(unsigned int) +
+	/* PPU registers */ 12 + 2*sizeof(unsigned int) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
 	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count 
 	         );
 	buffer_start = buffer;
+	tmp = buffer;
 
 	/* CPU dumping */
 	memcpy(buffer, &(CPU->A),  1); buffer++;
@@ -77,6 +126,8 @@ void save_state(int i) {
 	memcpy(buffer, &(PPU->spr_addr), 2);  buffer += 2;
 	memcpy(buffer, &(PPU->lines), sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
+	memcpy(buffer, &(PPU->scanline_timeout), sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
 
 	/* VRAM dumping */
 	memcpy(buffer, PPU->VRAM, 0x4000);
@@ -91,7 +142,6 @@ void save_state(int i) {
 	memcpy(buffer, &(mapper->reg_count), sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 	memcpy(buffer, mapper->regs, mapper->reg_count);
-	buffer += mapper->reg_count;
 
 	free(states_dir);
 	return;
