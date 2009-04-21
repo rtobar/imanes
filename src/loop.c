@@ -38,7 +38,7 @@ SDL_mutex *pause_mutex;
 
 int run_loop;
 
-void main_loop(ines_file *file) {
+void main_loop() {
 
 	uint8_t opcode;
 	int standard_lines;
