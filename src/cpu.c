@@ -529,6 +529,20 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
+		case RLA:
+			oper.value = read_cpu_ram(oper.address);
+			tmp = oper.value & 0x80;
+			oper.value <<= 1;
+			oper.value |= (CPU->SR & C_FLAG);
+			write_cpu_ram(oper.address, oper.value);
+			if( tmp )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+			CPU->A &= oper.value;
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
+
 		case SAX:
 			write_cpu_ram(oper.address, CPU->A & CPU->X );
 			break;
