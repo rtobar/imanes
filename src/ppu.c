@@ -49,8 +49,8 @@ void dump_ppu() {
 	printf("CR1:%02x  ", PPU->CR1);
 	printf("CR2:%02x  ", PPU->CR2);
 	printf("SR:%02x  ", PPU->SR);
-	printf("VADDR:%04x\n", PPU->vram_addr);
-	printf("TMPADDR:%04x\n", PPU->temp_addr);
+	printf("VADDR:%04x  ", PPU->vram_addr);
+	printf("TMPADDR:%04x  ", PPU->temp_addr);
 	printf("SPRADDR:%04x\n", PPU->spr_addr);
 
 }
