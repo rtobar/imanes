@@ -521,6 +521,29 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->A - tmp, N_FLAG | Z_FLAG);
 			break;
 
+		case ISC:
+			tmp = read_cpu_ram(oper.address) + 1;
+			write_cpu_ram(oper.address, tmp);
+
+			tmp16 = CPU->A - tmp - (1 - (CPU->SR & C_FLAG));
+
+			/* If result is over 0xFF, then the carry is 1 */
+			if( tmp16 > 0xFF )
+				CPU->SR &= ~C_FLAG;
+			else
+				CPU->SR |= C_FLAG;
+
+			/* Set overflow flag if needed */
+			if( ( ((CPU->A^tmp16) & 0x80) != 0 ) &&
+			    ( ((CPU->A^tmp) & 0x80) != 0 ) )
+				CPU->SR |= V_FLAG;
+			else
+				CPU->SR &= ~V_FLAG;
+
+			CPU->A = tmp16 & 0xFF; /* truncate to 8 bits */
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
+
 		case LAX:
 			if( inst.addr_mode != ADDR_IMMEDIATE )
 				oper.value = read_cpu_ram(oper.address);
