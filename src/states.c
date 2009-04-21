@@ -47,7 +47,7 @@ void load_state(int i) {
 	buffer += sizeof(unsigned int);
 
 	/* RAM dumping */
-	memcpy(buffer, CPU->RAM, 0x10000);
+	memcpy(CPU->RAM, buffer, 0x10000);
 	buffer += 0x10000;
 
 	/* PPU dumping */
