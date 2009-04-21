@@ -83,10 +83,12 @@ void main_loop(ines_file *file) {
 		/* If we want to save our current state or load a new one,
 		 * now is the time to do it! */
 		if( config.save_state == 1 ) {
+			INFO( printf("Saving current state to %d\n", config.current_state) );
 			save_state(config.current_state);
 			config.save_state = 0;
 		}
-		if( config.load_state == 1 ) {
+		else if( config.load_state == 1 ) {
+			INFO( printf("Loading state %d\n", config.current_state) );
 			load_state(config.current_state);
 			config.load_state = 0;
 		}
