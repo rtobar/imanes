@@ -566,6 +566,38 @@ void execute_instruction(instruction inst, operand oper) {
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
+		case RRA:
+			/* Right shift */
+			oper.value = read_cpu_ram(oper.address);
+			tmp = oper.value & 0x1;
+			oper.value >>= 1;
+			oper.value |= ((CPU->SR & C_FLAG) << 7);
+			write_cpu_ram(oper.address, oper.value);
+			if( tmp )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+
+			/* ADC */
+			tmp16 = CPU->A + oper.value + (CPU->SR & C_FLAG);
+
+			/* If result is over 0xFF, then the carry is 1 */
+			if( tmp16 > 0xFF )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+
+			/* Set overflow flag if needed */
+			if( ( ((CPU->A^tmp16)      & 0x80) != 0 ) &&
+			    ( ((CPU->A^oper.value) & 0x80) == 0 ) )
+				CPU->SR |= V_FLAG;
+			else
+				CPU->SR &= ~V_FLAG;
+
+			CPU->A = tmp16 & 0xFF; /* Truncate to 8 bits */
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
+
 		case SAX:
 			write_cpu_ram(oper.address, CPU->A & CPU->X );
 			break;
@@ -579,6 +611,18 @@ void execute_instruction(instruction inst, operand oper) {
 			oper.value <<= 1;
 			write_cpu_ram(oper.address, oper.value);
 			CPU->A |= oper.value;
+			update_flags(CPU->A, N_FLAG | Z_FLAG);
+			break;
+
+		case SRE:
+			oper.value = read_cpu_ram(oper.address);
+			if( oper.value & 0x01 )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+			oper.value >>= 1;
+			write_cpu_ram(oper.address, oper.value);
+			CPU->A ^= oper.value;
 			update_flags(CPU->A, N_FLAG | Z_FLAG);
 			break;
 
