@@ -46,24 +46,27 @@ int screen_loop(void *args) {
 	while(1) {
 
 		/* Check if there are pending events. If there are not, wait for it */
-		if( !SDL_PollEvent(&event) ) {	
-			SDL_WaitEvent(&event);
+		if( !SDL_WaitEvent(NULL) ) {
+			printf("Error waiting for events\n");
+			exit(0);
 		}
 
-		switch(event.type) {
-
-			case SDL_KEYDOWN:
-				nes_keydown(event.key.keysym);
-				break;
-
-			case SDL_KEYUP:
-				nes_keyup(event.key.keysym);
-				break;
-
-			case SDL_QUIT:
-				run_loop = 0;
-				SDL_mutexV(pause_mutex);
-				return 0;
+		while( SDL_PollEvent(&event) ) {
+			switch(event.type) {
+	
+				case SDL_KEYDOWN:
+					nes_keydown(event.key.keysym);
+					break;
+	
+				case SDL_KEYUP:
+					nes_keyup(event.key.keysym);
+					break;
+	
+				case SDL_QUIT:
+					run_loop = 0;
+					SDL_mutexV(pause_mutex);
+					return 0;
+			}
 		}
 	}
 
