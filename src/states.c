@@ -43,6 +43,8 @@ void load_state(int i) {
 	memcpy(&(CPU->PC),     buffer, 2); buffer += 2;
 	memcpy(&(CPU->cycles), buffer, sizeof(unsigned long long));
    buffer += sizeof(unsigned long long);
+	memcpy(&(CPU->nmi_cycles), buffer, sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
 
 	/* RAM dumping */
 	memcpy(buffer, CPU->RAM, 0x10000);
@@ -61,6 +63,8 @@ void load_state(int i) {
 	memcpy(&(PPU->scanline_timeout), buffer, sizeof(int));
 	buffer += sizeof(int);
 	memcpy(&(PPU->lines), buffer, sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
+	memcpy(&(PPU->frames), buffer, sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 
 	/* VRAM dumping */
@@ -90,9 +94,9 @@ void save_state(int i) {
 
 	/* Memory allocation for state information */
 	buffer = malloc(
-	/* CPU registers*/  7 + sizeof(unsigned long long) +
+	/* CPU registers*/  7+sizeof(unsigned long long)+sizeof(unsigned int)+
 	/* RAM dump */      0x10000 +
-	/* PPU registers */ 12 + sizeof(unsigned int) + sizeof(int) +
+	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(int) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
 	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count 
@@ -109,6 +113,8 @@ void save_state(int i) {
 	memcpy(buffer, &(CPU->PC), 2); buffer += 2;
 	memcpy(buffer, &(CPU->cycles), sizeof(unsigned long long));
    buffer += sizeof(unsigned long long);
+	memcpy(buffer, &(CPU->nmi_cycles), sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
 
 	/* RAM dumping */
 	memcpy(buffer, CPU->RAM, 0x10000);
@@ -127,6 +133,8 @@ void save_state(int i) {
 	memcpy(buffer, &(PPU->scanline_timeout), sizeof(int));
 	buffer += sizeof(int);
 	memcpy(buffer, &(PPU->lines), sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
+	memcpy(buffer, &(PPU->frames), sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 
 	/* VRAM dumping */

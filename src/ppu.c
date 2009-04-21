@@ -53,6 +53,10 @@ void dump_ppu() {
 	printf("TMPADDR:%04x  ", PPU->temp_addr);
 	printf("SPRADDR:%04x\n", PPU->spr_addr);
 
+	printf("Frame:%02d  ", PPU->frames);
+	printf("Line:%03d   ", PPU->lines);
+	printf("ScanlineT:%03d\n", PPU->scanline_timeout);
+
 }
 
 void dump_spr_ram() {

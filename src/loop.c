@@ -42,7 +42,6 @@ void main_loop(ines_file *file) {
 
 	uint8_t opcode;
 	int standard_lines;
-	int frames;
 	int i;
 	unsigned long long cycles;
 	uint16_t pc_dumps[DUMPS] = { 0xffff };
@@ -55,7 +54,7 @@ void main_loop(ines_file *file) {
 	struct timespec endTime;
 #endif
 
-	frames = 0;
+	PPU->frames = 0;
 	cycles = 0;
 	standard_lines = 0;
 	PPU->lines = -1;
@@ -84,12 +83,17 @@ void main_loop(ines_file *file) {
 		 * now is the time to do it! */
 		if( config.save_state == 1 ) {
 			INFO( printf("Saving current state to %d\n", config.current_state) );
+			dump_cpu();
+			dump_ppu();
 			save_state(config.current_state);
 			config.save_state = 0;
 		}
 		else if( config.load_state == 1 ) {
 			INFO( printf("Loading state %d\n", config.current_state) );
 			load_state(config.current_state);
+			dump_cpu();
+			dump_ppu();
+			cycles = CPU->cycles;
 			config.load_state = 0;
 		}
 
@@ -165,7 +169,7 @@ void main_loop(ines_file *file) {
 
 			else if( PPU->lines < NES_SCREEN_HEIGHT ) {
 				mapper->update();
-				draw_line(PPU->lines++, frames);
+				draw_line(PPU->lines++, PPU->frames);
 			}
 
 			/* Start VBLANK period */
@@ -179,10 +183,10 @@ void main_loop(ines_file *file) {
 					cycles = CPU->cycles;
 				}
 
-				if( !config.run_fast || !(frames%2) )
+				if( !config.run_fast || !(PPU->frames%2) )
 					redraw_screen();
 				PPU->lines++;
-				frames++;
+				PPU->frames++;
 				standard_lines = 0;
 			}
 			/* VBLANK period */
@@ -210,8 +214,8 @@ void main_loop(ines_file *file) {
 					}
 	
 					if( endTime.tv_sec != tmp ) {
-						INFO( fprintf(stderr,"Running at %d fps\n",frames) );
-						frames = 0;
+						INFO( fprintf(stderr,"Running at %d fps\n",PPU->frames) );
+						PPU->frames = 0;
 					}
 	
 					sleepTime.tv_nsec = startTime.tv_nsec - endTime.tv_nsec;

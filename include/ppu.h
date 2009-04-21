@@ -57,6 +57,7 @@ typedef struct _ppu {
 	uint8_t mirroring;     /* Type of mirroring */
 	int scanline_timeout;  /* CPU cycles to next scanline */
 	unsigned int lines;    /* Current scanline */
+	unsigned int frames;   /* Frame counting */
 
 } nes_ppu;
 
