@@ -374,6 +374,9 @@ void initialize_instruction_set() {
 	SET_INSTRUCTION_ADDR_DATA( SAX, ABSOLUTE,  0x8F, 3, 4, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( SAX, IND_INDIR, 0x83, 2, 6, NORMAL);
 
+	/* SBC instruction (this is the only illegal opcode) */
+	SET_INSTRUCTION_ADDR_DATA( SBC, IMMEDIATE, 0xEB, 2, 2, NORMAL);
+
 	/* SLO instruction */
 	SET_INSTRUCTION_ADDR_DATA( SLO, ZEROPAGE,  0x07, 2, 5, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( SLO, ZERO_INDX, 0x17, 2, 6, NORMAL);
