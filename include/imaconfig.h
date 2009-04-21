@@ -16,6 +16,12 @@ typedef struct _config {
 	int use_sdl_colors;          /* Let SDL convert RGB values */
 } imanes_config;
 
+typedef enum _imanes_dir {
+	States,    /* To save internal states of ImaNES*/
+	Saves,     /* To save ROM's SRAM */
+	Snapshots  /* To save snapshots taken from ImaNES */
+} imanes_dir;
+
 /* This is the global configuration */
 extern imanes_config config;
 
@@ -25,8 +31,12 @@ void initialize_configuration();
 /* Loads per-user configuration */
 void load_user_configuration();
 
-/* Checks the existence (and creates) of per-user imanes config di
+/* Checks the existence (and creates) of per-user imanes config directory
  * and returns its name */
-char *get_imanes_dir();
+char *get_user_imanes_dir();
+
+/** Checks and returns internal config directories under the per-user
+ * imanes config directory */
+char *get_imanes_dir(imanes_dir dir);
 
 #endif /* imaconfig_h */

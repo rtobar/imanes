@@ -30,23 +30,23 @@
 #include "palette.h"
 #include "ppu.h"
 
-#ifdef _MSC_VER
-#define inline __inline
-#endif
-
 nes_cpu *CPU;
 
 void initialize_cpu() {
 
 	CPU = (nes_cpu *)malloc(sizeof(nes_cpu));
+	CPU->A = 0;
+	CPU->X = 0;
+	CPU->Y = 0;
+	CPU->SR = R_FLAG; /* It is never ever used, but always set */
+	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
+
 	CPU->cycles = 0;
 	CPU->nmi_cycles = 0;
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
-	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
 	CPU->reset = 1;
 	CPU->sram_enabled = 0;
 	CPU->sram_enabled &= ~SRAM_ENABLE;
-	CPU->SR = R_FLAG; /* It is never ever used, but always set */
 
 	return;
 }

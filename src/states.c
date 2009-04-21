@@ -27,7 +27,7 @@ void load_state(int i) {
 
 	char *user_imanes_dir;
 
-	user_imanes_dir = get_imanes_dir();
+	user_imanes_dir = get_user_imanes_dir();
 
 	free(user_imanes_dir);
 	return;
@@ -38,7 +38,7 @@ void save_state(int i) {
 	char *user_imanes_dir;
 	void *buffer, *buffer_start;
 
-	user_imanes_dir = get_imanes_dir();
+	user_imanes_dir = get_imanes_dir(States);
 
 	/* Memory allocation for state information */
 	buffer = malloc(

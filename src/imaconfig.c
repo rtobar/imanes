@@ -23,10 +23,11 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 #include <direct.h>
 #endif
 
+#include "debug.h"
 #include "imaconfig.h"
 
 imanes_config config;
@@ -53,24 +54,51 @@ void initialize_configuration() {
 
 void load_user_configuration() {
 
-	get_imanes_dir();
+	get_user_imanes_dir();
 
 	return;
 }
 
-char *get_imanes_dir() {
+/* Internal method to check and create a directory.
+ * It returns 0 when returns gracefully, -1 otherwise */
+int check_and_create(char *dir) {
 
 	int tmp;
+	struct stat s;
+
+	/* Check if the directory exists */
+	tmp = stat(dir, &s);
+
+	/* Not found, let's create it (we assume that $HOME exists) */
+	if( tmp == -1 ) {
+		fprintf(stderr,"Directory '%s' not found, creating it...\n", dir);
+#ifdef _MSC_VER
+		tmp = _mkdir(dir);
+#else
+		tmp = mkdir(dir, S_IRWXU | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+#endif
+
+		if( tmp == -1 ) {
+			fprintf(stderr,"Error while creating directory '%s': ", dir);
+			perror(NULL);
+			return -1;
+		}
+	}
+
+	return 0;
+}
+
+char *get_user_imanes_dir() {
+
 	char * user_home;
 	char * user_imanes_dir;
-	struct stat s;
-#ifdef _WIN32
+#ifdef _MSC_VER
 	size_t size;
 #endif
 
-#ifdef _WIN32
+#ifdef _MSC_VER
 	_dupenv_s(&user_home, &size, "APPDATA");
-	printf("Data directory is %s\n", user_home);
+	INFO( printf("Data directory is %s\n", user_home) );
 #else
 	user_home = getenv("HOME");
 #endif
@@ -81,31 +109,73 @@ char *get_imanes_dir() {
 	}
 
 	user_imanes_dir = (char *)malloc(strlen(user_home) + 9);
-#ifdef _WIN32
-	sprintf_s(user_imanes_dir,strlen(user_home)+9,"%s/Imanes/",user_home);
+#ifdef _MSC_VER
+	sprintf_s(user_imanes_dir,strlen(user_home)+9,"%s/Imanes",user_home);
 #else
-	sprintf(user_imanes_dir,"%s/.imanes/", user_home);
+	sprintf(user_imanes_dir,"%s/.imanes", user_home);
 #endif
 
-	/* Check if the directory exists */
-	tmp = stat(user_imanes_dir, &s);
-
-	/* Not found, let's create it (we assume that $HOME exists) */
-	if( tmp == -1 ) {
-		fprintf(stderr,"Directory '%s' not found, creating it...\n", user_imanes_dir);
-#ifdef _WIN32
-		tmp = _mkdir(user_imanes_dir);
-#else
-		tmp = mkdir(user_imanes_dir, S_IRWXU | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-#endif
-
-		if( tmp == -1 ) {
-			fprintf(stderr,"Error while creating directory '%s': ", user_imanes_dir);
-			perror(NULL);
-			return NULL;
-		}
-	}
+	if( check_and_create(user_imanes_dir) )
+		return NULL;
 
 	return user_imanes_dir;
+}
 
+char *get_imanes_dir(imanes_dir dir) {
+
+	char *user_imanes_dir;
+	char *specific_dir;
+
+	user_imanes_dir = get_user_imanes_dir();
+	specific_dir = NULL;
+
+	if( user_imanes_dir == NULL )
+		return NULL;
+
+	switch(dir) {
+
+		case States:
+			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 8);
+#ifdef _MSC_VER
+			sprintf_s(user_imanes_dir,strlen(user_home)+8,"%s/states",user_home);
+#else
+			sprintf(specific_dir, "%s/states", user_imanes_dir);
+#endif
+			if( check_and_create(specific_dir) ) {
+				free(specific_dir);
+				free(user_imanes_dir);
+				return NULL;
+			}
+			break;
+
+		case Saves:
+			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 7);
+#ifdef _MSC_VER
+			sprintf_s(user_imanes_dir,strlen(user_home)+7,"%s/saves",user_home);
+#else
+			sprintf(specific_dir, "%s/saves", user_imanes_dir);
+#endif
+			if( check_and_create(specific_dir) ) {
+				free(specific_dir);
+				free(user_imanes_dir);
+				return NULL;
+			}
+			break;
+
+		case Snapshots:
+			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 11);
+#ifdef _MSC_VER
+			sprintf_s(user_imanes_dir,strlen(user_home)+11,"%s/snapshots",user_home);
+#else
+			sprintf(specific_dir, "%s/snapshots", user_imanes_dir);
+#endif
+			if( check_and_create(specific_dir) ) {
+				free(specific_dir);
+				free(user_imanes_dir);
+				return NULL;
+			}
+			break;
+	}
+
+	return specific_dir;
 }
