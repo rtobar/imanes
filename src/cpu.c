@@ -440,7 +440,7 @@ void execute_instruction(instruction inst, operand oper) {
 			tmp16 = CPU->A - oper.value - (1 - (CPU->SR & C_FLAG));
 
 			/* If result is over 0xFF, then the carry is 1 */
-			if( tmp16 >= 0xFF )
+			if( tmp16 > 0xFF )
 				CPU->SR &= ~C_FLAG;
 			else
 				CPU->SR |= C_FLAG;
