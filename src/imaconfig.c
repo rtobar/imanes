@@ -34,6 +34,8 @@ imanes_config config;
 
 void initialize_configuration() {
 
+	char *dummy;
+
 	/* Emulator window */
 	config.show_bg  = 1;
 	config.show_front_spr = 1;
@@ -50,6 +52,11 @@ void initialize_configuration() {
 
 	/* Use our color construction */
 	config.use_sdl_colors = 0;
+
+	/* Creates all directories if necessary */
+	dummy = get_imanes_dir(States);    free(dummy);
+	dummy = get_imanes_dir(Saves);     free(dummy);
+	dummy = get_imanes_dir(Snapshots); free(dummy);
 }
 
 void load_user_configuration() {
