@@ -82,36 +82,44 @@ void nes_keydown(SDL_keysym keysym) {
 			break;
 
 		/* Show background */
-		case SDLK_F1:
+		case SDLK_1:
 			INFO( printf("Background %s\n", (config.show_bg  ? "OFF" : "ON")) );
 			config.show_bg  = ( !config.show_bg );
 			break;
 
 		/* Show front sprites */
-		case SDLK_F2:
+		case SDLK_2:
 			INFO( printf("Front sprites %s\n", (config.show_front_spr ? "OFF": "ON")) );
 			config.show_front_spr = ( !config.show_front_spr );
 			break;
 
 		/* Show front sprites */
-		case SDLK_F3:
+		case SDLK_3:
 			INFO( printf("Back sprites %s\n", (config.show_back_spr ? "OFF": "ON")) );
 			config.show_back_spr = ( !config.show_back_spr );
 			break;
 
-		case SDLK_F4:
+		case SDLK_4:
 			INFO( printf("Screen background %s\n", (config.show_screen_bg ? "OFF" : "ON")) );
 			config.show_screen_bg = ( !config.show_screen_bg );
 			break;
 
 		/* Reset */
-		case SDLK_F5:
+		case SDLK_5:
 			INFO( printf("Reseting NES\n") );
 			CPU->reset = 1;
 			break;
 
+		case SDLK_F7:
+			dump_spr_ram();
+			INFO( printf("Instructions never executed:\n") );
+			for(i=0;i!=INSTRUCTIONS_NUMBER;i++)
+				if(instructions[i].size != 0 && !instructions[i].executed )
+					printf("%02x - %s\n", instructions[i].opcode, instructions[i].name);
+
+
 		/* Pause */
-		case SDLK_F6:
+		case SDLK_ESCAPE:
 			INFO( printf("%s emulation\n", (config.pause ? "Resuming" : "Pausing")) );
 			if( !config.pause ) {
 				SDL_mutexP(pause_mutex);
@@ -122,13 +130,6 @@ void nes_keydown(SDL_keysym keysym) {
 				config.pause = 0;
 			}
 			break;
-
-		case SDLK_F7:
-			dump_spr_ram();
-			INFO( printf("Instructions never executed:\n") );
-			for(i=0;i!=INSTRUCTIONS_NUMBER;i++)
-				if(instructions[i].size != 0 && !instructions[i].executed )
-					printf("%02x - %s\n", instructions[i].opcode, instructions[i].name);
 
 		/* Run as fast as possible */
 		case SDLK_BACKSPACE:
