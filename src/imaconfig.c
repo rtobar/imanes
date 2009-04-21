@@ -53,7 +53,10 @@ void initialize_configuration() {
 	/* Use our color construction */
 	config.use_sdl_colors = 0;
 
-	/* Creates all directories if necessary */
+	/* Start with the state 0 */
+	config.current_state = 0;
+
+	/* Create all directories if necessary */
 	dummy = get_imanes_dir(States);    free(dummy);
 	dummy = get_imanes_dir(Saves);     free(dummy);
 	dummy = get_imanes_dir(Snapshots); free(dummy);

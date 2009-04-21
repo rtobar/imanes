@@ -24,6 +24,7 @@
 #include "loop.h"
 #include "pad.h"
 #include "ppu.h"
+#include "states.h"
 
 nes_pad pads[2];
 
@@ -102,6 +103,23 @@ void nes_keydown(SDL_keysym keysym) {
 		case SDLK_4:
 			INFO( printf("Screen background %s\n", (config.show_screen_bg ? "OFF" : "ON")) );
 			config.show_screen_bg = ( !config.show_screen_bg );
+			break;
+
+		/* Save a state */
+		case SDLK_F2:
+			save_state(config.current_state);
+			break;
+
+		/* Choose which state to use */
+		case SDLK_F3:
+			config.current_state++;
+			if( config.current_state == 10 )
+				config.current_state = 0;
+			break;
+
+		/* Load a state */
+		case SDLK_F4:
+			load_state(config.current_state);
 			break;
 
 		/* Reset */
