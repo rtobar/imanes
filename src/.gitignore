@@ -4,3 +4,5 @@ Makefile.in
 *.o
 imanes
 gmon.out
+tags
+TAGS
