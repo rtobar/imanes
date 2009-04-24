@@ -18,14 +18,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef __APPLE__
-#include <SDL/SDL.h>
-#include <SDL/SDL_thread.h>
-#else
-#include <SDL.h>
-#include <SDL_thread.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -35,8 +27,10 @@
 #include "pad.h"
 #include "screen.h"
 
+/* This is used by the screenshot utility */
+SDL_Surface *nes_screen;
+
 static SDL_Thread  *screen_thread;
-static SDL_Surface *nes_screen;
 
 int screen_loop(void *args) {
 
