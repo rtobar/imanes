@@ -39,8 +39,8 @@
 void save_screenshot() {
 
 	int fd;
-	unsigned int i;
-	unsigned int j;
+	int i;
+	int j;
 	unsigned int offset;
 	unsigned int total_size;
 	ssize_t written;
@@ -69,10 +69,8 @@ void save_screenshot() {
 	memcpy(buffer + 0x0E, &tmp32, 4);
 	/* Dimensions */
 	tmp32 = NES_SCREEN_WIDTH;
-	tmp32 = 2;
 	memcpy(buffer + 0x12, &tmp32, 4);
 	tmp32 = NES_NTSC_HEIGHT;
-	tmp32 = 2;
 	memcpy(buffer + 0x16, &tmp32, 4);
 	tmp16 = 1;
 	memcpy(buffer + 0x1A, &tmp16, 2);
@@ -83,7 +81,6 @@ void save_screenshot() {
 	memset(buffer + 0x1E, 0, 4);
 	/* Raw data size */
 	tmp32 = (NES_SCREEN_WIDTH * NES_NTSC_HEIGHT)*3;
-	tmp32 = 0x10;
 	memcpy(buffer + 0x22, &tmp32, 4);
 	/* Resolutions */
 	tmp32 = 2835;
@@ -102,6 +99,7 @@ void save_screenshot() {
 			memcpy(buffer + offset++, color, 1);
 			memcpy(buffer + offset++, color+1, 1);
 			memcpy(buffer + offset++, color+2, 1);
+			printf("Saved color at %04x. i=%3d, j=%3d\n", offset, i, j);
 		}
 	}
 
