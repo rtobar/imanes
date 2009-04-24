@@ -58,6 +58,8 @@ void initialize_configuration() {
 	config.save_state = 0;
 	config.load_state = 0;
 
+	config.take_screenshot = 0;
+
 	/* Create all directories if necessary */
 	dummy = get_imanes_dir(States);    free(dummy);
 	dummy = get_imanes_dir(Saves);     free(dummy);

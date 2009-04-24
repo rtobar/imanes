@@ -26,6 +26,7 @@
 #include "loop.h"
 #include "pad.h"
 #include "screen.h"
+#include "screenshot.h"
 
 /* This is used by the screenshot utility */
 SDL_Surface *nes_screen;
@@ -134,6 +135,12 @@ void draw_pixel(int x, int y, nes_palette color) {
 }
 
 void redraw_screen() {
+
+	/* Take screenshot */
+	if( config.take_screenshot ) {
+		config.take_screenshot = 0;
+		save_screenshot();
+	}
 
 	if( SDL_Flip(nes_screen) == -1 ) {
 		fprintf(stderr,"Couldn't refresh screen :(\n");

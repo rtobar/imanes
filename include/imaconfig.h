@@ -19,6 +19,8 @@ typedef struct _config {
 	int verbosity;               /* How verbose imanes should be */
 	int run_fast;                /* Run as fast as possible */
 	int use_sdl_colors;          /* Let SDL convert RGB values */
+
+	int take_screenshot;         /* Should we take a screenshot? */
 } imanes_config;
 
 typedef enum _imanes_dir {

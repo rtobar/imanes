@@ -104,6 +104,10 @@ void nes_keydown(SDL_keysym keysym) {
 			config.show_screen_bg = ( !config.show_screen_bg );
 			break;
 
+		case SDLK_F1:
+			config.take_screenshot = 1;
+			break;
+
 		/* Save a state. We just set a flag, since the actual
 		 * loading is done in the main thread. */
 		case SDLK_F2:
