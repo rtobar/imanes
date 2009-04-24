@@ -25,22 +25,40 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef __APPLE__
+#include <SDL/SDL.h>
+#include <SDL/SDL_thread.h>
+#else
+#include <SDL.h>
+#include <SDL_thread.h>
+#endif
+
+#include "screen.h"
+#include "screenshot.h"
+
 void save_screenshot() {
 
 	int fd;
+	unsigned int i;
+	unsigned int j;
+	unsigned int offset;
+	unsigned int total_size;
 	ssize_t written;
 	void *buffer;
+	void *color;
 	uint16_t tmp16;
 	uint32_t tmp32;
+	Uint32 *pixels;
 
-	buffer = malloc(0x46);
+	total_size = 0x10 + (NES_SCREEN_WIDTH * NES_NTSC_HEIGHT)*3;
+	buffer = malloc(total_size);
 
 	/* Magic number */
 	memset(buffer, 'B', 1);
 	memset(buffer + 0x01, 'M', 1);
 
 	/* file size, reserved data and offset */
-	tmp32 = 0x46;
+	tmp32 = total_size;
 	memcpy(buffer + 0x02, &tmp32, 4);
 	memset(buffer + 0x06, 0, 4);
 	tmp32 = 0x36;
@@ -50,10 +68,10 @@ void save_screenshot() {
 	tmp32 = 0x28;
 	memcpy(buffer + 0x0E, &tmp32, 4);
 	/* Dimensions */
-	//tmp32 = NES_SCREEN_WIDTH;
+	tmp32 = NES_SCREEN_WIDTH;
 	tmp32 = 2;
 	memcpy(buffer + 0x12, &tmp32, 4);
-	//tmp32 = NES_NTSC_HEIGHT;
+	tmp32 = NES_NTSC_HEIGHT;
 	tmp32 = 2;
 	memcpy(buffer + 0x16, &tmp32, 4);
 	tmp16 = 1;
@@ -64,7 +82,7 @@ void save_screenshot() {
 	/* Compression method */
 	memset(buffer + 0x1E, 0, 4);
 	/* Raw data size */
-	//tmp32 = (NES_SCREEN_WIDTH * NES_NTSC_HEIGHT)*3;
+	tmp32 = (NES_SCREEN_WIDTH * NES_NTSC_HEIGHT)*3;
 	tmp32 = 0x10;
 	memcpy(buffer + 0x22, &tmp32, 4);
 	/* Resolutions */
@@ -76,22 +94,16 @@ void save_screenshot() {
 	memset(buffer + 0x32, 0, 4);
 
 	/* Pixel data */
-	memset(buffer + 0x36, 0, 1);
-	memset(buffer + 0x37, 0, 1);
-	memset(buffer + 0x38, 255, 1);
-	memset(buffer + 0x39, 255, 1);
-	memset(buffer + 0x3A, 255, 1);
-	memset(buffer + 0x3B, 255, 1);
-	memset(buffer + 0x3C, 0, 1);
-	memset(buffer + 0x3D, 0, 1);
-	memset(buffer + 0x3E, 255, 1);
-	memset(buffer + 0x3F, 0, 1);
-	memset(buffer + 0x40, 0, 1);
-	memset(buffer + 0x41, 0, 1);
-	memset(buffer + 0x42, 255, 1);
-	memset(buffer + 0x43, 0, 1);
-	memset(buffer + 0x44, 0, 1);
-	memset(buffer + 0x45, 0, 1);
+	offset = 0x36;
+	pixels = (Uint32*)nes_screen->pixels;
+	for(i = NES_NTSC_HEIGHT - 1; i>=0; i--) {
+		for(j = 0; j!= NES_SCREEN_WIDTH; j++) {
+			color = pixels+i*NES_SCREEN_WIDTH+j;
+			memcpy(buffer + offset++, color, 1);
+			memcpy(buffer + offset++, color+1, 1);
+			memcpy(buffer + offset++, color+2, 1);
+		}
+	}
 
 	fd = open("screenshot.bmp", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
@@ -100,8 +112,8 @@ void save_screenshot() {
 		return;
 	}
 
-	written = write(fd, (void *)buffer, 0x46);
-	if( written != 0x46 ) {
+	written = write(fd, (void *)buffer, total_size);
+	if( written != total_size ) {
 		perror("Error while saving snapshot");
 		return;
 	}
