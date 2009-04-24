@@ -33,6 +33,7 @@
 #include <SDL_thread.h>
 #endif
 
+#include "debug.h"
 #include "screen.h"
 #include "screenshot.h"
 
@@ -50,7 +51,7 @@ void save_screenshot() {
 	uint32_t tmp32;
 	Uint32 *pixels;
 
-	total_size = 0x10 + (NES_SCREEN_WIDTH * NES_NTSC_HEIGHT)*3;
+	total_size = 0x36 + (NES_SCREEN_WIDTH * NES_NTSC_HEIGHT)*3;
 	buffer = malloc(total_size);
 
 	/* Magic number */
@@ -99,7 +100,6 @@ void save_screenshot() {
 			memcpy(buffer + offset++, color, 1);
 			memcpy(buffer + offset++, color+1, 1);
 			memcpy(buffer + offset++, color+2, 1);
-			printf("Saved color at %04x. i=%3d, j=%3d\n", offset, i, j);
 		}
 	}
 
@@ -116,6 +116,8 @@ void save_screenshot() {
 		return;
 	}
 	close(fd);
+
+	INFO( printf("Saved screenshot at '%s'\n", "screenshot.bmp") );
 
 	free(buffer);
 }
