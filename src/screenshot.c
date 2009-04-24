@@ -34,6 +34,7 @@
 #endif
 
 #include "debug.h"
+#include "imaconfig.h"
 #include "screen.h"
 #include "screenshot.h"
 
@@ -44,6 +45,8 @@ void save_screenshot() {
 	int j;
 	unsigned int offset;
 	unsigned int total_size;
+	char *ss_dir;
+	char *ss_file;
 	ssize_t written;
 	void *buffer;
 	void *color;
@@ -103,10 +106,22 @@ void save_screenshot() {
 		}
 	}
 
-	fd = open("screenshot.bmp", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+	ss_dir = get_imanes_dir(Snapshots);
+	if( ss_dir == NULL ) {
+		fprintf(stderr,"Couldn't save screenshot\n");
+		free(buffer);
+		free(ss_dir);
+		return;
+	}
+
+	ss_file = (char *)malloc(strlen(ss_dir) + 7);
+	sprintf(ss_file,"%s/0.bmp", ss_dir);
+	free(ss_dir);
+
+	fd = open(ss_file, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 
 	if( fd == -1 ) {
-		perror("Error while opening 'screenshot.bmp'");
+		perror("Error while opening 'ss_file'");
 		return;
 	}
 
@@ -117,7 +132,7 @@ void save_screenshot() {
 	}
 	close(fd);
 
-	INFO( printf("Saved screenshot at '%s'\n", "screenshot.bmp") );
+	INFO( printf("Saved screenshot at '%s'\n", ss_file) );
 
 	free(buffer);
 }
