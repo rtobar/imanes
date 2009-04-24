@@ -49,7 +49,6 @@ void save_sram(char *save_file) {
 	if( !CPU->sram_enabled )
 		return;
 
-	return;
 #ifdef _MSC_VER
 	fd = _sopen_s(&fd,save_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
 #else
@@ -116,7 +115,6 @@ char *load_sram(char *rom_file) {
 	memcpy(tmp, rom_file + i + 1, strlen(rom_file) - i);
 
 	/* Find where the extension of the file begins */
-	printf("Given file is '%s'\n", tmp);
 	for(i=strlen(tmp); i>=0; i--) {
 		if( tmp[i] == '.' ) {
 			tmp[i] = '\0';
@@ -132,7 +130,6 @@ char *load_sram(char *rom_file) {
 #endif
 	free(tmp);
 	free(save_dir);
-	printf("Saving file is '%s'\n", save_file);
 
 	#ifdef _MSC_VER
 	fd = _sopen_s(&fd,save_file, O_RDONLY, _SH_DENYWR, _S_IREAD|_S_IWRITE);
@@ -143,8 +140,7 @@ char *load_sram(char *rom_file) {
 	if( fd == -1 ) {
 		fprintf(stderr,"Error while opening '%s': ", save_file);
 		perror(NULL);
-		free(save_file);
-		return NULL;
+		return save_file;
 	}
 
 #ifdef _MSC_VER
