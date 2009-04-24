@@ -16,6 +16,7 @@ imanes_SOURCES = \
      parse_file.c \
      ppu.c \
      screen.c \
+     screenshot.c \
      sram.c \
      states.c \
      unrom.c

@@ -121,6 +121,7 @@ int main(int args, char *argv[]) {
 	setbuf(stderr,NULL);
 #endif
 
+	save_screenshot();
 	/* Parse command line options */
 	parse_options(args, argv);
 
