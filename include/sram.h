@@ -7,8 +7,8 @@
 void save_sram(char * file);
 
 /* Function used to get the contents of the SRAM from a
- * file on disk
+ * file on disk. Returns the file where the contents are saves
  */
-void load_sram(char * file);
+char * load_sram(char * rom_file);
 
 #endif /* sram_h */

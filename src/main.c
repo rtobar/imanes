@@ -109,6 +109,7 @@ void parse_options(int args, char *argv[]) {
 
 int main(int args, char *argv[]) {
 
+	char *save_file;
 	ines_file *nes_rom;
 
 	/* Print NOW everything :D */
@@ -136,7 +137,7 @@ int main(int args, char *argv[]) {
 	/* Read the ines file and get all the ROM/VROM */
 	nes_rom = check_ines_file(argv[optind]);
 	map_rom_memory(nes_rom);
-	load_sram(argv[optind]);
+	save_file = load_sram(argv[optind]);
 
 	/* Create the screen and a separate thread for the events */
 	init_screen();
@@ -146,7 +147,7 @@ int main(int args, char *argv[]) {
 
 	end_screen();
 	free_ines_file(nes_rom);
-	save_sram(argv[optind]);
+	save_sram(save_file);
 
 	return 0;
 }
