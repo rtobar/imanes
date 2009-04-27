@@ -49,16 +49,21 @@ void screen_loop() {
 
 		while( SDL_PollEvent(&event) ) {
 			switch(event.type) {
-	
-				case SDL_KEYDOWN:
-					nes_keydown(event.key.keysym);
-					break;
-	
+
 				case SDL_KEYUP:
 					nes_keyup(event.key.keysym);
 					break;
-	
+
+				/* Alt-F4 in Windows should lead us to SDL_QUIT */
+				case SDL_KEYDOWN:
+					if( !(event.key.keysym.sym == SDLK_F4 &&
+						event.key.keysym.mod == SDLK_LALT) ) {
+						nes_keydown(event.key.keysym);
+						break;
+					}
+
 				case SDL_QUIT:
+					printf("Quiting ImaNES\n");
 					run_loop = 0;
 					SDL_mutexV(pause_mutex);
 					return;

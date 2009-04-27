@@ -98,6 +98,7 @@ char *load_sram(char *rom_file) {
 	if( !CPU->sram_enabled )
 		return NULL;
 
+	INFO( printf("Loading SRAM... ") );
 	save_dir = get_imanes_dir(Saves);
 
 	if( save_dir == NULL ) {
@@ -158,5 +159,6 @@ char *load_sram(char *rom_file) {
 	close(fd);
 #endif
 
+	INFO( printf("done!\n") );
 	return save_file;
 }

@@ -138,9 +138,7 @@ int main(int args, char *argv[]) {
 	/* Read the ines file and get all the ROM/VROM */
 	nes_rom = check_ines_file(argv[optind]);
 	map_rom_memory(nes_rom);
-	INFO( printf("Loading SRAM... ") );
 	save_file = load_sram(argv[optind]);
-	INFO( printf("done!\n") );
 
 	/* Create the screen and a separate thread for the events */
 	init_screen();
