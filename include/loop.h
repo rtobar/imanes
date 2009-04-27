@@ -7,12 +7,10 @@
 #include <SDL_thread.h>
 #endif
 
-extern SDL_mutex *pause_mutex;
-
 /**
  * This is the main program loop
  */
-void main_loop();
+int main_loop(void *);
 
 /**
  * Ends the VBlank period

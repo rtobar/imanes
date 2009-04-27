@@ -21,7 +21,7 @@
 #include "cpu.h"
 #include "debug.h"
 #include "imaconfig.h"
-#include "loop.h"
+#include "screen.h"
 #include "pad.h"
 #include "ppu.h"
 

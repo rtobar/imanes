@@ -19,6 +19,10 @@
 
 /* This is used by the screenshot utility */
 extern SDL_Surface *nes_screen;
+extern SDL_mutex *pause_mutex;
+
+/* Screen loop */
+void screen_loop(void);
 
 /**
  * This method initializes the screen where everything is going to be drawn

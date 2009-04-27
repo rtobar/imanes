@@ -34,11 +34,9 @@
 
 #define DUMPS   1
 
-SDL_mutex *pause_mutex;
-
 int run_loop;
 
-void main_loop() {
+int main_loop(void *args) {
 
 	uint8_t opcode;
 	int standard_lines;
@@ -59,8 +57,6 @@ void main_loop() {
 	standard_lines = 0;
 	PPU->lines = -1;
 	PPU->scanline_timeout = CYCLES_PER_SCANLINE;
-
-	pause_mutex = SDL_CreateMutex();
 
 	/* Get the initial time for the first screen drawing */
 #ifndef _MSC_VER
@@ -114,7 +110,7 @@ void main_loop() {
 			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
 			fprintf(stderr,"I'm exiting now... sorry :(\n");
 			fprintf(stderr,"Close the window when finished\n");
-			return;
+			return -1;
 		}
 
 		/* Select operand depending on the addressing node */
@@ -240,6 +236,7 @@ void main_loop() {
 
 	}
 
+	return 0;
 }
 
 void end_vblank() {

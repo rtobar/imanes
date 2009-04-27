@@ -111,6 +111,7 @@ int main(int args, char *argv[]) {
 
 	char *save_file;
 	ines_file *nes_rom;
+	SDL_Thread *main_thread;
 
 	/* Print NOW everything :D */
 #ifdef _MSC_VER
@@ -145,7 +146,10 @@ int main(int args, char *argv[]) {
 	init_screen();
 
 	/* Main execution loop */
-	main_loop();
+	/* The main loop goes in a separate thread */
+	main_thread = SDL_CreateThread(main_loop, NULL);
+	screen_loop();
+	SDL_WaitThread(main_thread,NULL);
 
 	end_screen();
 	free_ines_file(nes_rom);

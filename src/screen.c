@@ -30,12 +30,13 @@
 
 /* This is used by the screenshot utility */
 SDL_Surface *nes_screen;
+SDL_mutex *pause_mutex;
 
-static SDL_Thread  *screen_thread;
-
-int screen_loop(void *args) {
+void screen_loop() {
 
 	SDL_Event event;
+
+	SDL_mutexV(pause_mutex);
 
 	/* Here comes the main event loop */
 	while(1) {
@@ -60,7 +61,7 @@ int screen_loop(void *args) {
 				case SDL_QUIT:
 					run_loop = 0;
 					SDL_mutexV(pause_mutex);
-					return 0;
+					return;
 			}
 		}
 	}
@@ -71,6 +72,8 @@ int screen_loop(void *args) {
 void init_screen() {
 	
 	char window_title[30];
+	pause_mutex = SDL_CreateMutex();
+	SDL_mutexP(pause_mutex);
 
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
 		fprintf(stderr,"Error when initializing screen: %s\n", SDL_GetError());
@@ -90,15 +93,10 @@ void init_screen() {
 #endif
 
 	SDL_WM_SetCaption(window_title,NULL);
-
-	/* The event loop should go in a separate thread */
-	screen_thread = SDL_CreateThread(screen_loop, NULL);
-
 }
 
 void end_screen() {
 
-	SDL_WaitThread(screen_thread,NULL);
 	SDL_Quit();
 
 }
