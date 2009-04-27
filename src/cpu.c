@@ -909,7 +909,7 @@ void execute_nmi() {
 
 	/* Push the PC and the SR */
 	/* Finally, jump to the interrupt vector */
-	stack_push( CPU->PC >> 8 );
+	stack_push( (CPU->PC >> 8) & 0xFF );
 	stack_push( CPU->PC & 0xFF );
 	stack_push( CPU->SR );
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
@@ -939,7 +939,7 @@ void execute_irq() {
 	if( CPU->SR & I_FLAG )
 		return;
 
-	stack_push( (CPU->PC+2) >> 8 );
+	stack_push( ((CPU->PC+2) >> 8) & 0xFF );
 	stack_push( (CPU->PC+2) & 0xFF );
 	stack_push( CPU->SR );
 	CPU->PC = ( CPU->RAM[0xFFFE] | ( CPU->RAM[0xFFFF]<<8 ) );
