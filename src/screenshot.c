@@ -23,7 +23,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef _MSC_VER
+#include <io.h>
+#include <share.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#else
 #include <unistd.h>
+#endif
 
 #ifdef __APPLE__
 #include <SDL/SDL.h>
@@ -47,15 +55,19 @@ void save_screenshot() {
 	unsigned int total_size;
 	char *ss_dir;
 	char *ss_file;
-	ssize_t written;
-	void *buffer;
-	void *color;
+	char *buffer;
+	char *color;
 	uint16_t tmp16;
 	uint32_t tmp32;
 	Uint32 *pixels;
+#ifdef _MSC_VER
+	int written;
+#else
+	ssize_t written;
+#endif
 
 	total_size = 0x36 + (NES_SCREEN_WIDTH * NES_NTSC_HEIGHT)*3;
-	buffer = malloc(total_size);
+	buffer = (char *)malloc(total_size);
 
 	/* Magic number */
 	memset(buffer, 'B', 1);
@@ -99,7 +111,7 @@ void save_screenshot() {
 	pixels = (Uint32*)nes_screen->pixels;
 	for(i = NES_NTSC_HEIGHT - 1; i>=0; i--) {
 		for(j = 0; j!= NES_SCREEN_WIDTH; j++) {
-			color = pixels+i*NES_SCREEN_WIDTH+j;
+			color = (char *)(pixels+i*NES_SCREEN_WIDTH+j);
 			memcpy(buffer + offset++, color, 1);
 			memcpy(buffer + offset++, color+1, 1);
 			memcpy(buffer + offset++, color+2, 1);
@@ -115,22 +127,35 @@ void save_screenshot() {
 	}
 
 	ss_file = (char *)malloc(strlen(ss_dir) + 7);
+#ifdef _MSC_VER
+	sprintf_s(ss_file,strlen(ss_dir)+7,"%s/0.bmp", ss_dir);
+	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+#else
 	sprintf(ss_file,"%s/0.bmp", ss_dir);
-	free(ss_dir);
-
 	fd = open(ss_file, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+#endif
+	free(ss_dir);
 
 	if( fd == -1 ) {
 		perror("Error while opening 'ss_file'");
 		return;
 	}
 
+#ifdef _MSC_VER
+	written = _write(fd, (void *)buffer, total_size);
+#else
 	written = write(fd, (void *)buffer, total_size);
+#endif
+
 	if( written != total_size ) {
 		perror("Error while saving snapshot");
 		return;
 	}
+#ifdef _MSC_VER
+	_close(fd);
+#else
 	close(fd);
+#endif
 
 	INFO( printf("Saved screenshot at '%s'\n", ss_file) );
 

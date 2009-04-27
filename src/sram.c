@@ -50,7 +50,7 @@ void save_sram(char *save_file) {
 		return;
 
 #ifdef _MSC_VER
-	fd = _sopen_s(&fd,save_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+	_sopen_s(&fd,save_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
 #else
 	fd = open(save_file, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 #endif

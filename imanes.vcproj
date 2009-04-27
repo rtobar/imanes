@@ -44,7 +44,7 @@
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="2"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
@@ -140,7 +140,7 @@
 				AdditionalDependencies="SDL.lib SDLmain.lib"
 				OutputFile="$(ProjectName).exe"
 				LinkIncremental="1"
-				GenerateManifest="false"
+				GenerateManifest="true"
 				IgnoreAllDefaultLibraries="false"
 				AddModuleNamesToAssembly=""
 				GenerateDebugInformation="false"
@@ -234,6 +234,10 @@
 		</File>
 		<File
 			RelativePath=".\src\screen.c"
+			>
+		</File>
+		<File
+			RelativePath=".\src\screenshot.c"
 			>
 		</File>
 		<File

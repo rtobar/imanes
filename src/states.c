@@ -28,7 +28,7 @@ void *tmp;
 void load_state(int i) {
 
 	char *user_imanes_dir;
-	void *buffer;
+	char *buffer;
 
 	user_imanes_dir = get_user_imanes_dir();
 
@@ -42,7 +42,7 @@ void load_state(int i) {
 	memcpy(&(CPU->SR),     buffer, 1); buffer++;
 	memcpy(&(CPU->PC),     buffer, 2); buffer += 2;
 	memcpy(&(CPU->cycles), buffer, sizeof(unsigned long long));
-   buffer += sizeof(unsigned long long);
+	buffer += sizeof(unsigned long long);
 	memcpy(&(CPU->nmi_cycles), buffer, sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 
@@ -88,7 +88,7 @@ void load_state(int i) {
 void save_state(int i) {
 
 	char *states_dir;
-	void *buffer, *buffer_start;
+	char *buffer, *buffer_start;
 
 	states_dir = get_imanes_dir(States);
 
@@ -112,7 +112,7 @@ void save_state(int i) {
 	memcpy(buffer, &(CPU->SR), 1); buffer++;
 	memcpy(buffer, &(CPU->PC), 2); buffer += 2;
 	memcpy(buffer, &(CPU->cycles), sizeof(unsigned long long));
-   buffer += sizeof(unsigned long long);
+	buffer += sizeof(unsigned long long);
 	memcpy(buffer, &(CPU->nmi_cycles), sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 
