@@ -168,6 +168,9 @@ int main_loop(void *args) {
 			else if( PPU->lines < NES_SCREEN_HEIGHT ) {
 				mapper->update();
 				draw_line(PPU->lines++, PPU->frames);
+				if( PPU->lines == (NES_SCREEN_HEIGHT - 8) &&
+				    (!config.run_fast || !(PPU->frames%2)) )
+					redraw_screen();
 			}
 
 			/* Start VBLANK period */
@@ -181,8 +184,6 @@ int main_loop(void *args) {
 					cycles = CPU->cycles;
 				}
 
-				if( !config.run_fast || !(PPU->frames%2) )
-					redraw_screen();
 				PPU->lines++;
 				PPU->frames++;
 				standard_lines = 0;
