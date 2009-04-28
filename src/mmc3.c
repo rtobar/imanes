@@ -274,6 +274,7 @@ void mmc3_update() {
 
 		if( irq_counter == 0 && irq_enabled ) {
 			printf("MMC3: Triggering IRQ\n");
+			CPU->SR &= ~B_FLAG;
 			execute_irq();
 		}
 	}

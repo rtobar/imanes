@@ -920,10 +920,6 @@ void execute_nmi() {
 
 void execute_reset() {
 
-	/* If the interrupt flag is cleared, we reject the interrupt */
-	if( CPU->SR & I_FLAG )
-		return;
-
 	/* Let the mapper do its stuff */
 	mapper->reset();
 
@@ -935,8 +931,9 @@ void execute_reset() {
 /* This is called by BRK and mappers IRQ triggers */
 void execute_irq() {
 
-	/* If the interrupt flag is cleared, we reject the interrupt */
-	if( CPU->SR & I_FLAG )
+	/* If the interrupt flag is cleared, we reject the interrupt
+	 * (BRK should still work anyways) */
+	if( CPU->SR & I_FLAG  && !(CPU->SR & B_FLAG) )
 		return;
 
 	stack_push( ((CPU->PC+2) >> 8) & 0xFF );
