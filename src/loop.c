@@ -245,6 +245,7 @@ void end_vblank() {
 
 	PPU->SR &= ~VBLANK_FLAG;
 	PPU->SR &= ~HIT_FLAG;
+	PPU->SR &= ~MAX_SPRITES_DRAWN;
 
 	return;
 }
