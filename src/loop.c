@@ -151,24 +151,26 @@ int main_loop(void *args) {
 
 			/* The NTSC screen works as follows:
 			 *
-			 * 1) 1 first useless scanline
+			 * 1) 1 first pre-render scanline
 			 * 2) 240 scanlines where pixels are drawn
 			 *    (only 224 are actually shown)
-			 * 3) 1 useless scanline
+			 * 3) 1 dummy scanline
 			 * 4) VBlank period
+			 *
+			 * The pre-render scanline works as all the others, but
+			 * doesn't get drawn.
 			 **/
 
-			/* One empty scanline at the beggining and the end */
-			if( PPU->lines == -1 || PPU->lines == NES_SCREEN_HEIGHT )
-				PPU->lines++;
-
-			else if( PPU->lines < NES_SCREEN_HEIGHT ) {
+			if( PPU->lines < NES_SCREEN_HEIGHT ) {
 				mapper->update();
 				draw_line(PPU->lines++, PPU->frames);
 				if( PPU->lines == (NES_SCREEN_HEIGHT - 8) &&
 				    (!config.run_fast || !(PPU->frames%2)) )
 					redraw_screen();
 			}
+			/* "Dummy" scanline at the end of the drawn scanlines */
+			else if( PPU->lines == NES_SCREEN_HEIGHT )
+				PPU->lines++;
 
 			/* Start VBLANK period */
 			else if( PPU->lines == NES_SCREEN_HEIGHT + 1 ) {
