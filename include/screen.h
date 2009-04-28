@@ -3,10 +3,8 @@
 
 #ifdef __APPLE__
 #include <SDL/SDL.h>
-#include <SDL/SDL_thread.h>
 #else
 #include <SDL.h>
-#include <SDL_thread.h>
 #endif
 
 #include "palette.h"
@@ -19,7 +17,6 @@
 
 /* This is used by the screenshot utility */
 extern SDL_Surface *nes_screen;
-extern SDL_mutex *pause_mutex;
 
 /* Screen loop */
 void screen_loop(void);

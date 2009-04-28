@@ -69,11 +69,12 @@ int main_loop(void *args) {
 	for(run_loop = 1;run_loop;) {
 
 		/* First, of all, we check if we should pause the emulation 
-		   We do so until the mutex has been released by the user
-		   Anyways, we don't hold it locked, so the user can pause the
-		   emulation again */
-		SDL_mutexP(pause_mutex);
-		SDL_mutexV(pause_mutex);
+		   We do so until the pause has been released by the user
+		   We also check if the user wants to quit the emulation */
+		while( config.pause && run_loop )
+			screen_loop();
+		if( !run_loop )
+			return 0;
 
 		/* If we want to save our current state or load a new one,
 		 * now is the time to do it! */
@@ -140,6 +141,7 @@ int main_loop(void *args) {
 		/* A line has ended its scanning, draw it */
 		if( PPU->scanline_timeout <= 0 ) {
 
+			screen_loop();
 			/* First, we set again the timeout to check the scanline */
 			PPU->scanline_timeout += CYCLES_PER_SCANLINE;
 

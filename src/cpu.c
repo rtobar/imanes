@@ -705,7 +705,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 				PPU->temp_addr = (PPU->temp_addr&0xFFE0) | ((value&0xF8)>>3);
 
 				/* This is, anyways, still correct, since I draw
-				 * the entire line at once in the same thread. This means
+				 * the entire line at once. This means
 				 * that setting PPU->x will not affect at all in the
 				 * drawing of the actual line */
 				PPU->latch = 0;

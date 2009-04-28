@@ -33,14 +33,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef __APPLE__
-#include <SDL/SDL.h>
-#include <SDL/SDL_thread.h>
-#else
-#include <SDL.h>
-#include <SDL_thread.h>
-#endif
-
 #include "debug.h"
 #include "imaconfig.h"
 #include "screen.h"

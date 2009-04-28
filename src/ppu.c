@@ -97,8 +97,8 @@ void draw_line(int line, int frame) {
 	int drawn_background_idx;      /* For Sprite #0 hit flag */
 	uint8_t drawn_back_sprites[8]; /* For Sprite #0 hit flag */
 	uint8_t drawn_background[256]; /* For Sprite #0 hit flag */
-	uint8_t front_sprites[8];
-	uint8_t back_sprites[8];
+	uint8_t front_sprites[9];
+	uint8_t back_sprites[9];
 	uint8_t col_index;
 	uint8_t byte1;
 	uint8_t byte2;
@@ -129,15 +129,18 @@ void draw_line(int line, int frame) {
 	frt_sprites = 0;
 	bck_sprites = 0;
 	PPU->SR &= ~MAX_SPRITES_DRAWN;
-	if( PPU->CR2 & SHOW_SPRITES ) {
 		for(i=0;i!=64;i++) {
 			tmp = *(PPU->SPR_RAM + 4*i) + 1;
 			if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
-				if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR )
+				if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR ) {
+					//printf("Found back sprite in line %d!\n", line);
 					back_sprites[bck_sprites++] = i;
-				else
+				}
+				else {
+					//printf("Found front sprite in line %d!\n", line);
 					front_sprites[frt_sprites++] = i;
-				if( (frt_sprites + bck_sprites) == 8 ) {
+				}
+				if( (frt_sprites + bck_sprites) == 9 ) {
 					PPU->SR |= MAX_SPRITES_DRAWN;
 					break;
 				}
@@ -145,7 +148,6 @@ void draw_line(int line, int frame) {
 		}
 		frt_sprites--;
 		bck_sprites--;
-	}
 
 	/* Fill all pixels with the background color */
 	if( config.show_screen_bg && ( !config.run_fast || !(frame%2) ) ) {

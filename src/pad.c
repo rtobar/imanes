@@ -109,7 +109,7 @@ void nes_keydown(SDL_keysym keysym) {
 			break;
 
 		/* Save a state. We just set a flag, since the actual
-		 * loading is done in the main thread. */
+		 * loading is done in the main loop. */
 		case SDLK_F2:
 			config.save_state = 1;
 			break;
@@ -122,7 +122,7 @@ void nes_keydown(SDL_keysym keysym) {
 			break;
 
 		/* LoaLoadstate. We just set a flag, since the actual
-		 * loading is done in the main thread. */
+		 * loading is done in the main loop. */
 		case SDLK_F4:
 			config.load_state = 1;
 			break;
@@ -144,14 +144,10 @@ void nes_keydown(SDL_keysym keysym) {
 		/* Pause */
 		case SDLK_ESCAPE:
 			INFO( printf("%s emulation\n", (config.pause ? "Resuming" : "Pausing")) );
-			if( !config.pause ) {
-				SDL_mutexP(pause_mutex);
+			if( !config.pause )
 				config.pause = 1;
-			}
-			else {
-				SDL_mutexV(pause_mutex);
+			else
 				config.pause = 0;
-			}
 			break;
 
 		/* Run as fast as possible */

@@ -30,44 +30,30 @@
 
 /* This is used by the screenshot utility */
 SDL_Surface *nes_screen;
-SDL_mutex *pause_mutex;
 
 void screen_loop() {
 
 	SDL_Event event;
 
-	SDL_mutexV(pause_mutex);
+	while( SDL_PollEvent(&event) ) {
+		switch(event.type) {
 
-	/* Here comes the main event loop */
-	while(1) {
+			case SDL_KEYUP:
+				nes_keyup(event.key.keysym);
+				break;
 
-		/* Check if there are pending events. If there are not, wait for it */
-		if( !SDL_WaitEvent(NULL) ) {
-			printf("Error waiting for events\n");
-			exit(0);
-		}
-
-		while( SDL_PollEvent(&event) ) {
-			switch(event.type) {
-
-				case SDL_KEYUP:
-					nes_keyup(event.key.keysym);
+			/* Alt-F4 in Windows should lead us to SDL_QUIT */
+			case SDL_KEYDOWN:
+				if( !(event.key.keysym.sym == SDLK_F4 &&
+					event.key.keysym.mod == SDLK_LALT) ) {
+					nes_keydown(event.key.keysym);
 					break;
+				}
 
-				/* Alt-F4 in Windows should lead us to SDL_QUIT */
-				case SDL_KEYDOWN:
-					if( !(event.key.keysym.sym == SDLK_F4 &&
-						event.key.keysym.mod == SDLK_LALT) ) {
-						nes_keydown(event.key.keysym);
-						break;
-					}
-
-				case SDL_QUIT:
-					printf("Quiting ImaNES\n");
-					run_loop = 0;
-					SDL_mutexV(pause_mutex);
-					return;
-			}
+			case SDL_QUIT:
+				printf("Quiting ImaNES\n");
+				run_loop = 0;
+				return;
 		}
 	}
 
@@ -77,8 +63,6 @@ void screen_loop() {
 void init_screen() {
 	
 	char window_title[30];
-	pause_mutex = SDL_CreateMutex();
-	SDL_mutexP(pause_mutex);
 
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
 		fprintf(stderr,"Error when initializing screen: %s\n", SDL_GetError());
