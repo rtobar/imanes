@@ -17,7 +17,7 @@
 
 #define NES_PALETTE_COLORS (64)
 
-#define CYCLES_PER_SCANLINE (113.666667)
+#define CYCLES_PER_SCANLINE (341/3.)
 
 typedef struct {
 	int fd;

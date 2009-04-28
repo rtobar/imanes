@@ -159,11 +159,8 @@ int main_loop(void *args) {
 			 **/
 
 			/* One empty scanline at the beggining and the end */
-			if( PPU->lines == -1 || PPU->lines == NES_SCREEN_WIDTH ) {
-				if( PPU->lines == -1 )
-					mapper->update();
+			if( PPU->lines == -1 || PPU->lines == NES_SCREEN_HEIGHT )
 				PPU->lines++;
-			}
 
 			else if( PPU->lines < NES_SCREEN_HEIGHT ) {
 				mapper->update();
