@@ -145,7 +145,7 @@ int main_loop(void *args) {
 
 			/* Every three lines, we should add one required cycle too
 			 * (i.e., CYCLES_PER_SCANLINE != 113, but == 113.66666... */
-			PPU->scanline_timeout += !(PPU->lines%3) ? 2: 0;
+			//PPU->scanline_timeout += !(PPU->lines%3) ? 2: 0;
 
 			/* The NTSC screen works as follows:
 			 *

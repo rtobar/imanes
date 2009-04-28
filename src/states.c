@@ -60,8 +60,8 @@ void load_state(int i) {
 	memcpy(&(PPU->vram_addr), buffer, 2); buffer += 2;
 	memcpy(&(PPU->temp_addr), buffer, 2); buffer += 2;
 	memcpy(&(PPU->spr_addr), buffer, 2);  buffer += 2;
-	memcpy(&(PPU->scanline_timeout), buffer, sizeof(int));
-	buffer += sizeof(int);
+	memcpy(&(PPU->scanline_timeout), buffer, sizeof(float));
+	buffer += sizeof(float);
 	memcpy(&(PPU->lines), buffer, sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 	memcpy(&(PPU->frames), buffer, sizeof(unsigned int));
@@ -96,7 +96,7 @@ void save_state(int i) {
 	buffer = malloc(
 	/* CPU registers*/  7+sizeof(unsigned long long)+sizeof(unsigned int)+
 	/* RAM dump */      0x10000 +
-	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(int) +
+	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
 	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count 
@@ -130,8 +130,8 @@ void save_state(int i) {
 	memcpy(buffer, &(PPU->vram_addr), 2); buffer += 2;
 	memcpy(buffer, &(PPU->temp_addr), 2); buffer += 2;
 	memcpy(buffer, &(PPU->spr_addr), 2);  buffer += 2;
-	memcpy(buffer, &(PPU->scanline_timeout), sizeof(int));
-	buffer += sizeof(int);
+	memcpy(buffer, &(PPU->scanline_timeout), sizeof(float));
+	buffer += sizeof(float);
 	memcpy(buffer, &(PPU->lines), sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 	memcpy(buffer, &(PPU->frames), sizeof(unsigned int));

@@ -55,7 +55,7 @@ void dump_ppu() {
 
 	printf("Frame:%02d  ", PPU->frames);
 	printf("Line:%03d   ", PPU->lines);
-	printf("ScanlineT:%03d\n", PPU->scanline_timeout);
+	printf("ScanlineT:%.3f\n", PPU->scanline_timeout);
 
 }
 
@@ -89,7 +89,6 @@ void draw_line(int line, int frame) {
 	int j;
 	int tx; /* X coord inside a tile */
 	int ty; /* Y coord inside a tile */
-	int tmp;
 	int big_sprite;
 	int bck_sprites; /* Counters for arrays bellow */
 	int frt_sprites;
@@ -105,6 +104,7 @@ void draw_line(int line, int frame) {
 	uint8_t byte2;
 	uint8_t byte3;
 	uint8_t tile;
+	uint8_t tmp;
 	uint16_t attr_table;
 	uint16_t name_table;
 	uint16_t orig_name_table;
