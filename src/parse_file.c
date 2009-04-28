@@ -82,8 +82,7 @@ ines_file *check_ines_file(char *file_path) {
 #endif
 
 	if( strncmp(buff,"NES\032",4) || read_bytes != 4 ) {
-		printf("FD is %d\n", rom_file->fd);
-		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
+		fprintf(stderr,"Error: %s is not a valid NES ROM, incompatible header information\n",file_path);
 		exit(EXIT_FAILURE);
 	}
 
