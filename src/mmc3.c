@@ -70,8 +70,6 @@ int  mmc3_check_address(uint16_t address) {
 	if( address < 0x8000 )
 		return 0;
 
-	//printf("MMC3: Writing %02x into %04x\n", CPU->RAM[address], address);
-
 	/* This only set values, does not take any action */
 	if( address == 0x8000 ) {
 		mapper->regs[0] = CPU->RAM[address];
@@ -143,7 +141,7 @@ void mmc3_switch_banks() {
 			else
 				offset = 0xC000;
 
-			printf("MMC3: Reg0:%02x, Swapping {-2} bank to %04x\n", mapper->regs[0], offset);
+			DEBUG( printf("MMC3: Reg0:%02x, Swapping {-2} bank to %04x\n", mapper->regs[0], offset) );
 			memcpy( CPU->RAM + offset,
 			   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
 			   ROM_BANK_SIZE/2);
@@ -153,7 +151,7 @@ void mmc3_switch_banks() {
 		case SwapBanks:
 			bank = mapper->regs[1];
 			command = (mapper->regs[0]&0x7);
-			printf("MMC3: bank:%02x   command:%02x   reg0:%02x\n", bank, command, mapper->regs[0]);
+			DEBUG( printf("MMC3: bank:%02x   command:%02x   reg0:%02x\n", bank, command, mapper->regs[0]) );
 
 			/* Switch VROM page */
 			if( command <= 5 ) {
@@ -163,14 +161,14 @@ void mmc3_switch_banks() {
 				if( command <= 1 ) {
 					offset = 0x800*command + ((mapper->regs[0]&0x80) << 5);
 					bank &= 0xFE;
-					printf("MMC3: Switching VROM bank %d to %04x\n", bank,offset);
+					DEBUG( printf("MMC3: Switching VROM bank %d to %04x\n", bank,offset) );
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 2*1024);
 				}
 				/* Copy 1 Kb VROM page */
 				else {
 					offset = (command-2)*0x400 + (!(mapper->regs[0]&0x80))*0x1000;
-					printf("MMC3: Switching VROM bank %d to %04x\n", bank,offset);
+					DEBUG( printf("MMC3: Switching VROM bank %d to %04x\n", bank,offset) );
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 1024);
 				}
@@ -185,7 +183,7 @@ void mmc3_switch_banks() {
 				else if( mapper->regs[0] & 0x40 )
 					offset += 0x4000;
 
-				printf("MMC3: Switching ROM bank %02x into %04x\n", bank, offset);
+				DEBUG( printf("MMC3: Switching ROM bank %02x into %04x\n", bank, offset) );
 				memcpy(CPU->RAM + offset,
 				       mapper->file->rom + bank*ROM_BANK_SIZE/2,
 				       ROM_BANK_SIZE/2);
@@ -273,7 +271,7 @@ void mmc3_update() {
 			irq_counter--;
 
 		if( irq_counter == 0 && irq_enabled ) {
-			printf("MMC3: Triggering IRQ\n");
+			DEBUG( printf("MMC3: Triggering IRQ\n") );
 			CPU->SR &= ~B_FLAG;
 			execute_irq();
 		}
