@@ -33,7 +33,9 @@ void initialize_instruction_set() {
 	instructions = (instruction *)malloc(sizeof(instruction)*
 	                                     OPCODES_NUMBER);
 
-	
+	/*********************/
+	/** "Legal" opcodes **/
+	/*********************/
 	/* ADC instruction */
 	SET_INSTRUCTION_ADDR_DATA( ADC, IMMEDIATE, 0x69, 2, 2, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( ADC, ZEROPAGE,  0x65, 2, 3, NORMAL);
@@ -299,7 +301,26 @@ void initialize_instruction_set() {
 	SET_INSTRUCTION_ADDR_DATA( TYA, IMPLIED, 0x98, 1, 2, NORMAL);
 
 
+	/*********************/
 	/** Illegal opcodes **/
+	/*********************/
+	/* AHX instruction (it seems not to be present in the 6502) */
+	SET_INSTRUCTION_ADDR_DATA( AHX, INDIR_IND, 0x93, 2, 6, NORMAL);
+	SET_INSTRUCTION_ADDR_DATA( AHX, ABS_INDY,  0x9F, 3, 5, NORMAL);
+
+	/* ANC instruction (it comes in two flavors) */
+	SET_INSTRUCTION_ADDR_DATA( ANC, IMMEDIATE, 0x0B, 2, 2, NORMAL);
+	SET_INSTRUCTION_ADDR_DATA( ANC, IMMEDIATE, 0x2B, 2, 2, NORMAL);
+
+	/* ALR instruction */
+	SET_INSTRUCTION_ADDR_DATA( ALR, IMMEDIATE, 0x4B, 2, 2, NORMAL);
+
+	/* ARR instrunction */
+	SET_INSTRUCTION_ADDR_DATA( ARR, IMMEDIATE, 0x6B, 2, 2, NORMAL);
+
+	/* AXS instruction */
+	SET_INSTRUCTION_ADDR_DATA( AXS, IMMEDIATE, 0xCB, 2, 2, NORMAL);
+
 	/* DCP instruction */
 	SET_INSTRUCTION_ADDR_DATA( DCP, ZEROPAGE,  0xC7, 2, 5, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( DCP, ZERO_INDX, 0xD7, 2, 6, NORMAL);
@@ -317,6 +338,9 @@ void initialize_instruction_set() {
 	SET_INSTRUCTION_ADDR_DATA( ISC, ABS_INDY,  0xFB, 3, 7, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( ISC, IND_INDIR, 0xE3, 2, 8, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( ISC, INDIR_IND, 0xF3, 2, 8, NORMAL);
+
+	/* LAS instruction */
+	SET_INSTRUCTION_ADDR_DATA( LAS, ABS_INDY,  0xBB, 3, 4, PAGE);
 
 	/* LAX instruction */
 	SET_INSTRUCTION_ADDR_DATA( LAX, IMMEDIATE, 0xAB, 2, 2, NORMAL);
@@ -373,6 +397,12 @@ void initialize_instruction_set() {
 	SET_INSTRUCTION_ADDR_DATA( SAX, ABSOLUTE,  0x8F, 3, 4, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( SAX, IND_INDIR, 0x83, 2, 6, NORMAL);
 
+	/* SHX instruction (it seems not to be present in the 6502) */
+	SET_INSTRUCTION_ADDR_DATA( SHX, ABS_INDY,  0x9E, 3, 5, NORMAL);
+
+	/* SHY instruction (it seems not to be present in the 6502) */
+	SET_INSTRUCTION_ADDR_DATA( SHY, ABS_INDX,  0x9C, 3, 5, NORMAL);
+
 	/* SBC instruction (this is the only illegal opcode) */
 	SET_INSTRUCTION_ADDR_DATA( SBC, IMMEDIATE, 0xEB, 2, 2, NORMAL);
 
@@ -402,6 +432,12 @@ void initialize_instruction_set() {
 	SET_INSTRUCTION_ADDR_DATA( RRA, ABS_INDY,  0x7B, 3, 7, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( RRA, IND_INDIR, 0x63, 2, 8, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( RRA, INDIR_IND, 0x73, 2, 8, NORMAL);
+
+	/* TAS instruction */
+	SET_INSTRUCTION_ADDR_DATA( TAS, ABS_INDY,  0x9B, 3, 5, NORMAL);
+
+	/* XAA instruction */
+	SET_INSTRUCTION_ADDR_DATA( XAA, IMMEDIATE, 0x8B, 2, 2, NORMAL);
 
 	return;
 }
@@ -520,4 +556,3 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 	DEBUG( printf("\n") );
 	return oper;
 }
-
