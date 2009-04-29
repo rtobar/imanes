@@ -23,12 +23,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #ifdef _MSC_VER
 #include <io.h>
 #include <share.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #else
 #include <unistd.h>
 #endif
@@ -54,6 +54,7 @@ void save_screenshot() {
 	uint16_t tmp16;
 	uint32_t tmp32;
 	Uint32 *pixels;
+	struct stat s;
 #ifdef _MSC_VER
 	int written;
 #else
@@ -120,20 +121,38 @@ void save_screenshot() {
 		return;
 	}
 
+	/* We loop until we find a name for a file that doesn't exist,
+	 * so we don't overwrite an existing screenshot */
 	tmp = get_filename(config.rom_file);
-	ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 6);
+	ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 4 + 7);
+	for(i=0;;i++) {
 #ifdef _MSC_VER
-	sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+6,"%s/%s.bmp", ss_dir, tmp);
+		sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+6,"%s/%s-%04d.bmp", ss_dir, i, tmp, i);
+#else
+		sprintf(ss_file,"%s/%s-%04d.bmp", ss_dir, tmp, i);
+#endif
+		j = stat(ss_file, &s);
+		if( j == -1 )
+			break;
+	}
+
+#ifdef _MSC_VER
 	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
 #else
-	sprintf(ss_file,"%s/%s.bmp", ss_dir, tmp);
 	fd = open(ss_file, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 #endif
 	free(ss_dir);
 	free(tmp);
 
 	if( fd == -1 ) {
-		perror("Error while opening 'ss_file'");
+		tmp = (char *)malloc(23 + strlen(ss_file));
+#ifdef _MSC_VER
+		sprintf_s(tmp, strlen(ss_file)+23, "Error while opening '%s'", ss_file);
+#else
+		sprintf(tmp, "Error while opening '%s'", ss_file);
+#endif
+		perror(tmp);
+		free(tmp);
 		return;
 	}
 
