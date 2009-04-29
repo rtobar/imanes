@@ -177,11 +177,11 @@ char *get_imanes_dir(imanes_dir dir) {
 			break;
 
 		case Snapshots:
-			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 11);
+			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 13);
 #ifdef _MSC_VER
-			sprintf_s(specific_dir,strlen(user_imanes_dir)+11,"%s/snapshots",user_imanes_dir);
+			sprintf_s(specific_dir,strlen(user_imanes_dir)+13,"%s/screenshots",user_imanes_dir);
 #else
-			sprintf(specific_dir, "%s/snapshots", user_imanes_dir);
+			sprintf(specific_dir, "%s/screenshots", user_imanes_dir);
 #endif
 			if( check_and_create(specific_dir) ) {
 				free(specific_dir);
