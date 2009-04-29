@@ -82,21 +82,15 @@ void save_sram(char *save_file) {
 
 char *load_sram(char *rom_file) {
 
-	int i;
 	int fd;
 	char *save_file;
 	char *save_dir;
 	char *tmp;
 #ifdef _MSC_VER
-#define SEP '\\'
 	int read_bytes;
 #else
-#define SEP '/'
 	ssize_t read_bytes;
 #endif
-
-	if( !CPU->sram_enabled )
-		return NULL;
 
 	INFO( printf("Loading SRAM... ") );
 	save_dir = get_imanes_dir(Saves);
@@ -108,20 +102,7 @@ char *load_sram(char *rom_file) {
 	}
 
 	/* Get just the name of the file */
-	for(i=strlen(rom_file); i>=0; i--) {
-		if( rom_file[i] == SEP )
-			break;
-	}
-	tmp = (char *)malloc(strlen(rom_file) - i);
-	memcpy(tmp, rom_file + i + 1, strlen(rom_file) - i);
-
-	/* Find where the extension of the file begins */
-	for(i=strlen(tmp); i>=0; i--) {
-		if( tmp[i] == '.' ) {
-			tmp[i] = '\0';
-			break;
-		}
-	}
+	tmp = get_filename(rom_file);
 
 	save_file = (char *)malloc(strlen(save_dir) + strlen(tmp) + 6);
 #ifdef _MSC_VER

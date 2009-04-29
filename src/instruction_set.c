@@ -21,22 +21,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "common.h"
 #include "cpu.h"
 #include "debug.h"
 #include "instruction_set.h"
 
 instruction *instructions;
-
-void inst_lowercase(char *inst_name, char *ret) {
-
-	int i;
-
-	for(i=0;i!=3;i++)
-		ret[i] = inst_name[i] + 32;
-	ret[3] = '\0';
-
-	return;
-}
 
 void initialize_instruction_set() {
 

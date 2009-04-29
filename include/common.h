@@ -30,4 +30,12 @@ typedef struct {
 	int has_trainer;
 } ines_file;
 
+
+/* For a given file, and given its full path, get only the file name
+ * _without_ extension */
+char *get_filename(char *full_pathname);
+
+/* Convert an instruction's name to lowercase */
+void inst_lowercase(char *inst_name, char *ret);
+
 #endif /* common_h */
