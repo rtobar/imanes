@@ -135,9 +135,10 @@ int main(int args, char *argv[]) {
 	initialize_pads();
 
 	/* Read the ines file and get all the ROM/VROM */
-	nes_rom = check_ines_file(argv[optind]);
+	config.rom_file = argv[optind];
+	nes_rom = check_ines_file(config.rom_file);
 	map_rom_memory(nes_rom);
-	save_file = load_sram(argv[optind]);
+	save_file = load_sram(config.rom_file);
 
 	/* Init the graphics engine */
 	init_screen();

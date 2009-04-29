@@ -21,6 +21,8 @@ typedef struct _config {
 	int use_sdl_colors;          /* Let SDL convert RGB values */
 
 	int take_screenshot;         /* Should we take a screenshot? */
+
+	char *rom_file;             /* Name of the rom file */
 } imanes_config;
 
 typedef enum _imanes_dir {

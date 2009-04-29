@@ -33,6 +33,7 @@
 #include <unistd.h>
 #endif
 
+#include "common.h"
 #include "debug.h"
 #include "imaconfig.h"
 #include "screen.h"
@@ -47,6 +48,7 @@ void save_screenshot() {
 	unsigned int total_size;
 	char *ss_dir;
 	char *ss_file;
+	char *tmp;
 	char *buffer;
 	char *color;
 	uint16_t tmp16;
@@ -118,15 +120,17 @@ void save_screenshot() {
 		return;
 	}
 
-	ss_file = (char *)malloc(strlen(ss_dir) + 7);
+	tmp = get_filename(config.rom_file);
+	ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 6);
 #ifdef _MSC_VER
-	sprintf_s(ss_file,strlen(ss_dir)+7,"%s/0.bmp", ss_dir);
+	sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+6,"%s/%s.bmp", ss_dir, tmp);
 	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
 #else
-	sprintf(ss_file,"%s/0.bmp", ss_dir);
+	sprintf(ss_file,"%s/%s.bmp", ss_dir, tmp);
 	fd = open(ss_file, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 #endif
 	free(ss_dir);
+	free(tmp);
 
 	if( fd == -1 ) {
 		perror("Error while opening 'ss_file'");
