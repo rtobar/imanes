@@ -113,6 +113,10 @@ char *load_sram(char *rom_file) {
 	free(tmp);
 	free(save_dir);
 
+	/* If SRAM is not enabled, just return the name of the file */
+	if( !CPU->sram_enabled )
+		return save_file;
+
 	#ifdef _MSC_VER
 	fd = _sopen_s(&fd,save_file, O_RDONLY, _SH_DENYWR, _S_IREAD|_S_IWRITE);
 #else
