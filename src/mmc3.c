@@ -265,7 +265,7 @@ void mmc3_reset() {
 void mmc3_update() {
 
 	if( irq_counter == 0 )
-		irq_counter = irq_tmp;
+		irq_counter = irq_tmp+1;
 	else {
 		if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) )
 			irq_counter--;
