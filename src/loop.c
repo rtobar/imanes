@@ -80,16 +80,12 @@ int main_loop(void *args) {
 		 * now is the time to do it! */
 		if( config.save_state == 1 ) {
 			INFO( printf("Saving current state to %d\n", config.current_state) );
-			dump_cpu();
-			dump_ppu();
 			save_state(config.current_state);
 			config.save_state = 0;
 		}
 		else if( config.load_state == 1 ) {
 			INFO( printf("Loading state %d\n", config.current_state) );
 			load_state(config.current_state);
-			dump_cpu();
-			dump_ppu();
 			cycles = CPU->cycles;
 			config.load_state = 0;
 		}
