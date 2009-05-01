@@ -18,21 +18,30 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "imaconfig.h"
 #include "states.h"
 
-void *tmp;
+static void *state;
+static int last_save = -1;
 
 void load_state(int i) {
 
 	char *user_imanes_dir;
 	char *buffer;
 
-	user_imanes_dir = get_user_imanes_dir();
-
-	buffer = tmp;
+	/* If we are loading the last state that we saved,
+	 * we don't need to go and read the state file */
+	if( last_save == config.current_state )
+		buffer = state;
+	else {
+		user_imanes_dir = get_user_imanes_dir();
+		free(user_imanes_dir);
+	}
 
 	/* CPU dumping */
 	memcpy(&(CPU->A),      buffer, 1); buffer++;
@@ -83,28 +92,40 @@ void load_state(int i) {
 	buffer += sizeof(unsigned int);
 	memcpy(mapper->regs, buffer, mapper->reg_count);
 
-	free(user_imanes_dir);
 	return;
 }
 
 void save_state(int i) {
 
-	char *states_dir;
-	char *buffer, *buffer_start;
+	int fd;
+	char *ss_dir;
+	char *ss_file;
+	char *tmp;
+	char *buffer;
+	unsigned int total_size;
+#ifdef _MSC_VER
+	int written;
+#else
+	ssize_t written;
+#endif
 
-	states_dir = get_imanes_dir(States);
+	ss_dir = get_imanes_dir(States);
+	if( ss_dir == NULL ) {
+		fprintf(stderr,"Couldn't save state: cannot reach states dir\n");
+		return;
+	}
 
 	/* Memory allocation for state information */
-	buffer = malloc(
+	total_size = 
 	/* CPU registers*/  7+sizeof(unsigned long long)+sizeof(unsigned int)+
 	/* RAM dump */      0x0800 + 0xBFDF +
 	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
-	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count 
-	         );
-	buffer_start = buffer;
-	tmp = buffer;
+	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count;
+
+	/* Memory allocation for state information */
+	buffer = (char *)malloc(total_size);
 
 	/* CPU dumping */
 	memcpy(buffer, &(CPU->A),  1); buffer++;
@@ -162,6 +183,48 @@ void save_state(int i) {
 	buffer += sizeof(unsigned int);
 	memcpy(buffer, mapper->regs, mapper->reg_count);
 
-	free(states_dir);
+	/* Get the pointer back to where it should be */
+	buffer -= total_size;
+
+	/* Finally, save it into a file */
+	tmp = get_filename(config.rom_file);
+	ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 2 + 7);
+#ifdef _MSC_VER
+	sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+2+7,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
+#else
+	sprintf(ss_file,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
+#endif
+
+#ifdef _MSC_VER
+	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+#else
+	fd = open(ss_file, O_CREAT|O_RDWR|O_SYNC|O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+#endif
+	free(ss_dir);
+	free(tmp);
+	free(ss_file);
+
+#ifdef _MSC_VER
+	written = _write(fd, (void *)buffer, total_size);
+#else
+	written = write(fd, (void *)buffer, total_size);
+#endif
+
+	if( written != total_size )
+		perror("Error while saving state to file");
+
+#ifdef _MSC_VER
+	_close(fd);
+#else
+	close(fd);
+#endif
+
+	/* Copy the state into the a buffer, so we don't need to
+	 * read the state file if we want to load the last saved state */
+	state = realloc(state, total_size);
+	memcpy(state, buffer, total_size);
+	last_save = config.current_state;
+
+	free(buffer);
 	return;
 }
