@@ -3,6 +3,9 @@ General:
 
  * [DONE] Configurable verbosity
  * [DONE] Add a pause option (using pthread_mutex I think...)
+ * [DONE] Screenshot support
+ * [    ] Internal state saving
+ * [    ] SRAM saving
 
 CPU:
 ====
@@ -13,6 +16,7 @@ CPU:
  * [DONE] Fix the ADC/SBC instructions (recognize the C flag change)
  * [DONE] Check ASL
  * [    ] Add illegal opcodes
+ * [    ] Improve CPU/PPU timing
 
 PPU:
 ====
