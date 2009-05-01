@@ -5,7 +5,7 @@ General:
  * [DONE] Add a pause option (using pthread_mutex I think...)
  * [DONE] Screenshot support
  * [    ] Internal state saving
- * [    ] SRAM saving
+ * [DONE] SRAM saving
 
 CPU:
 ====

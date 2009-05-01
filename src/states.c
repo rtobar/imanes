@@ -47,8 +47,10 @@ void load_state(int i) {
 	buffer += sizeof(unsigned int);
 
 	/* RAM dumping */
-	memcpy(CPU->RAM, buffer, 0x10000);
-	buffer += 0x10000;
+	memcpy(CPU->RAM, buffer, 0x0800);
+	buffer += 0x0800;
+	memcpy(CPU->RAM + 0x4020, buffer, 0xBFDF);
+	buffer += 0xBFDF;
 
 	/* PPU dumping */
 	memcpy(&(PPU->CR1), buffer, 1);       buffer++;
@@ -95,7 +97,7 @@ void save_state(int i) {
 	/* Memory allocation for state information */
 	buffer = malloc(
 	/* CPU registers*/  7+sizeof(unsigned long long)+sizeof(unsigned int)+
-	/* RAM dump */      0x10000 +
+	/* RAM dump */      0x0800 + 0xBFDF +
 	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
@@ -117,8 +119,17 @@ void save_state(int i) {
 	buffer += sizeof(unsigned int);
 
 	/* RAM dumping */
-	memcpy(buffer, CPU->RAM, 0x10000);
-	buffer += 0x10000;
+	/* We only need to dump the following sections:
+	 *
+	 * 0x0000 - 0x07FF
+	 * 0x4020 - 0xFFFF
+	 *
+	 * Everything else is I/O mapped regiters or mirroring
+	 */
+	memcpy(buffer, CPU->RAM, 0x0800);
+	buffer += 0x0800;
+	memcpy(buffer, CPU->RAM + 0x4020, 0xBFDF);
+	buffer += 0xBFDF;
 
 	/* PPU dumping */
 	memcpy(buffer, &(PPU->CR1), 1);       buffer++;
