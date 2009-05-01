@@ -31,16 +31,63 @@ static int last_save = -1;
 
 void load_state(int i) {
 
-	char *user_imanes_dir;
+	int fd;
+	char *ss_dir;
+	char *ss_file;
+	char *tmp;
 	char *buffer;
+	unsigned int total_size;
+#ifdef _MSC_VER
+	int read_bytes;
+#else
+	ssize_t read_bytes;
+#endif
+
+	/* This is the total size of the state */
+	total_size = 
+	/* CPU registers*/  7+sizeof(unsigned long long)+sizeof(unsigned int)+
+	/* RAM dump */      0x0800 + 0xBFDF +
+	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
+	/* VRAM dump */     0x4000 +
+	/* SPR-RAM dump */  0x100 +
+	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count;
 
 	/* If we are loading the last state that we saved,
 	 * we don't need to go and read the state file */
 	if( last_save == config.current_state )
 		buffer = state;
 	else {
-		user_imanes_dir = get_user_imanes_dir();
-		free(user_imanes_dir);
+		/* Read the state from the corresponding file */
+		ss_dir = get_imanes_dir(States);
+		tmp = get_filename(config.rom_file);
+		ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 2 + 7);
+#ifdef _MSC_VER
+		sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+2+7,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
+		fd = _sopen_s(&fd,ss_file, O_RDONLY, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+#else
+		sprintf(ss_file,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
+		fd = open(ss_file, O_RDONLY);
+#endif
+		free(ss_dir);
+		free(ss_file);
+		free(tmp);
+
+		if( fd == -1 ) {
+			fprintf(stderr,"Error while opening '%s': ", ss_file);
+			perror(NULL);
+			return;
+		}
+		buffer = (char *)malloc(total_size);
+#ifdef _MSC_VER
+		read_bytes = _read(fd, buffer, total_size);
+#else
+		read_bytes = read(fd, buffer, total_size);
+#endif
+
+		if( read_bytes != total_size ) {
+			fprintf(stderr,"File '%s' is not a valid state file\n", ss_file);
+			return;
+		}
 	}
 
 	/* CPU dumping */
@@ -115,7 +162,7 @@ void save_state(int i) {
 		return;
 	}
 
-	/* Memory allocation for state information */
+	/* This is the total size of the state */
 	total_size = 
 	/* CPU registers*/  7+sizeof(unsigned long long)+sizeof(unsigned int)+
 	/* RAM dump */      0x0800 + 0xBFDF +
@@ -182,6 +229,7 @@ void save_state(int i) {
 	memcpy(buffer, &(mapper->reg_count), sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 	memcpy(buffer, mapper->regs, mapper->reg_count);
+	buffer += mapper->reg_count;
 
 	/* Get the pointer back to where it should be */
 	buffer -= total_size;
