@@ -1,6 +1,6 @@
 /*  ImaNES: I'm a NES. An intelligent NES emulator
 
-    UNROM.c   -    UNROM Mapper emulation under ImaNES
+    unrom.c   -    UNROM Mapper emulation under ImaNES
 
     Copyright (C) 2009   Rodrigo Tobar Carrizo
 
