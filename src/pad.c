@@ -33,6 +33,11 @@ void initialize_pads() {
 	pads[0].plugged = 1;
 	pads[0].pressed_keys = 0;
 	pads[0].reads = 0;
+
+	pads[1].plugged = 1;
+	pads[1].pressed_keys = 0;
+	pads[1].reads = 0;
+
 }
 
 void nes_keydown(SDL_keysym keysym) {
@@ -41,6 +46,9 @@ void nes_keydown(SDL_keysym keysym) {
 
 	switch( keysym.sym ) {
 
+		/****************/
+		/* First player */
+		/****************/
 		/* Up */
 		case SDLK_w:
 			pads[0].pressed_keys |= NES_UP;
@@ -81,6 +89,52 @@ void nes_keydown(SDL_keysym keysym) {
 			pads[0].pressed_keys |= NES_SELECT;
 			break;
 
+		/*****************/
+		/* Second player */
+		/*****************/
+		/* Up */
+		case SDLK_UP:
+			pads[1].pressed_keys |= NES_UP;
+			break;
+
+		/* Down */
+		case SDLK_DOWN:
+			pads[1].pressed_keys |= NES_DOWN;
+			break;
+
+		/* Left */
+		case SDLK_LEFT:
+			pads[1].pressed_keys |= NES_LEFT;
+			break;
+
+		/* Right */
+		case SDLK_RIGHT:
+			pads[1].pressed_keys |= NES_RIGHT;
+			break;
+
+		/* A button */
+		case SDLK_n:
+			pads[1].pressed_keys |= NES_A;
+			break;
+
+		/* B button */
+		case SDLK_m:
+			pads[1].pressed_keys |= NES_B;
+			break;
+
+		/* Start button */
+		case SDLK_LSHIFT:
+			pads[1].pressed_keys |= NES_START;
+			break;
+
+		/* Select button */
+		case SDLK_LCTRL:
+			pads[1].pressed_keys |= NES_SELECT;
+			break;
+
+		/******************/
+		/* ImaNES actions */
+		/******************/
 		/* Show background */
 		case SDLK_1:
 			INFO( printf("Background %s\n", (config.show_bg  ? "OFF" : "ON")) );
@@ -166,6 +220,9 @@ void nes_keyup(SDL_keysym keysym) {
 
 	switch( keysym.sym ) {
 
+		/****************/
+		/* First player */
+		/****************/
 		/* Up */
 		case SDLK_w:
 			pads[0].pressed_keys &= ~NES_UP;
@@ -204,6 +261,49 @@ void nes_keyup(SDL_keysym keysym) {
 		/* Select button */
 		case SDLK_RCTRL:
 			pads[0].pressed_keys &= ~NES_SELECT;
+			break;
+
+		/*****************/
+		/* Second player */
+		/*****************/
+		/* Up */
+		case SDLK_UP:
+			pads[1].pressed_keys &= ~NES_UP;
+			break;
+
+		/* Down */
+		case SDLK_DOWN:
+			pads[1].pressed_keys &= ~NES_DOWN;
+			break;
+
+		/* Left */
+		case SDLK_LEFT:
+			pads[1].pressed_keys &= ~NES_LEFT;
+			break;
+
+		/* Right */
+		case SDLK_RIGHT:
+			pads[1].pressed_keys &= ~NES_RIGHT;
+			break;
+
+		/* A button */
+		case SDLK_n:
+			pads[1].pressed_keys &= ~NES_A;
+			break;
+
+		/* B button */
+		case SDLK_m:
+			pads[1].pressed_keys &= ~NES_B;
+			break;
+
+		/* Start button */
+		case SDLK_LSHIFT:
+			pads[1].pressed_keys &= ~NES_START;
+			break;
+
+		/* Select button */
+		case SDLK_LCTRL:
+			pads[1].pressed_keys &= ~NES_SELECT;
 			break;
 
 		/* Run at 60 fps */

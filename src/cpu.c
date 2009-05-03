@@ -650,7 +650,7 @@ void update_flags(int8_t value, uint8_t flags) {
 
 void write_cpu_ram(uint16_t address, uint8_t value) {
 
-	static unsigned int strobe_pad = 0;
+	static unsigned int strobe_pad[2] = {0,0};
 	int i;
 
 	XTREME( if( 0x2000 <= address && address <= 0x2006 ) {
@@ -755,14 +755,24 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* 1st joystick */			
 		case 0x4016:
 			if( value == 0x01 ) {
-				strobe_pad = 1;
+				strobe_pad[0] = 1;
 			}
-			else if( value == 0x00 && strobe_pad ) {
+			else if( value == 0x00 && strobe_pad[0] ) {
 				pads[0].reads = 0;
-				strobe_pad = 0;
+				strobe_pad[0] = 0;
 			}
 			break;
 
+		/* 2nd joystick */			
+		case 0x4017:
+			if( value == 0x01 ) {
+				strobe_pad[1] = 1;
+			}
+			else if( value == 0x00 && strobe_pad[1] ) {
+				pads[1].reads = 0;
+				strobe_pad[1] = 0;
+			}
+			break;
 
 		/* Normal RAM memory area */
 		default:
@@ -849,7 +859,6 @@ uint8_t read_cpu_ram(uint16_t address) {
 	/* 1st Joystick */
 	else if( address == 0x4016 ) {
 		pads[0].reads++;
-		*(CPU->RAM + 0x4016) = 0;
 		if( !pads[0].plugged )
 			ret_val = 2; // bit 1 set if not plugged
 
@@ -860,6 +869,21 @@ uint8_t read_cpu_ram(uint16_t address) {
 
 		if( pads[0].reads == 32 )
 			pads[0].reads = 0;
+	}
+
+	/* 2nd Joystick */
+	else if( address == 0x4017 ) {
+		pads[1].reads++;
+		if( !pads[1].plugged )
+			ret_val = 2; // bit 1 set if not plugged
+
+		/* If we should return a key state... */
+		if( pads[1].reads <= 8 ) {
+			ret_val |= ((pads[1].pressed_keys >> (pads[1].reads-1)) & 0x1); 
+		}
+
+		if( pads[1].reads == 32 )
+			pads[1].reads = 0;
 	}
 
 	/* SRAM area */
