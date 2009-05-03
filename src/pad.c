@@ -121,7 +121,7 @@ void nes_keydown(SDL_keysym keysym) {
 				config.current_state = 0;
 			break;
 
-		/* LoaLoadstate. We just set a flag, since the actual
+		/* Load a state. We just set a flag, since the actual
 		 * loading is done in the main loop. */
 		case SDLK_F4:
 			config.load_state = 1;
@@ -132,14 +132,6 @@ void nes_keydown(SDL_keysym keysym) {
 			INFO( printf("Reseting NES\n") );
 			CPU->reset = 1;
 			break;
-
-		case SDLK_F7:
-			dump_spr_ram();
-			INFO( printf("Instructions never executed:\n") );
-			for(i=0;i!=INSTRUCTIONS_NUMBER;i++)
-				if(instructions[i].size != 0 && !instructions[i].executed )
-					printf("%02x - %s\n", instructions[i].opcode, instructions[i].name);
-
 
 		/* Pause */
 		case SDLK_ESCAPE:
@@ -154,6 +146,15 @@ void nes_keydown(SDL_keysym keysym) {
 		case SDLK_BACKSPACE:
 			config.run_fast = 1;
 			break;
+
+		/* This is for debugging */
+		case SDLK_F7:
+			dump_spr_ram();
+			INFO( printf("Instructions never executed:\n") );
+			for(i=0;i!=INSTRUCTIONS_NUMBER;i++)
+				if(instructions[i].size != 0 && !instructions[i].executed )
+					printf("%02x - %s\n", instructions[i].opcode, instructions[i].name);
+
 
 		default:
 			break;
