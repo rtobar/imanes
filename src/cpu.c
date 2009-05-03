@@ -860,7 +860,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 	else if( address == 0x4016 ) {
 		pads[0].reads++;
 		if( !pads[0].plugged )
-			ret_val = 2; // bit 1 set if not plugged
+			ret_val = 0x02; // bit 1 set if not plugged
 
 		/* If we should return a key state... */
 		if( pads[0].reads <= 8 ) {
@@ -875,7 +875,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 	else if( address == 0x4017 ) {
 		pads[1].reads++;
 		if( !pads[1].plugged )
-			ret_val = 2; // bit 1 set if not plugged
+			ret_val = 0x02; // bit 1 set if not plugged
 
 		/* If we should return a key state... */
 		if( pads[1].reads <= 8 ) {
