@@ -181,6 +181,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\src\common.c"
+			>
+		</File>
+		<File
 			RelativePath=".\src\cpu.c"
 			>
 		</File>

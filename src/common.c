@@ -19,6 +19,7 @@
  */
 
 #include <string.h>
+#include <stdlib.h>
 
 void inst_lowercase(char *inst_name, char *ret) {
 
