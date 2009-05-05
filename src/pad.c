@@ -29,14 +29,15 @@ nes_pad pads[2];
 
 void initialize_pads() {
 
-	/* TODO: Support 2nd pad */
 	pads[0].plugged = 1;
 	pads[0].pressed_keys = 0;
 	pads[0].reads = 0;
+	pads[0].strobe_pad = 0;
 
 	pads[1].plugged = 1;
 	pads[1].pressed_keys = 0;
 	pads[1].reads = 0;
+	pads[1].strobe_pad = 0;
 
 }
 

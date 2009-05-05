@@ -45,7 +45,7 @@ void screen_loop() {
 			/* Alt-F4 in Windows should lead us to SDL_QUIT */
 			case SDL_KEYDOWN:
 				if( !(event.key.keysym.sym == SDLK_F4 &&
-					event.key.keysym.mod == SDLK_LALT) ) {
+					(event.key.keysym.mod & SDLK_LALT)) ) {
 					nes_keydown(event.key.keysym);
 					break;
 				}
