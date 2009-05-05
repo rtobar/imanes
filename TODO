@@ -37,8 +37,8 @@ Pads:
 =====
 
  * [DONE] Add initial support for user input through keyboard
- * Support second pad
- * Configurable keys
+ * [DONE] Support second pad
+ * [    ] Configurable keys
 
 Mappers:
 ========
