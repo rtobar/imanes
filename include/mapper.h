@@ -37,6 +37,9 @@ typedef struct _mapper {
 
 } nes_mapper;
 
+/* Dumps the contents of the internal mapper registers into stdout */
+void dump_mapper();
+
 /* Mapper list from http://fms.komkon.org/EMUL8/NES.html */
 extern nes_mapper mapper_list[];
 

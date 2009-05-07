@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <string.h>
 #ifndef _MSC_VER
 #include <strings.h>
@@ -45,3 +46,19 @@ nes_mapper mapper_list[] = {
 	  mmc3_switch_banks , mmc3_reset,  mmc3_update } ,
 	{ -1 }
 };
+
+void dump_mapper() {
+
+	int i;
+
+	printf("%s: ", mapper->name);
+
+	if( mapper->reg_count ) {
+		for(i=0; i!=mapper->reg_count; i++)
+			printf("reg%d: %02x ", i, mapper->regs[i]);
+		printf("\n");
+	}
+	else {
+		printf("<no registers>\n");
+	}
+}
