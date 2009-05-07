@@ -147,6 +147,10 @@ void load_state(int i) {
 	buffer += sizeof(unsigned int);
 	memcpy(mapper->regs, buffer, mapper->reg_count);
 
+	mapper->reset();
+	mapper->switch_banks();
+	dump_mapper();
+
 	return;
 }
 
