@@ -27,9 +27,6 @@
 #include "mmc1.h"
 #include "ppu.h"
 
-static int touched_reg;
-
-uint8_t prev[4] = {0,0,0,0};
 
 void mmc1_initialize_mapper() {
 
@@ -43,6 +40,7 @@ void mmc1_initialize_mapper() {
 int  mmc1_check_address(uint16_t address) {
 
 	uint8_t value;
+	static uint8_t prev[4] = {0,0,0,0};
 	static uint8_t shifts = 0;
 	static int saved = 0;
 
@@ -94,7 +92,6 @@ int  mmc1_check_address(uint16_t address) {
 			}
 			);
 
-			touched_reg = (address-0x8000) >> 13;
 			shifts = 0;
 			saved = 0;
 			return 1;
