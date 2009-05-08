@@ -22,6 +22,4 @@ imanes_SOURCES = \
      states.c \
      unrom.c
 
-imanes_LDFLAGS = -lrt
-
 AM_CPPFLAGS = -I$(top_srcdir)/include -Wall -O3 -pedantic

@@ -1,11 +1,7 @@
 #ifndef screen_h
 #define screen_h
 
-#ifdef __APPLE__
 #include <SDL/SDL.h>
-#else
-#include <SDL.h>
-#endif
 
 #include "palette.h"
 

@@ -21,12 +21,12 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #ifdef _MSC_VER
 #include <io.h>
 #include <share.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #else
 #include <unistd.h>
 #endif
