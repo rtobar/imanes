@@ -41,6 +41,34 @@ void initialize_pads() {
 
 }
 
+void dump_pad(int p) {
+
+	printf("Pad %d. Pressed button: ", p);
+
+	if( pads[p].pressed_keys == 0 )
+		printf("<none>");
+	else {
+		if( pads[p].pressed_keys & NES_A )
+			printf("A ");
+		if( pads[p].pressed_keys & NES_B )
+			printf("B ");
+		if( pads[p].pressed_keys & NES_SELECT )
+			printf("SELECT ");
+		if( pads[p].pressed_keys & NES_START )
+			printf("START ");
+		if( pads[p].pressed_keys & NES_UP )
+			printf("UP ");
+		if( pads[p].pressed_keys & NES_DOWN )
+			printf("DOWN ");
+		if( pads[p].pressed_keys & NES_LEFT )
+			printf("LEFT ");
+		if( pads[p].pressed_keys & NES_RIGHT )
+			printf("RIGHT ");
+	}
+	printf("\n");
+
+}
+
 void nes_keydown(SDL_keysym keysym) {
 
 	int i;

@@ -30,6 +30,9 @@ extern nes_pad pads[2];
 /* Initializes the pads */
 void initialize_pads();
 
+/* Dumps the contents of the given pad */
+void dump_pad(int pad);
+
 /* Update pads information for pressed keys */
 void nes_keydown(SDL_keysym keysym);
 
