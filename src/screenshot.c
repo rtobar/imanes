@@ -106,7 +106,7 @@ void save_screenshot() {
 	pixels = (Uint32*)nes_screen->pixels;
 	for(i = NES_NTSC_HEIGHT - 1; i>=0; i--) {
 		for(j = 0; j!= NES_SCREEN_WIDTH; j++) {
-			color = (char *)(pixels+i*NES_SCREEN_WIDTH+j);
+			color = (char *)(pixels+config.video_scale*config.video_scale*i*NES_SCREEN_WIDTH+j*config.video_scale);
 			memcpy(buffer + offset++, color, 1);
 			memcpy(buffer + offset++, color+1, 1);
 			memcpy(buffer + offset++, color+2, 1);
