@@ -62,7 +62,7 @@ void screen_loop() {
 
 void init_screen() {
 	
-	char window_title[30];
+	char window_title[13];
 
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
 		fprintf(stderr,"Error when initializing screen: %s\n", SDL_GetError());
@@ -76,9 +76,9 @@ void init_screen() {
 	}
 
 #ifdef _MSC_VER
-	sprintf_s(window_title,30,"ImaNES emulator version %s",IMANES_VERSION);
+	sprintf_s(window_title,30,"ImaNES %s",IMANES_VERSION);
 #else
-	sprintf(window_title,"ImaNES emulator version %s",IMANES_VERSION);
+	sprintf(window_title,"ImaNES %s",IMANES_VERSION);
 #endif
 
 	SDL_WM_SetCaption(window_title,NULL);
@@ -135,5 +135,26 @@ void redraw_screen() {
 		SDL_Quit();
 		exit(EXIT_FAILURE);
 	}
+
+}
+
+void show_fps(int fps) {
+	char window_title[23];
+
+	if( config.show_fps ) {
+#ifdef _MSC_VER
+		sprintf_s(window_title,30,"ImaNES %s - %d fps",IMANES_VERSION, fps);
+#else
+		sprintf(window_title,"ImaNES %s - %d fps",IMANES_VERSION, fps);
+#endif
+	}
+	else {
+#ifdef _MSC_VER
+		sprintf_s(window_title,30,"ImaNES %s",IMANES_VERSION);
+#else
+		sprintf(window_title,"ImaNES %s",IMANES_VERSION);
+#endif
+	}
+	SDL_WM_SetCaption(window_title, NULL);
 
 }

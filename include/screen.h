@@ -37,6 +37,11 @@ void end_screen(void);
 void draw_pixel(int x, int y, nes_palette color);
 
 /**
+ * Shows the current fps in the emulation window title
+ */
+void show_fps();
+
+/**
  * Redraw screen
  */
 void redraw_screen();

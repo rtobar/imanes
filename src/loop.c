@@ -206,7 +206,7 @@ int main_loop(void *args) {
 					}
 	
 					if( endTime.tv_sec != tmp ) {
-						INFO( fprintf(stderr,"Running at %d fps\n",PPU->frames) );
+						show_fps(PPU->frames);
 						PPU->frames = 0;
 					}
 	

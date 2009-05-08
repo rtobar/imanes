@@ -161,9 +161,9 @@ void nes_keydown(SDL_keysym keysym) {
 			pads[1].pressed_keys |= NES_SELECT;
 			break;
 
-		/******************/
-		/* ImaNES actions */
-		/******************/
+		/*****************/
+		/* ImaNES layers */
+		/*****************/
 		/* Show background */
 		case SDLK_1:
 			INFO( printf("Background %s\n", (config.show_bg  ? "OFF" : "ON")) );
@@ -187,6 +187,10 @@ void nes_keydown(SDL_keysym keysym) {
 			config.show_screen_bg = ( !config.show_screen_bg );
 			break;
 
+		/******************/
+		/* ImaNES actions */
+		/******************/
+		/* Take a screenshot of the current screen at the end of the frame */
 		case SDLK_F1:
 			config.take_screenshot = 1;
 			break;
@@ -216,6 +220,19 @@ void nes_keydown(SDL_keysym keysym) {
 			CPU->reset = 1;
 			break;
 
+		case SDLK_F6:
+			INFO( printf("Show frames per second %s\n", (config.show_fps ? "OFF": "ON")) );
+			config.show_fps = ( !config.show_fps );
+			break;
+
+		/* This is for debugging */
+		case SDLK_F7:
+			dump_spr_ram();
+			INFO( printf("Instructions never executed:\n") );
+			for(i=0;i!=INSTRUCTIONS_NUMBER;i++)
+				if(instructions[i].size != 0 && !instructions[i].executed )
+					printf("%02x - %s\n", instructions[i].opcode, instructions[i].name);
+
 		/* Pause */
 		case SDLK_ESCAPE:
 			INFO( printf("%s emulation\n", (config.pause ? "Resuming" : "Pausing")) );
@@ -229,14 +246,6 @@ void nes_keydown(SDL_keysym keysym) {
 		case SDLK_BACKSPACE:
 			config.run_fast = 1;
 			break;
-
-		/* This is for debugging */
-		case SDLK_F7:
-			dump_spr_ram();
-			INFO( printf("Instructions never executed:\n") );
-			for(i=0;i!=INSTRUCTIONS_NUMBER;i++)
-				if(instructions[i].size != 0 && !instructions[i].executed )
-					printf("%02x - %s\n", instructions[i].opcode, instructions[i].name);
 
 
 		default:

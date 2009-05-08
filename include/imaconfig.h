@@ -8,6 +8,7 @@ typedef struct _config {
 	uint8_t show_back_spr;       /* Should we display back sprites? */
 	uint8_t show_bg;             /* Should we display the background */
 	uint8_t show_screen_bg;      /* Background color behind everything */
+	uint8_t show_fps;            /* Show frames per second information */
 	uint8_t pause;               /* Pause emulation */
 
 	/* State-related */
