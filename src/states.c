@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,14 +78,20 @@ void load_state(int i) {
 		fd = open(ss_file, O_RDONLY);
 #endif
 		free(ss_dir);
-		free(ss_file);
 		free(tmp);
 
-		if( fd == -1 ) {
-			fprintf(stderr,"Error while opening '%s': ", ss_file);
-			perror(NULL);
+		if( fd == -1 && errno == ENOENT) {
+			fprintf(stderr,"Cannot load state %d because it doesn't exist\n", config.current_state);
+			free(ss_file);
 			return;
 		}
+		else if( fd == -1 ) {
+			fprintf(stderr,"Error while opening '%s': ", ss_file);
+			perror(NULL);
+			free(ss_file);
+			return;
+		}
+		free(ss_file);
 		buffer = (char *)malloc(total_size);
 #ifdef _MSC_VER
 		read_bytes = _read(fd, buffer, total_size);
@@ -149,7 +156,6 @@ void load_state(int i) {
 
 	mapper->reset();
 	mapper->switch_banks();
-	dump_mapper();
 
 	return;
 }
