@@ -133,11 +133,9 @@ void draw_line(int line, int frame) {
 			tmp = *(PPU->SPR_RAM + 4*i) + 1;
 			if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
 				if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR ) {
-					//printf("Found back sprite in line %d!\n", line);
 					back_sprites[bck_sprites++] = i;
 				}
 				else {
-					//printf("Found front sprite in line %d!\n", line);
 					front_sprites[frt_sprites++] = i;
 				}
 				if( (frt_sprites + bck_sprites) == 8 ) {
