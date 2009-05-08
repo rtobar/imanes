@@ -32,6 +32,7 @@
 #include <unistd.h>
 #endif
 
+#include "debug.h"
 #include "imaconfig.h"
 #include "states.h"
 
@@ -156,6 +157,8 @@ void load_state(int i) {
 
 	mapper->reset();
 	mapper->switch_banks();
+
+	INFO( printf("Loaded state %d\n", config.current_state) );
 
 	return;
 }
@@ -292,5 +295,7 @@ void save_state(int i) {
 	last_save = config.current_state;
 
 	free(buffer);
+	INFO( printf("Saved state %d\n", config.current_state) );
+
 	return;
 }
