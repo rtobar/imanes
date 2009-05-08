@@ -55,7 +55,7 @@ void load_state(int i) {
 
 	/* This is the total size of the state */
 	total_size = 
-	/* CPU registers*/  7+sizeof(unsigned long long)+sizeof(unsigned int)+
+	/* CPU registers*/  7+sizeof(unsigned long int)+sizeof(unsigned int)+
 	/* RAM dump */      0x0800 + 0xBFDF +
 	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
 	/* VRAM dump */     0x4000 +
@@ -113,8 +113,8 @@ void load_state(int i) {
 	memcpy(&(CPU->SP),     buffer, 1); buffer++;
 	memcpy(&(CPU->SR),     buffer, 1); buffer++;
 	memcpy(&(CPU->PC),     buffer, 2); buffer += 2;
-	memcpy(&(CPU->cycles), buffer, sizeof(unsigned long long));
-	buffer += sizeof(unsigned long long);
+	memcpy(&(CPU->cycles), buffer, sizeof(unsigned long int));
+	buffer += sizeof(unsigned long int);
 	memcpy(&(CPU->nmi_cycles), buffer, sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 
@@ -185,7 +185,7 @@ void save_state(int i) {
 
 	/* This is the total size of the state */
 	total_size = 
-	/* CPU registers*/  7+sizeof(unsigned long long)+sizeof(unsigned int)+
+	/* CPU registers*/  7+sizeof(unsigned long int)+sizeof(unsigned int)+
 	/* RAM dump */      0x0800 + 0xBFDF +
 	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
 	/* VRAM dump */     0x4000 +
@@ -202,8 +202,8 @@ void save_state(int i) {
 	memcpy(buffer, &(CPU->SP), 1); buffer++;
 	memcpy(buffer, &(CPU->SR), 1); buffer++;
 	memcpy(buffer, &(CPU->PC), 2); buffer += 2;
-	memcpy(buffer, &(CPU->cycles), sizeof(unsigned long long));
-	buffer += sizeof(unsigned long long);
+	memcpy(buffer, &(CPU->cycles), sizeof(unsigned long int));
+	buffer += sizeof(unsigned long int);
 	memcpy(buffer, &(CPU->nmi_cycles), sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 

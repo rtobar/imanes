@@ -41,7 +41,7 @@ int main_loop(void *args) {
 	uint8_t opcode;
 	int standard_lines;
 	int i;
-	unsigned long long cycles;
+	unsigned long int cycles;
 	uint16_t pc_dumps[DUMPS] = { 0xffff };
 	operand operand = { 0, 0 };
 	instruction inst;
@@ -138,10 +138,6 @@ int main_loop(void *args) {
 			screen_loop();
 			/* First, we set again the timeout to check the scanline */
 			PPU->scanline_timeout += CYCLES_PER_SCANLINE;
-
-			/* Every three lines, we should add one required cycle too
-			 * (i.e., CYCLES_PER_SCANLINE != 113, but == 113.66666... */
-			//PPU->scanline_timeout += !(PPU->lines%3) ? 2: 0;
 
 			/* The NTSC screen works as follows:
 			 *

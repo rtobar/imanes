@@ -21,7 +21,7 @@ typedef struct {
 	uint8_t  SP;  /* Stack pointer */
 
 	/* Cycles stuff */
-	unsigned long long cycles;  /* How many cycles has it given in total */
+	unsigned long int cycles;  /* How many cycles has it given in total */
 	unsigned int nmi_cycles;    /* Cycles given since the last NMI */
 
 	/* Memory */

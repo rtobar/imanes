@@ -24,4 +24,4 @@ imanes_SOURCES = \
 
 imanes_LDFLAGS = -lrt
 
-AM_CPPFLAGS = -I$(top_srcdir)/include -Wall -O3
+AM_CPPFLAGS = -I$(top_srcdir)/include -Wall -O3 -pedantic
