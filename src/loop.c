@@ -79,12 +79,10 @@ int main_loop(void *args) {
 		/* If we want to save our current state or load a new one,
 		 * now is the time to do it! */
 		if( config.save_state == 1 ) {
-			INFO( printf("Saving current state to %d\n", config.current_state) );
 			save_state(config.current_state);
 			config.save_state = 0;
 		}
 		else if( config.load_state == 1 ) {
-			INFO( printf("Loading state %d\n", config.current_state) );
 			load_state(config.current_state);
 			cycles = CPU->cycles;
 			config.load_state = 0;
