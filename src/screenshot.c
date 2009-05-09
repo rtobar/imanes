@@ -143,7 +143,6 @@ void save_screenshot() {
 #endif
 	free(ss_dir);
 	free(tmp);
-	free(ss_file);
 
 	if( fd == -1 ) {
 		tmp = (char *)malloc(23 + strlen(ss_file));
@@ -154,6 +153,7 @@ void save_screenshot() {
 #endif
 		perror(tmp);
 		free(tmp);
+		free(ss_file);
 		return;
 	}
 
@@ -165,6 +165,7 @@ void save_screenshot() {
 
 	if( written != total_size ) {
 		perror("Error while saving snapshot");
+		free(ss_file);
 		return;
 	}
 #ifdef _MSC_VER
@@ -175,5 +176,6 @@ void save_screenshot() {
 
 	INFO( printf("Saved screenshot at '%s'\n", ss_file) );
 
+	free(ss_file);
 	free(buffer);
 }
