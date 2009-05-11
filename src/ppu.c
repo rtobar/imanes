@@ -42,6 +42,12 @@ void initialize_ppu() {
 	PPU->latch = 1;
 	PPU->vram_addr = 0;
 	PPU->temp_addr = 0;
+	PPU->spr_addr = 0;
+	PPU->SR = 0;
+	PPU->CR1 = 0;
+	PPU->CR2 = 0;
+	PPU->frames = 0;
+	PPU->lines = 0;
 }
 
 void dump_ppu() {
