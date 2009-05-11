@@ -138,6 +138,7 @@ char *load_sram(char *rom_file) {
 
 	if( read_bytes != 0x2000 ) {
 		fprintf(stderr,"File '%s' is not a valid SRAM dump file, SRAM not loaded.", save_file);
+		memset(CPU->RAM + 0x6000, 0, 0x2000);
 	}
 
 #ifdef _MSC_VER
