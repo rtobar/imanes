@@ -38,7 +38,7 @@
 
 void save_sram(char *save_file) {
 
-	int fd = 3;
+	int fd;
 
 #ifdef _MSC_VER
 	int written_bytes;
@@ -58,6 +58,7 @@ void save_sram(char *save_file) {
 	if( fd == -1 ) {
 		fprintf(stderr,"Error while opening '%s': ", save_file);
 		perror(NULL);
+		return;
 	}
 
 #ifdef _MSC_VER
