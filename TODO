@@ -4,7 +4,7 @@ General:
  * [DONE] Configurable verbosity
  * [DONE] Add a pause option (using pthread_mutex I think...)
  * [DONE] Screenshot support
- * [    ] Internal state saving
+ * [FIX] Internal state saving
  * [DONE] SRAM saving
 
 CPU:
@@ -37,7 +37,7 @@ Pads:
 =====
 
  * [DONE] Add initial support for user input through keyboard
- * [DONE] Support second pad
+ * [FIX] Support second pad
  * [    ] Configurable keys
 
 Mappers:
