@@ -50,7 +50,7 @@ void save_sram(char *save_file) {
 		return;
 
 #ifdef _MSC_VER
-	_sopen_s(&fd,save_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+	_sopen_s(&fd,save_file, O_WRONLY|O_CREAT|O_BINARY, SH_DENYNO, S_IREAD|S_IWRITE);
 #else
 	fd = open(save_file, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 #endif
@@ -119,7 +119,7 @@ char *load_sram(char *rom_file) {
 		return save_file;
 
 	#ifdef _MSC_VER
-	fd = _sopen_s(&fd,save_file, O_RDONLY, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+	_sopen_s(&fd,save_file, O_RDONLY|O_BINARY, SH_DENYNO, S_IREAD);
 #else
 	fd = open(save_file, O_RDONLY);
 #endif
@@ -136,8 +136,9 @@ char *load_sram(char *rom_file) {
 	read_bytes = read(fd, CPU->RAM + 0x6000, 0x2000);
 #endif
 
-	if( read_bytes != 0x2000 )
-		fprintf(stderr,"File '%s' is not a valid SRAM dump file\n", save_file);
+	if( read_bytes != 0x2000 ) {
+		fprintf(stderr,"File '%s' is not a valid SRAM dump file, SRAM not loaded.", save_file);
+	}
 
 #ifdef _MSC_VER
 	_close(fd);

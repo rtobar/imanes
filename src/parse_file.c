@@ -59,7 +59,7 @@ ines_file *check_ines_file(char *file_path) {
 
 	rom_file = (ines_file *)malloc(sizeof(ines_file));
 #ifdef _MSC_VER
-	if( _sopen_s(&(rom_file->fd), file_path, O_RDONLY|_O_BINARY, _SH_DENYWR, _S_IREAD|_S_IWRITE) == -1 ) {
+	if( _sopen_s(&(rom_file->fd), file_path, O_RDONLY|O_BINARY, SH_DENYWR, S_IREAD|S_IWRITE) == -1 ) {
 #else
 	if( (rom_file->fd = open(file_path, O_RDONLY)) == -1 ) {
 #endif

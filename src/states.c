@@ -73,7 +73,7 @@ void load_state(int i) {
 		ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 2 + 7);
 #ifdef _MSC_VER
 		sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+2+7,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
-		fd = _sopen_s(&fd,ss_file, O_RDONLY, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+		_sopen_s(&fd,ss_file, O_RDONLY|O_BINARY, SH_DENYWR, S_IREAD|S_IWRITE);
 #else
 		sprintf(ss_file,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
 		fd = open(ss_file, O_RDONLY);
@@ -265,7 +265,7 @@ void save_state(int i) {
 #endif
 
 #ifdef _MSC_VER
-	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT, SH_DENYWR, S_IREAD|S_IWRITE);
 #else
 	fd = open(ss_file, O_CREAT|O_RDWR|O_SYNC|O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 #endif

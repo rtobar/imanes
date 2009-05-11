@@ -127,7 +127,7 @@ void save_screenshot() {
 	ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 4 + 7);
 	for(i=0;;i++) {
 #ifdef _MSC_VER
-		sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+4+7,"%s/%s-%04d.bmp", ss_dir, i, tmp, i);
+		sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+4+7,"%s\\%s-%04d.bmp", ss_dir, tmp, i);
 #else
 		sprintf(ss_file,"%s/%s-%04d.bmp", ss_dir, tmp, i);
 #endif
@@ -137,7 +137,7 @@ void save_screenshot() {
 	}
 
 #ifdef _MSC_VER
-	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT, _SH_DENYWR, _S_IREAD|_S_IWRITE);
+	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT|O_BINARY, SH_DENYWR, S_IREAD|S_IWRITE);
 #else
 	fd = open(ss_file, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 #endif

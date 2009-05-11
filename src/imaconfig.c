@@ -125,7 +125,7 @@ char *get_user_imanes_dir() {
 
 	user_imanes_dir = (char *)malloc(strlen(user_home) + 9);
 #ifdef _MSC_VER
-	sprintf_s(user_imanes_dir,strlen(user_home)+9,"%s/Imanes",user_home);
+	sprintf_s(user_imanes_dir,strlen(user_home)+9,"%s\\Imanes",user_home);
 #else
 	sprintf(user_imanes_dir,"%s/.imanes", user_home);
 #endif
@@ -152,7 +152,7 @@ char *get_imanes_dir(imanes_dir dir) {
 		case States:
 			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 8);
 #ifdef _MSC_VER
-			sprintf_s(specific_dir,strlen(user_imanes_dir)+8,"%s/states",user_imanes_dir);
+			sprintf_s(specific_dir,strlen(user_imanes_dir)+8,"%s\\states",user_imanes_dir);
 #else
 			sprintf(specific_dir, "%s/states", user_imanes_dir);
 #endif
@@ -166,7 +166,7 @@ char *get_imanes_dir(imanes_dir dir) {
 		case Saves:
 			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 7);
 #ifdef _MSC_VER
-			sprintf_s(specific_dir,strlen(user_imanes_dir)+7,"%s/saves",user_imanes_dir);
+			sprintf_s(specific_dir,strlen(user_imanes_dir)+7,"%s\\saves",user_imanes_dir);
 #else
 			sprintf(specific_dir, "%s/saves", user_imanes_dir);
 #endif
@@ -180,7 +180,7 @@ char *get_imanes_dir(imanes_dir dir) {
 		case Snapshots:
 			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 13);
 #ifdef _MSC_VER
-			sprintf_s(specific_dir,strlen(user_imanes_dir)+13,"%s/screenshots",user_imanes_dir);
+			sprintf_s(specific_dir,strlen(user_imanes_dir)+13,"%s\\screenshots",user_imanes_dir);
 #else
 			sprintf(specific_dir, "%s/screenshots", user_imanes_dir);
 #endif
