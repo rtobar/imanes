@@ -860,7 +860,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 
 		/* If we should return a key state... */
 		if( pads[0].reads < 8 )
-			ret_val |= ((pads[0].pressed_keys >> (pads[0].reads)) & 0x1); 
+			ret_val |= ((pads[0].pressed_keys >> (pads[0].reads)) & 0x1);
 
 		/* This is the signature */
 		else if ( pads[0].reads == 19 && pads[0].plugged )
@@ -876,7 +876,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 
 		/* If we should return a key state... */
 		if( pads[1].reads < 8 )
-			ret_val |= ((pads[1].pressed_keys >> (pads[1].reads)) & 0x1); 
+			ret_val |= ((pads[1].pressed_keys >> (pads[1].reads)) & 0x1);
 
 		/* This is the signature */
 		else if ( pads[1].reads == 18 && pads[1].plugged )
