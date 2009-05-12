@@ -650,6 +650,7 @@ void update_flags(int8_t value, uint8_t flags) {
 
 void write_cpu_ram(uint16_t address, uint8_t value) {
 
+	static int strobe_pad = 0;
 	int i;
 
 	XTREME( if( 0x2000 <= address && address <= 0x2006 ) {
@@ -753,24 +754,18 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 		/* 1st joystick */			
 		case 0x4016:
-			if( value == 0x01 ) {
-				pads[0].strobe_pad = 1;
-			}
-			else if( value == 0x00 && pads[0].strobe_pad ) {
+			if( value == 0x01 )
+				strobe_pad = 1;
+			else if( value == 0x00 && strobe_pad ) {
+				strobe_pad = 0;
 				pads[0].reads = 0;
-				pads[0].strobe_pad = 0;
+				pads[1].reads = 0;
 			}
 			break;
 
 		/* 2nd joystick */			
 		case 0x4017:
-			if( value == 0x01 ) {
-				pads[1].strobe_pad = 1;
-			}
-			else if( value == 0x00 && pads[1].strobe_pad ) {
-				pads[1].reads = 0;
-				pads[1].strobe_pad = 0;
-			}
+			/* TODO: Check better what to do when writting here */
 			break;
 
 		/* Normal RAM memory area */

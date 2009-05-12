@@ -32,12 +32,10 @@ void initialize_pads() {
 	pads[0].plugged = 1;
 	pads[0].pressed_keys = 0;
 	pads[0].reads = 0;
-	pads[0].strobe_pad = 0;
 
 	pads[1].plugged = 1;
 	pads[1].pressed_keys = 0;
 	pads[1].reads = 0;
-	pads[1].strobe_pad = 0;
 
 }
 
