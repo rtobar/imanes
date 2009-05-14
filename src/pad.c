@@ -234,10 +234,7 @@ void nes_keydown(SDL_keysym keysym) {
 		/* Pause */
 		case SDLK_ESCAPE:
 			INFO( printf("%s emulation\n", (config.pause ? "Resuming" : "Pausing")) );
-			if( !config.pause )
-				config.pause = 1;
-			else
-				config.pause = 0;
+			config.pause = ( !config.pause );
 			break;
 
 		/* Run as fast as possible */
