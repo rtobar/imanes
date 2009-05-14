@@ -35,6 +35,7 @@
 
 #include "cpu.h"
 #include "debug.h"
+#include "gui.h"
 #include "imaconfig.h"
 #include "instruction_set.h"
 #include "loop.h"
@@ -142,6 +143,7 @@ int main(int args, char *argv[]) {
 
 	/* Init the graphics engine */
 	init_screen();
+	init_gui();
 
 	/* Main execution loop */
 	main_loop();

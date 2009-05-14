@@ -28,6 +28,7 @@
 #include "common.h"
 #include "cpu.h"
 #include "debug.h"
+#include "gui.h"
 #include "instruction_set.h"
 #include "loop.h"
 #include "mapper.h"
@@ -83,10 +84,13 @@ int main_loop(void *args) {
 	for(run_loop = 1;run_loop;) {
 
 		/* First, of all, we check if we should pause the emulation 
-		   We do so until the pause has been released by the user
-		   We also check if the user wants to quit the emulation */
-		while( config.pause && run_loop )
-			screen_loop();
+		 * If we are un pause, we go to GUI mode.
+		 * We do so until the pause has been released by the user
+		 * We also check if the user wants to quit the emulation */
+		if( config.pause && run_loop ) {
+			gui_set_background();
+			gui_loop();
+		}
 		if( !run_loop )
 			return 0;
 

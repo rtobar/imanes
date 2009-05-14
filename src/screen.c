@@ -63,7 +63,6 @@ void screen_loop() {
 void init_screen() {
 	
 	char window_title[13];
-	Uint32 color_key;
 
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
 		fprintf(stderr,"Error when initializing screen: %s\n", SDL_GetError());
@@ -124,8 +123,6 @@ void draw_pixel(int x, int y, nes_palette color) {
 }
 
 void redraw_screen() {
-
-	SDL_Rect dst;
 
 	/* Take screenshot */
 	if( config.take_screenshot ) {
