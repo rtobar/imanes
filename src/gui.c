@@ -29,18 +29,32 @@ void redraw_gui();
 
 static SDL_Surface *imanes_cursor;
 static SDL_Surface *gui_bg;
+static SDL_Surface *gui_cover;
 static int _cursor_x;
 static int _cursor_y;
 
 void init_gui() {
 
+	int i;
+	int j;
+	Uint32 fill_color;
 	Uint32 color_key;
 
 	gui_bg = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY | SDL_SRCALPHA,
 	                              NES_SCREEN_WIDTH*config.video_scale,
 	                              NES_NTSC_HEIGHT*config.video_scale,
 	                              NES_SCREEN_BPP,
+	                              0, 0, 0, SDL_ALPHA_OPAQUE);
+	gui_cover = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCALPHA,
+	                              NES_SCREEN_WIDTH*config.video_scale,
+	                              NES_NTSC_HEIGHT*config.video_scale,
+	                              NES_SCREEN_BPP,
 	                              0, 0, 0, 0);
+	SDL_SetAlpha(gui_cover, SDL_SRCALPHA, 150);
+	fill_color = SDL_MapRGBA(gui_bg->format, 0, 0, 255, 0);
+	for(i=0;i!=NES_SCREEN_WIDTH*config.video_scale;i++)
+		for(j=0;j!=NES_NTSC_HEIGHT*config.video_scale;j++)
+			((Uint32*)gui_cover->pixels)[i + j*NES_SCREEN_WIDTH*config.video_scale] = fill_color;
 
 	imanes_cursor = SDL_LoadBMP("../icons/imanes-cursor.bmp");
 	color_key = SDL_MapRGB(imanes_cursor->format, 98, 251, 14);
@@ -123,6 +137,11 @@ void redraw_gui() {
 
 void gui_set_background() {
 
+	SDL_Rect dst;
+	dst.x = 0;
+	dst.y = 0;
+
 	memcpy(gui_bg->pixels, nes_screen->pixels, sizeof(Uint32)*NES_SCREEN_WIDTH*config.video_scale*NES_NTSC_HEIGHT*config.video_scale);
+	SDL_BlitSurface(gui_cover, NULL, gui_bg, &dst);
 
 }
