@@ -83,6 +83,7 @@ void init_screen() {
 #endif
 
 	SDL_WM_SetCaption(window_title,NULL);
+	SDL_ShowCursor(SDL_DISABLE);
 }
 
 void end_screen() {

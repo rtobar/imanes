@@ -19,6 +19,9 @@
  */
 
 #include <SDL/SDL.h>
+#ifndef _MSC_VER
+#include <time.h>
+#endif
 
 #include "imaconfig.h"
 #include "loop.h"
@@ -27,18 +30,18 @@
 void gui_keydown(SDL_keysym);
 void redraw_gui();
 
-static SDL_Surface *imanes_cursor;
 static SDL_Surface *gui_bg;
 static SDL_Surface *gui_cover;
-static int _cursor_x;
-static int _cursor_y;
+/* static SDL_Surface *imanes_cursor; */
+/* static int _cursor_x; */
+/* static int _cursor_y; */
 
 void init_gui() {
 
 	int i;
 	int j;
 	Uint32 fill_color;
-	Uint32 color_key;
+	/*Uint32 color_key;*/
 
 	gui_bg = SDL_CreateRGBSurface(SDL_HWSURFACE | SDL_SRCCOLORKEY | SDL_SRCALPHA,
 	                              NES_SCREEN_WIDTH*config.video_scale,
@@ -56,12 +59,11 @@ void init_gui() {
 		for(j=0;j!=NES_NTSC_HEIGHT*config.video_scale;j++)
 			((Uint32*)gui_cover->pixels)[i + j*NES_SCREEN_WIDTH*config.video_scale] = fill_color;
 
-	imanes_cursor = SDL_LoadBMP("../icons/imanes-cursor.bmp");
+	/* imanes_cursor = SDL_LoadBMP("../icons/imanes-cursor.bmp");
 	color_key = SDL_MapRGB(imanes_cursor->format, 98, 251, 14);
 	SDL_SetColorKey(imanes_cursor, SDL_SRCCOLORKEY, color_key);
-	SDL_ShowCursor(SDL_DISABLE);
 	_cursor_x = 100;
-	_cursor_y = 100;
+	_cursor_y = 100; */
 
 	return;
 }
@@ -69,6 +71,11 @@ void init_gui() {
 void gui_loop() {
 
 	SDL_Event event;
+#ifndef _MSC_VER
+	struct timespec sleepTime = { 0, 2e7};
+#endif
+
+	SDL_ShowCursor(SDL_ENABLE);
 
 	while( config.pause ) {
 		while( SDL_PollEvent(&event) ) {
@@ -88,18 +95,21 @@ void gui_loop() {
 					config.pause = 0;
 					return;
 	
-				case SDL_MOUSEMOTION:
+				/*case SDL_MOUSEMOTION:
 					_cursor_x = event.motion.x;
 					_cursor_y = event.motion.y;
-					break;
+					break; */
 			}
 	
 		}
 
 		redraw_gui();
-		usleep(20000);
+#ifndef _MSC_VER
+		nanosleep(&sleepTime, NULL);
+#endif
 	}
 
+	SDL_ShowCursor(SDL_DISABLE);
 }
 
 void gui_keydown(SDL_keysym keysym) {
@@ -118,14 +128,15 @@ void gui_keydown(SDL_keysym keysym) {
 
 void redraw_gui() {
 
-	SDL_Rect dst;
+	/*SDL_Rect dst;*/
 
+	/* Copy first of all the background pixels */
 	memcpy(nes_screen->pixels, gui_bg->pixels, sizeof(Uint32)*NES_SCREEN_WIDTH*config.video_scale*NES_NTSC_HEIGHT*config.video_scale);
 
 	/* Finally, show where the cursor where is */
-	dst.x = _cursor_x;
+	/* dst.x = _cursor_x;
 	dst.y = _cursor_y;
-	SDL_BlitSurface(imanes_cursor, NULL, nes_screen, &dst);
+	SDL_BlitSurface(imanes_cursor, NULL, nes_screen, &dst); */
 
 	if( SDL_Flip(nes_screen) == -1 ) {
 		fprintf(stderr,"Couldn't refresh screen :(\n");
