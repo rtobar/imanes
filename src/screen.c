@@ -30,9 +30,6 @@
 
 /* This is used by the screenshot utility */
 SDL_Surface *nes_screen;
-SDL_Surface *imanes_cursor;
-int x;
-int y;
 
 void screen_loop() {
 
@@ -57,11 +54,6 @@ void screen_loop() {
 				printf("Quiting ImaNES\n");
 				run_loop = 0;
 				return;
-
-			case SDL_MOUSEMOTION:
-				x = event.motion.x;
-				y = event.motion.y;
-				break;
 		}
 	}
 
@@ -79,12 +71,6 @@ void init_screen() {
 	}
 
 	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*config.video_scale, NES_NTSC_HEIGHT*config.video_scale, NES_SCREEN_BPP, 0);
-
-	imanes_cursor = SDL_LoadBMP("../icons/imanes-cursor.bmp");
-	color_key = SDL_MapRGB(imanes_cursor->format, 98, 251, 14);
-	SDL_SetColorKey(imanes_cursor, SDL_SRCCOLORKEY, color_key);
-
-	SDL_ShowCursor(SDL_DISABLE);
 
 	if( nes_screen == NULL ) {
 		fprintf(stderr,"Error while setting video mode: %s\n", SDL_GetError());
@@ -146,10 +132,6 @@ void redraw_screen() {
 		config.take_screenshot = 0;
 		save_screenshot();
 	}
-
-	dst.x = x;
-	dst.y = y;
-	SDL_BlitSurface(imanes_cursor, NULL, nes_screen, &dst);
 
 	if( SDL_Flip(nes_screen) == -1 ) {
 		fprintf(stderr,"Couldn't refresh screen :(\n");
