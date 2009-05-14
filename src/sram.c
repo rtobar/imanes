@@ -26,25 +26,20 @@
 #ifdef _MSC_VER
 #include <io.h>
 #include <share.h>
-#include <sys/types.h>
 #else
 #include <unistd.h>
 #endif
 
 #include "cpu.h"
 #include "debug.h"
+#include "platform.h"
 #include "sram.h"
 
 
 void save_sram(char *save_file) {
 
 	int fd;
-
-#ifdef _MSC_VER
-	int written_bytes;
-#else
-	ssize_t written_bytes;
-#endif
+	RW_RET written_bytes;
 
 	if( !CPU->sram_enabled )
 		return;
@@ -61,22 +56,14 @@ void save_sram(char *save_file) {
 		return;
 	}
 
-#ifdef _MSC_VER
-	written_bytes = _write(fd, CPU->RAM + 0x6000, 0x2000);
-#else
-	written_bytes = write(fd, CPU->RAM + 0x6000, 0x2000);
-#endif
+	written_bytes = IMANES_WRITE(fd, CPU->RAM + 0x6000, 0x2000);
 
 	if( written_bytes != 0x2000 ) {
 		fprintf(stderr,"Couldn't dump SRAM data to '%s': ", save_file);
 		perror(NULL);
 	}
 
-#ifdef _MSC_VER
-	_close(fd);
-#else
-	close(fd);
-#endif
+	IMANES_CLOSE(fd);
 
 	return;
 }
@@ -87,11 +74,7 @@ char *load_sram(char *rom_file) {
 	char *save_file;
 	char *save_dir;
 	char *tmp;
-#ifdef _MSC_VER
-	int read_bytes;
-#else
-	ssize_t read_bytes;
-#endif
+	RW_RET read_bytes;
 
 	INFO( printf("Loading SRAM... ") );
 	save_dir = get_imanes_dir(Saves);
@@ -130,22 +113,14 @@ char *load_sram(char *rom_file) {
 		return save_file;
 	}
 
-#ifdef _MSC_VER
-	read_bytes = _read(fd, CPU->RAM + 0x6000, 0x2000);
-#else
-	read_bytes = read(fd, CPU->RAM + 0x6000, 0x2000);
-#endif
+	read_bytes = IMANES_READ(fd, CPU->RAM + 0x6000, 0x2000);
 
 	if( read_bytes != 0x2000 ) {
 		fprintf(stderr,"File '%s' is not a valid SRAM dump file, SRAM not loaded.", save_file);
 		memset(CPU->RAM + 0x6000, 0, 0x2000);
 	}
 
-#ifdef _MSC_VER
-	_close(fd);
-#else
-	close(fd);
-#endif
+	IMANES_CLOSE(fd);
 
 	INFO( printf("done!\n") );
 	return save_file;

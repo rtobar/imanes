@@ -34,16 +34,17 @@
 #include "common.h"
 #include "cpu.h"
 #include "parse_file.h"
+#include "platform.h"
 #include "ppu.h"
 #include "mapper.h"
 
 ines_file *check_ines_file(char *file_path) {
 
 	int i;
-	int read_bytes;
 	char *buff;
 	struct stat stat_buf;
 	ines_file *rom_file;
+	RW_RET read_bytes;
 
 	/* Error handling */
 	if( stat(file_path,&stat_buf) ) {
@@ -75,11 +76,7 @@ ines_file *check_ines_file(char *file_path) {
 
 	/* Read the iNES magic bytes */
 	buff = (char *)malloc(4);
-#ifdef _MSC_VER
-	read_bytes = _read(rom_file->fd, buff, 4);
-#else
-	read_bytes = read(rom_file->fd, buff, 4);
-#endif
+	read_bytes = IMANES_READ(rom_file->fd, buff, 4);
 
 	if( strncmp(buff,"NES\032",4) || read_bytes != 4 ) {
 		fprintf(stderr,"Error: %s is not a valid NES ROM, incompatible header information\n",file_path);
@@ -87,21 +84,13 @@ ines_file *check_ines_file(char *file_path) {
 	}
 
 	/* ROM and VROM blocks */
-#ifdef _MSC_VER
-	read_bytes = _read(rom_file->fd, &(rom_file->romBanks), 1);
-#else
-	read_bytes = read(rom_file->fd, &(rom_file->romBanks), 1);
-#endif
+	read_bytes = IMANES_READ(rom_file->fd, &(rom_file->romBanks), 1);
 	if( read_bytes != 1 ) {
 		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
 		exit(EXIT_FAILURE);
 	}
 
-#ifdef _MSC_VER
-	read_bytes = _read(rom_file->fd, &(rom_file->vromBanks), 1);
-#else
-	read_bytes = read(rom_file->fd, &(rom_file->vromBanks), 1);
-#endif
+	read_bytes = IMANES_READ(rom_file->fd, &(rom_file->vromBanks), 1);
 	if( read_bytes != 1 ) {
 		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
 		exit(EXIT_FAILURE);
@@ -112,11 +101,7 @@ ines_file *check_ines_file(char *file_path) {
 
 	/* Mapper, name table mirroring and others */
 	buff = realloc(buff,2);
-#ifdef _MSC_VER
-	read_bytes = _read(rom_file->fd, buff, 2);
-#else
-	read_bytes = read(rom_file->fd, buff, 2);
-#endif
+	read_bytes = IMANES_READ(rom_file->fd, buff, 2);
 
 	if( read_bytes != 2 ) {
 		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
@@ -158,11 +143,7 @@ ines_file *check_ines_file(char *file_path) {
 
 	/* The rest of the header is ignored until now... */
 	buff = realloc(buff,8);
-#ifdef _MSC_VER
-	read_bytes = _read(rom_file->fd, buff, 8);
-#else
-	read_bytes = read(rom_file->fd, buff, 8);
-#endif
+	read_bytes = IMANES_READ(rom_file->fd, buff, 8);
 	if( read_bytes != 8 ) {
 		fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
 		exit(EXIT_FAILURE);
@@ -171,11 +152,7 @@ ines_file *check_ines_file(char *file_path) {
 	if( rom_file->has_trainer ) {
 
 		printf("Trainer present in ROM file\n");
-#ifdef _MSC_VER
-		read_bytes = _read( rom_file->fd, buff, 512);
-#else
-		read_bytes = read( rom_file->fd, buff, 512);
-#endif
+		read_bytes = IMANES_READ( rom_file->fd, buff, 512);
 		if( read_bytes != 512 ) {
 			fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
 			exit(EXIT_FAILURE);
@@ -195,43 +172,24 @@ void map_rom_memory(ines_file *nes_rom) {
 	nes_rom->vrom = (uint8_t *)malloc(nes_rom->vromBanks*VROM_BANK_SIZE);
 
 	/* Read and check */
-#ifdef _MSC_VER
-	read_bytes = _read(nes_rom->fd, (void *)nes_rom->rom ,
-#else
-	read_bytes = read(nes_rom->fd, (void *)nes_rom->rom ,
-#endif
+	read_bytes = IMANES_READ(nes_rom->fd, (void *)nes_rom->rom ,
 	                  nes_rom->romBanks * ROM_BANK_SIZE);
 	if( read_bytes != nes_rom->romBanks * ROM_BANK_SIZE ) {
 		fprintf(stderr,"Error: malformed file (ROM not complete)\n");
-#ifdef _MSC_VER
-		_close(nes_rom->fd);
-#else
-		close(nes_rom->fd);
-#endif
+		IMANES_CLOSE(nes_rom->fd);
 		exit(EXIT_FAILURE);
 	}
 
-#ifdef _MSC_VER
-	read_bytes = _read(nes_rom->fd, (void *)nes_rom->vrom,
-#else
-	read_bytes = read(nes_rom->fd, (void *)nes_rom->vrom,
-#endif
+	read_bytes = IMANES_READ(nes_rom->fd, (void *)nes_rom->vrom,
 	                  nes_rom->vromBanks*VROM_BANK_SIZE);
 	if( read_bytes != nes_rom->vromBanks*VROM_BANK_SIZE ) {
 		fprintf(stderr,"Error: malformed file (VROM not complete)\n");
-#ifdef _MSC_VER
-		_close(nes_rom->fd);
-#else
-		close(nes_rom->fd);
-#endif
+		IMANES_CLOSE(nes_rom->fd);
 		exit(EXIT_FAILURE);
 	}
 	
-#ifdef _MSC_VER
-	_close(nes_rom->fd);
-#else
-	close(nes_rom->fd);
-#endif
+	IMANES_CLOSE(nes_rom->fd);
+
 }
 
 void free_ines_file(ines_file *file) {

@@ -28,7 +28,6 @@
 #ifdef _MSC_VER
 #include <io.h>
 #include <share.h>
-#include <sys/types.h>
 #else
 #include <unistd.h>
 #endif
@@ -36,6 +35,7 @@
 #include "common.h"
 #include "debug.h"
 #include "imaconfig.h"
+#include "platform.h"
 #include "screen.h"
 #include "screenshot.h"
 
@@ -55,11 +55,7 @@ void save_screenshot() {
 	uint32_t tmp32;
 	Uint32 *pixels;
 	struct stat s;
-#ifdef _MSC_VER
-	int written;
-#else
-	ssize_t written;
-#endif
+	RW_RET written;
 
 	total_size = 0x36 + (NES_SCREEN_WIDTH * NES_NTSC_HEIGHT)*3;
 	buffer = (char *)malloc(total_size);
@@ -157,22 +153,14 @@ void save_screenshot() {
 		return;
 	}
 
-#ifdef _MSC_VER
-	written = _write(fd, (void *)buffer, total_size);
-#else
-	written = write(fd, (void *)buffer, total_size);
-#endif
+	written = IMANES_WRITE(fd, (void *)buffer, total_size);
 
 	if( written != total_size ) {
 		perror("Error while saving snapshot");
 		free(ss_file);
 		return;
 	}
-#ifdef _MSC_VER
-	_close(fd);
-#else
-	close(fd);
-#endif
+	IMANES_CLOSE(fd);
 
 	INFO( printf("Saved screenshot at '%s'\n", ss_file) );
 
