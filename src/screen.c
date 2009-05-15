@@ -145,14 +145,14 @@ void show_fps(int fps) {
 
 	if( config.show_fps ) {
 #ifdef _MSC_VER
-		sprintf_s(window_title,30,"ImaNES %s - %d fps",IMANES_VERSION, fps);
+		sprintf_s(window_title,23,"ImaNES %s - %d fps",IMANES_VERSION, fps);
 #else
 		sprintf(window_title,"ImaNES %s - %d fps",IMANES_VERSION, fps);
 #endif
 	}
 	else {
 #ifdef _MSC_VER
-		sprintf_s(window_title,30,"ImaNES %s",IMANES_VERSION);
+		sprintf_s(window_title,23,"ImaNES %s",IMANES_VERSION);
 #else
 		sprintf(window_title,"ImaNES %s",IMANES_VERSION);
 #endif

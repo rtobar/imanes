@@ -23,6 +23,7 @@
 #include <time.h>
 #endif
 
+#include "common.h"
 #include "imaconfig.h"
 #include "loop.h"
 #include "screen.h"
@@ -70,12 +71,20 @@ void init_gui() {
 
 void gui_loop() {
 
+	char window_title[23];
 	SDL_Event event;
 #ifndef _MSC_VER
 	struct timespec sleepTime = { 0, 2e7};
 #endif
 
 	SDL_ShowCursor(SDL_ENABLE);
+
+#ifdef _MSC_VER
+	sprintf_s(window_title,30,"ImaNES %s",IMANES_VERSION);
+#else
+	sprintf(window_title,"ImaNES %s",IMANES_VERSION);
+#endif
+	SDL_WM_SetCaption(window_title, NULL);
 
 	while( config.pause ) {
 		while( SDL_PollEvent(&event) ) {
