@@ -34,6 +34,7 @@
 
 #include "debug.h"
 #include "imaconfig.h"
+#include "platform.h"
 #include "states.h"
 
 static void *state;
@@ -47,11 +48,7 @@ void load_state(int i) {
 	char *tmp;
 	char *buffer;
 	unsigned int total_size;
-#ifdef _MSC_VER
-	int read_bytes;
-#else
-	ssize_t read_bytes;
-#endif
+	RW_RET read_bytes;
 
 	/* This is the total size of the state */
 	total_size = 
@@ -94,11 +91,8 @@ void load_state(int i) {
 		}
 		free(ss_file);
 		buffer = (char *)malloc(total_size);
-#ifdef _MSC_VER
-		read_bytes = _read(fd, buffer, total_size);
-#else
-		read_bytes = read(fd, buffer, total_size);
-#endif
+		read_bytes = IMANES_READ(fd, buffer, total_size);
+		IMANES_CLOSE(fd);
 
 		if( read_bytes != total_size ) {
 			fprintf(stderr,"File '%s' is not a valid state file\n", ss_file);
@@ -273,20 +267,12 @@ void save_state(int i) {
 	free(tmp);
 	free(ss_file);
 
-#ifdef _MSC_VER
-	written = _write(fd, (void *)buffer, total_size);
-#else
-	written = write(fd, (void *)buffer, total_size);
-#endif
+	written = IMANES_WRITE(fd, (void *)buffer, total_size);
 
 	if( written != total_size )
 		perror("Error while saving state to file");
 
-#ifdef _MSC_VER
-	_close(fd);
-#else
-	close(fd);
-#endif
+	IMANES_CLOSE(fd);
 
 	/* Copy the state into the a buffer, so we don't need to
 	 * read the state file if we want to load the last saved state */
