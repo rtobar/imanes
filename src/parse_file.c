@@ -33,6 +33,7 @@
 
 #include "common.h"
 #include "cpu.h"
+#include "debug.h"
 #include "parse_file.h"
 #include "platform.h"
 #include "ppu.h"
@@ -96,8 +97,8 @@ ines_file *check_ines_file(char *file_path) {
 		exit(EXIT_FAILURE);
 	}
 
-	printf("File contains %hu 16kb ROM banks and %hu 8kb VROM banks\n",
-          rom_file->romBanks, rom_file->vromBanks);
+	INFO( printf("File contains %hu 16kb ROM banks and %hu 8kb VROM banks\n",
+          rom_file->romBanks, rom_file->vromBanks) );
 
 	/* Mapper, name table mirroring and others */
 	buff = realloc(buff,2);
@@ -115,10 +116,10 @@ ines_file *check_ines_file(char *file_path) {
 	if( buff[0] & 0x08 )
 		PPU->mirroring = FOUR_SCREEN_MIRRORING;
 
-	printf("Mirroring type: %d\n", PPU->mirroring);
+	INFO( printf("Mirroring type: %d\n", PPU->mirroring) );
 
 	CPU->sram_enabled = (buff[0] & 0x02) >> 1;
-	printf("SRAM is %s\n", (CPU->sram_enabled ? "enabled" : "disabled") );
+	INFO( printf("SRAM is %s\n", (CPU->sram_enabled ? "enabled" : "disabled") ) );
 	rom_file->has_trainer  = buff[0] & 0x04;
 
 	rom_file->mapper_id = (buff[1] & 0xF0) | ( (buff[0] >> 4) & 0x0F );
@@ -129,7 +130,7 @@ ines_file *check_ines_file(char *file_path) {
 		if( rom_file->mapper_id == mapper_list[i].id ) {
 			mapper = mapper_list+i;
 			mapper->file = rom_file;
-			printf("ROM mapper is '%s'\n",mapper->name);
+			INFO( printf("ROM mapper is '%s'\n",mapper->name) );
 		}
 	}
 
@@ -151,7 +152,7 @@ ines_file *check_ines_file(char *file_path) {
 
 	if( rom_file->has_trainer ) {
 
-		printf("Trainer present in ROM file\n");
+		INFO( printf("Trainer present in ROM file\n") );
 		read_bytes = IMANES_READ( rom_file->fd, buff, 512);
 		if( read_bytes != 512 ) {
 			fprintf(stderr,"Error: %s is not a valid NES ROM\n",file_path);
