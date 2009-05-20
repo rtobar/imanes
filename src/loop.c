@@ -203,7 +203,7 @@ int main_loop(void *args) {
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
 
-					PPU->lines = -1;
+					PPU->lines = 0;
 					end_vblank();
 
 					/* Calculate how much we should sleep for 50/60 FPS */
