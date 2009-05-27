@@ -128,11 +128,7 @@ void save_screenshot() {
 			break;
 	}
 
-#ifdef _MSC_VER
-	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT|O_BINARY, SH_DENYWR, S_IREAD|S_IWRITE);
-#else
-	fd = open(ss_file, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-#endif
+	IMANES_OPEN(fd, ss_file, IMANES_OPEN_WRITE);
 	free(ss_dir);
 	free(tmp);
 

@@ -44,11 +44,7 @@ void save_sram(char *save_file) {
 	if( !CPU->sram_enabled )
 		return;
 
-#ifdef _MSC_VER
-	_sopen_s(&fd,save_file, O_WRONLY|O_CREAT|O_BINARY, SH_DENYNO, S_IREAD|S_IWRITE);
-#else
-	fd = open(save_file, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
-#endif
+	IMANES_OPEN(fd,save_file, IMANES_OPEN_WRITE);
 
 	if( fd == -1 ) {
 		fprintf(stderr,"Error while opening '%s': ", save_file);
@@ -97,11 +93,7 @@ char *load_sram(char *rom_file) {
 	if( !CPU->sram_enabled )
 		return save_file;
 
-#ifdef _MSC_VER
-	_sopen_s(&fd,save_file, O_RDONLY|O_BINARY, SH_DENYNO, S_IREAD);
-#else
-	fd = open(save_file, O_RDONLY);
-#endif
+	IMANES_OPEN(fd,save_file, IMANES_OPEN_READ);
 
 	if( fd == -1 ) {
 		fprintf(stderr,"Error while opening '%s': ", save_file);

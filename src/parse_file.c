@@ -56,11 +56,8 @@ ines_file *check_ines_file(const char *file_path) {
 	}
 
 	rom_file = (ines_file *)malloc(sizeof(ines_file));
-#ifdef _MSC_VER
-	if( _sopen_s(&(rom_file->fd), file_path, O_RDONLY|O_BINARY, SH_DENYWR, S_IREAD|S_IWRITE) == -1 ) {
-#else
-	if( (rom_file->fd = open(file_path, O_RDONLY)) == -1 ) {
-#endif
+	IMANES_OPEN( rom_file->fd, file_path, IMANES_OPEN_READ);
+	if( rom_file->fd == -1 ) {
 		buff = (char *)malloc(strlen(file_path) + 14);
 		imanes_sprintf(buff,strlen(file_path) + 14,"Couldn't open %s",file_path);
 		perror((const char *)buff);
