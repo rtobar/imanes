@@ -10,7 +10,7 @@
 #define SRAM_ENABLE 0x01
 #define SRAM_RO     0x02
 
-typedef struct {
+typedef struct _cpu {
 
 	/* Internal CPU registers */
 	uint16_t PC;  /* Program counter. 16 bits long, but points 8 bit code */
@@ -34,6 +34,8 @@ typedef struct {
 	uint8_t sram_enabled;
 } nes_cpu;
 
+extern nes_cpu *CPU;
+
 /** SR flags */
 #define N_FLAG 0x80
 #define V_FLAG 0x40
@@ -46,8 +48,6 @@ typedef struct {
 
 #define BEGIN_STACK (0x100)
 #define STACK_SIZE  (0x100)
-
-extern nes_cpu *CPU;
 
 /**
  * Initialize the CPU with its registers

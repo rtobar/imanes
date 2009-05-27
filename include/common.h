@@ -28,7 +28,7 @@
 
 #define CYCLES_PER_SCANLINE ((float)(341/3.))
 
-typedef struct {
+typedef struct _ines_file {
 	int fd;
 	uint8_t romBanks;
 	uint8_t vromBanks;
@@ -38,7 +38,6 @@ typedef struct {
 
 	int has_trainer;
 } ines_file;
-
 
 /* For a given file, and given its full path, get only the file name
  * _without_ extension */

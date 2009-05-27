@@ -109,7 +109,7 @@
 /* Number of possible opcodes */
 #define OPCODES_NUMBER  0x100
 
-typedef struct {
+typedef struct _instruction {
 	uint8_t opcode;       /* 1 byte opcode */
 	uint8_t instr_id;     /* Which instruction corresponds */
 	char name[4];         /* Instruction name string */
