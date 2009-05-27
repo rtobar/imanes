@@ -3,8 +3,17 @@
 
 #include <stdint.h>
 
-/* Version string */
-#define IMANES_VERSION "0.1"
+/* ImaNES information */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#else
+#define PACKAGE_BUGREPORT "https://csrg.inf.utfsm.cl/flyspray/index.php?project=10"
+#define PACKAGE_NAME      "ImaNES"
+#define PACKAGE_VERSION   "0.1"
+#define PACKAGE_STRING    "ImaNES 0.1"
+#endif
+
+#define IMANES_VERSION PACKAGE_VERSION
 
 /* RAM sizes */
 #define NES_RAM_SIZE     (0x10000)
