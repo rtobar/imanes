@@ -189,6 +189,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\src\gui.c"
+			>
+		</File>
+		<File
 			RelativePath=".\src\imaconfig.c"
 			>
 		</File>
