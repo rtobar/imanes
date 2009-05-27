@@ -23,13 +23,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#ifdef _MSC_VER
-#include <io.h>
-#include <share.h>
-#else
-#include <unistd.h>
-#endif
-
 #include "cpu.h"
 #include "debug.h"
 #include "platform.h"

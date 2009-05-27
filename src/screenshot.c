@@ -25,13 +25,6 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#ifdef _MSC_VER
-#include <io.h>
-#include <share.h>
-#else
-#include <unistd.h>
-#endif
-
 #include "common.h"
 #include "debug.h"
 #include "imaconfig.h"

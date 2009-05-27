@@ -11,9 +11,17 @@
 #define IMANES_OPEN_READ  0
 #define IMANES_OPEN_WRITE 1
 
-/* Definitions necessary for compilation issues */
+/**
+ * Definitions necessary for compilation issues. First we include
+ * the common .h files, then we have type definitions, and finally
+ * some macro definitions for common systems calls
+ */
 #ifdef _MSC_VER
+
 	#include <direct.h>
+	#include <io.h>
+	#include <share.h>
+	#include <sys/types.h>
 
 	#define RW_RET      int
 
@@ -27,8 +35,11 @@
 	#define IMANES_WRITE        _write
 	#define IMANES_READ         _read
 	#define IMANES_MKDIR(dir)   _mkdir(dir)
+
 #else
+
 	#include <sys/types.h>
+	#include <unistd.h>
 
 	#define RW_RET      ssize_t
 
@@ -42,16 +53,22 @@
 	#define IMANES_WRITE        write
 	#define IMANES_READ         read
 	#define IMANES_MKDIR(dir)   mkdir(dir, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH)
-#endif
 
-/* Definitions for ImaNES */
+#endif /* _MSC_VER */
+
+
+/*
+ * These definitions are intended for ImaNES to work
+ * correctly under the different supported operating systems
+ */
 #ifdef _MSC_VER
 	#define DIR_SEP             '\\'
 	#define IMANES_USER_DIR     "Imanes"
 #else
 	#define DIR_SEP             '/'
 	#define IMANES_USER_DIR     ".imanes"
-#endif
+#endif /* _MSC_VER */
+
 
 /**
  * Wrapper for platform-specific sprintf function
