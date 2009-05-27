@@ -68,11 +68,11 @@ void load_state(int i) {
 		ss_dir = get_imanes_dir(States);
 		tmp = get_filename(config.rom_file);
 		ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 2 + 7);
+		imanes_sprintf(ss_file,strlen(ss_dir)+strlen(tmp)+2+7,"%s%c%s-%02d.sta", ss_dir, DIR_SEP, tmp, config.current_state);
+
 #ifdef _MSC_VER
-		sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+2+7,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
 		_sopen_s(&fd,ss_file, O_RDONLY|O_BINARY, SH_DENYWR, S_IREAD|S_IWRITE);
 #else
-		sprintf(ss_file,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
 		fd = open(ss_file, O_RDONLY);
 #endif
 		free(ss_dir);
@@ -165,11 +165,7 @@ void save_state(int i) {
 	char *tmp;
 	char *buffer;
 	unsigned int total_size;
-#ifdef _MSC_VER
-	int written;
-#else
-	ssize_t written;
-#endif
+	RW_RET written;
 
 	ss_dir = get_imanes_dir(States);
 	if( ss_dir == NULL ) {
@@ -252,11 +248,7 @@ void save_state(int i) {
 	/* Finally, save it into a file */
 	tmp = get_filename(config.rom_file);
 	ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 2 + 7);
-#ifdef _MSC_VER
-	sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+2+7,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
-#else
-	sprintf(ss_file,"%s/%s-%02d.sta", ss_dir, tmp, config.current_state);
-#endif
+	imanes_sprintf(ss_file,strlen(ss_dir)+strlen(tmp)+2+7,"%s%c%s-%02d.sta", ss_dir, DIR_SEP, tmp, config.current_state);
 
 #ifdef _MSC_VER
 	_sopen_s(&fd,ss_file, O_WRONLY|O_CREAT, SH_DENYWR, S_IREAD|S_IWRITE);

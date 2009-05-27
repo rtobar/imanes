@@ -102,9 +102,7 @@ char *get_user_imanes_dir() {
 	char * user_imanes_dir;
 #ifdef _MSC_VER
 	size_t size;
-#endif
 
-#ifdef _MSC_VER
 	_dupenv_s(&user_home, &size, "APPDATA");
 #else
 	user_home = getenv("HOME");
@@ -115,12 +113,10 @@ char *get_user_imanes_dir() {
 		return NULL;
 	}
 
-	user_imanes_dir = (char *)malloc(strlen(user_home) + 9);
-#ifdef _MSC_VER
-	sprintf_s(user_imanes_dir,strlen(user_home)+9,"%s\\Imanes",user_home);
-#else
-	sprintf(user_imanes_dir,"%s/.imanes", user_home);
-#endif
+	user_imanes_dir = (char *)malloc(strlen(user_home) + strlen(IMANES_USER_DIR) + 2);
+	imanes_sprintf(user_imanes_dir,
+	               strlen(user_home) + strlen(IMANES_USER_DIR) + 2,
+	               "%s%c%s",user_home, DIR_SEP,IMANES_USER_DIR);
 
 	if( check_and_create(user_imanes_dir) )
 		return NULL;
@@ -143,11 +139,7 @@ char *get_imanes_dir(imanes_dir dir) {
 
 		case States:
 			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 8);
-#ifdef _MSC_VER
-			sprintf_s(specific_dir,strlen(user_imanes_dir)+8,"%s\\states",user_imanes_dir);
-#else
-			sprintf(specific_dir, "%s/states", user_imanes_dir);
-#endif
+			imanes_sprintf(specific_dir,strlen(user_imanes_dir)+8,"%s%cstates",user_imanes_dir, DIR_SEP);
 			if( check_and_create(specific_dir) ) {
 				free(specific_dir);
 				free(user_imanes_dir);
@@ -157,11 +149,7 @@ char *get_imanes_dir(imanes_dir dir) {
 
 		case Saves:
 			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 7);
-#ifdef _MSC_VER
-			sprintf_s(specific_dir,strlen(user_imanes_dir)+7,"%s\\saves",user_imanes_dir);
-#else
-			sprintf(specific_dir, "%s/saves", user_imanes_dir);
-#endif
+			imanes_sprintf(specific_dir,strlen(user_imanes_dir)+7,"%s%csaves",user_imanes_dir, DIR_SEP);
 			if( check_and_create(specific_dir) ) {
 				free(specific_dir);
 				free(user_imanes_dir);
@@ -171,11 +159,7 @@ char *get_imanes_dir(imanes_dir dir) {
 
 		case Snapshots:
 			specific_dir = (char *)malloc(strlen(user_imanes_dir) + 13);
-#ifdef _MSC_VER
-			sprintf_s(specific_dir,strlen(user_imanes_dir)+13,"%s\\screenshots",user_imanes_dir);
-#else
-			sprintf(specific_dir, "%s/screenshots", user_imanes_dir);
-#endif
+			imanes_sprintf(specific_dir,strlen(user_imanes_dir)+13,"%s%cscreenshots",user_imanes_dir, DIR_SEP);
 			if( check_and_create(specific_dir) ) {
 				free(specific_dir);
 				free(user_imanes_dir);

@@ -233,6 +233,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\src\platform.c"
+			>
+		</File>
+		<File
 			RelativePath=".\src\ppu.c"
 			>
 		</File>

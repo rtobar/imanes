@@ -26,6 +26,7 @@
 #include "common.h"
 #include "imaconfig.h"
 #include "loop.h"
+#include "platform.h"
 #include "screen.h"
 
 void gui_keydown(SDL_keysym);
@@ -79,11 +80,7 @@ void gui_loop() {
 
 	SDL_ShowCursor(SDL_ENABLE);
 
-#ifdef _MSC_VER
-	sprintf_s(window_title,30,"ImaNES %s",IMANES_VERSION);
-#else
-	sprintf(window_title,"ImaNES %s",IMANES_VERSION);
-#endif
+	imanes_sprintf(window_title,30,"ImaNES %s",IMANES_VERSION);
 	SDL_WM_SetCaption(window_title, NULL);
 
 	while( config.pause ) {

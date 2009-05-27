@@ -16,6 +16,7 @@ imanes_SOURCES = \
      pad.c \
      palette.c \
      parse_file.c \
+     platform.c \
      ppu.c \
      screen.c \
      screenshot.c \

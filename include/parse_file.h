@@ -11,7 +11,7 @@
  * emulated. First it stats it, and after that it checks if is indeed a
  * iNES rom. Finally, it gets the information about the ROM
  */
-ines_file *check_ines_file(char *);
+ines_file *check_ines_file(const char *);
 
 /**
  * Maps all the ROM and VROM banks to main memory of our process

@@ -39,7 +39,7 @@
 #include "ppu.h"
 #include "mapper.h"
 
-ines_file *check_ines_file(char *file_path) {
+ines_file *check_ines_file(const char *file_path) {
 
 	int i;
 	char *buff;
@@ -50,11 +50,7 @@ ines_file *check_ines_file(char *file_path) {
 	/* Error handling */
 	if( stat(file_path,&stat_buf) ) {
 		buff = (char *)malloc(strlen(file_path) + 14);
-#ifdef _MSC_VER
-		sprintf_s(buff,strlen(file_path) + 14,"Couldn't open %s",file_path);
-#else
-		sprintf(buff,"Couldn't open %s",file_path);
-#endif
+		imanes_sprintf(buff,strlen(file_path) + 14,"Couldn't open %s",file_path);
 		perror((const char *)buff);
 		exit(EXIT_FAILURE);
 	}
@@ -66,11 +62,7 @@ ines_file *check_ines_file(char *file_path) {
 	if( (rom_file->fd = open(file_path, O_RDONLY)) == -1 ) {
 #endif
 		buff = (char *)malloc(strlen(file_path) + 14);
-#ifdef _MSC_VER
-		sprintf_s(buff,strlen(file_path) + 14,"Couldn't open %s",file_path);
-#else
-		sprintf(buff,"Couldn't open %s",file_path);
-#endif
+		imanes_sprintf(buff,strlen(file_path) + 14,"Couldn't open %s",file_path);
 		perror((const char *)buff);
 		exit(EXIT_FAILURE);
 	}

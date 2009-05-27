@@ -89,11 +89,7 @@ char *load_sram(char *rom_file) {
 	tmp = get_filename(rom_file);
 
 	save_file = (char *)malloc(strlen(save_dir) + strlen(tmp) + 6);
-#ifdef _MSC_VER
-	sprintf_s(save_file, strlen(save_dir) + strlen(tmp)+6, "%s\\%s.sav", save_dir, tmp);
-#else
-	sprintf(save_file, "%s/%s.sav", save_dir, tmp);
-#endif
+	imanes_sprintf(save_file, strlen(save_dir) + strlen(tmp)+6, "%s%c%s.sav", save_dir, DIR_SEP, tmp);
 	free(tmp);
 	free(save_dir);
 
@@ -101,7 +97,7 @@ char *load_sram(char *rom_file) {
 	if( !CPU->sram_enabled )
 		return save_file;
 
-	#ifdef _MSC_VER
+#ifdef _MSC_VER
 	_sopen_s(&fd,save_file, O_RDONLY|O_BINARY, SH_DENYNO, S_IREAD);
 #else
 	fd = open(save_file, O_RDONLY);

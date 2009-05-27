@@ -122,11 +122,7 @@ void save_screenshot() {
 	tmp = get_filename(config.rom_file);
 	ss_file = (char *)malloc(strlen(ss_dir) + strlen(tmp) + 4 + 7);
 	for(i=0;;i++) {
-#ifdef _MSC_VER
-		sprintf_s(ss_file,strlen(ss_dir)+strlen(tmp)+4+7,"%s\\%s-%04d.bmp", ss_dir, tmp, i);
-#else
-		sprintf(ss_file,"%s/%s-%04d.bmp", ss_dir, tmp, i);
-#endif
+		imanes_sprintf(ss_file,strlen(ss_dir)+strlen(tmp)+4+7,"%s%c%s-%04d.bmp", ss_dir, DIR_SEP, tmp, i);
 		j = stat(ss_file, &s);
 		if( j == -1 )
 			break;
@@ -142,11 +138,7 @@ void save_screenshot() {
 
 	if( fd == -1 ) {
 		tmp = (char *)malloc(23 + strlen(ss_file));
-#ifdef _MSC_VER
-		sprintf_s(tmp, strlen(ss_file)+23, "Error while opening '%s'", ss_file);
-#else
-		sprintf(tmp, "Error while opening '%s'", ss_file);
-#endif
+		imanes_sprintf(tmp, strlen(ss_file)+23, "Error while opening '%s'", ss_file);
 		perror(tmp);
 		free(tmp);
 		free(ss_file);

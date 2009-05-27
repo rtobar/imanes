@@ -22,9 +22,11 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "debug.h"
 #include "imaconfig.h"
 #include "loop.h"
 #include "pad.h"
+#include "platform.h"
 #include "screen.h"
 #include "screenshot.h"
 
@@ -51,7 +53,7 @@ void screen_loop() {
 				}
 
 			case SDL_QUIT:
-				printf("Quiting ImaNES\n");
+				INFO( printf("Quiting ImaNES\n") );
 				run_loop = 0;
 				return;
 		}
@@ -76,11 +78,7 @@ void init_screen() {
 		exit(EXIT_FAILURE);
 	}
 
-#ifdef _MSC_VER
-	sprintf_s(window_title,30,"ImaNES %s",IMANES_VERSION);
-#else
-	sprintf(window_title,"ImaNES %s",IMANES_VERSION);
-#endif
+	imanes_sprintf(window_title,30,"ImaNES %s",IMANES_VERSION);
 
 	SDL_WM_SetCaption(window_title,NULL);
 	SDL_ShowCursor(SDL_DISABLE);
@@ -141,22 +139,13 @@ void redraw_screen() {
 }
 
 void show_fps(int fps) {
+
 	char window_title[23];
 
-	if( config.show_fps ) {
-#ifdef _MSC_VER
-		sprintf_s(window_title,23,"ImaNES %s - %d fps",IMANES_VERSION, fps);
-#else
-		sprintf(window_title,"ImaNES %s - %d fps",IMANES_VERSION, fps);
-#endif
-	}
-	else {
-#ifdef _MSC_VER
-		sprintf_s(window_title,23,"ImaNES %s",IMANES_VERSION);
-#else
-		sprintf(window_title,"ImaNES %s",IMANES_VERSION);
-#endif
-	}
+	if( config.show_fps )
+		imanes_sprintf(window_title,23,"ImaNES %s - %d fps",IMANES_VERSION, fps);
+	else
+		imanes_sprintf(window_title,23,"ImaNES %s",IMANES_VERSION);
 	SDL_WM_SetCaption(window_title, NULL);
 
 }
