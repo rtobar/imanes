@@ -21,6 +21,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "platform.h"
+
 void inst_lowercase(char *inst_name, char *ret) {
 
 	int i;
@@ -34,17 +36,12 @@ void inst_lowercase(char *inst_name, char *ret) {
 
 char *get_filename(char *full_pathname) {
 
-#ifdef _MSC_VER
-#define SEP '\\'
-#else
-#define SEP '/'
-#endif
 	int i;
 	char *tmp;
 
 	/* Get just the name of the file */
 	for(i=strlen(full_pathname); i>=0; i--)
-		if( full_pathname[i] == SEP )
+		if( full_pathname[i] == DIR_SEP )
 			break;
 
 	tmp = (char *)malloc(strlen(full_pathname) - i);

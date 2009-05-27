@@ -7,15 +7,22 @@
 #undef RW_RET        /* Type returned by read()/write() */
 
 #ifdef _MSC_VER
-	#define IMANES_CLOSE   _close
-	#define IMANES_WRITE   _write
-	#define IMANES_READ    _read
+	#include <direct.h>
+
+	#define DIR_SEP '\\'
+	#define IMANES_CLOSE        _close
+	#define IMANES_WRITE        _write
+	#define IMANES_READ         _read
+	#define IMANES_MKDIR(dir)   _mkdir(dir)
 	#define RW_RET      int
 #else
 	#include <sys/types.h>
-	#define IMANES_CLOSE   close
-	#define IMANES_WRITE   write
-	#define IMANES_READ    read
+
+	#define DIR_SEP '/'
+	#define IMANES_CLOSE        close
+	#define IMANES_WRITE        write
+	#define IMANES_READ         read
+	#define IMANES_MKDIR(dir)   mkdir(dir, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH)
 	#define RW_RET      ssize_t
 #endif
 

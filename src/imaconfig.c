@@ -23,12 +23,9 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#ifdef _MSC_VER
-#include <direct.h>
-#endif
-
 #include "debug.h"
 #include "imaconfig.h"
+#include "platform.h"
 
 imanes_config config;
 
@@ -87,11 +84,7 @@ int check_and_create(char *dir) {
 	/* Not found, let's create it (we assume that $HOME exists) */
 	if( tmp == -1 ) {
 		fprintf(stderr,"Directory '%s' not found, creating it...\n", dir);
-#ifdef _MSC_VER
-		tmp = _mkdir(dir);
-#else
-		tmp = mkdir(dir, S_IRWXU | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-#endif
+		tmp = IMANES_MKDIR(dir);
 
 		if( tmp == -1 ) {
 			fprintf(stderr,"Error while creating directory '%s': ", dir);
@@ -113,7 +106,6 @@ char *get_user_imanes_dir() {
 
 #ifdef _MSC_VER
 	_dupenv_s(&user_home, &size, "APPDATA");
-	INFO( printf("Data directory is %s\n", user_home) );
 #else
 	user_home = getenv("HOME");
 #endif
