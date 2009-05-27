@@ -73,14 +73,9 @@ void init_gui() {
 
 void gui_loop() {
 
-	char window_title[23];
 	SDL_Event event;
 
 	SDL_ShowCursor(SDL_ENABLE);
-
-	imanes_sprintf(window_title,30,"ImaNES %s",IMANES_VERSION);
-	SDL_WM_SetCaption(window_title, NULL);
-
 	start_timing();
 
 	while( config.pause ) {
