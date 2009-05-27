@@ -27,13 +27,8 @@
 #include <unistd.h>
 #endif
 
-#if !defined(__APPLE__) &&  !defined(_MSC_VER)
-#include "config.h"
-#else
-#define PACKAGE_BUGREPORT "https://csrg.inf.utfsm.cl/flyspray/index.php?project=10"
-#endif
-
 #include "cpu.h"
+#include "common.h"
 #include "debug.h"
 #include "gui.h"
 #include "imaconfig.h"
@@ -47,16 +42,27 @@
 #include "sram.h"
 
 void usage(FILE *file, char *argv[]) {
-	fprintf(file,"\nImaNES: I'm a NES\n\n");
+	fprintf(file,"\n%s: I'm a NES\n\n", PACKAGE_NAME);
 	fprintf(file,"This program is licensed under the GPLv3 license.\n");
-	fprintf(file,"For bug reports, please refer to: %s\n\n", PACKAGE_BUGREPORT);
+	fprintf(file,"For bug reports, please refer to %s\n\n", PACKAGE_BUGREPORT);
 	fprintf(file,"Usage: %s [options] <rom file>\n\n",argv[0]);
 	fprintf(file,"Options:\n");
 	fprintf(file,"  -v        Increase verbosity. More -v, more verbose. Default: 0\n");
 	fprintf(file,"  -s <n>    Video scaling facotr. Default: 1\n");
-	fprintf(file,"  -c        Use SDL color construction. Default: no\n");
+	fprintf(file,"  -c        Use SDL color construction. Default: no\n\n");
 	fprintf(file,"  -h,-?     Show this help and exit\n");
+	fprintf(file,"  -V        Show the current version of ImaNES and exit\n\n");
+	fprintf(file,"ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm.cl>\n");
+	fprintf(file,"Please refer to the AUTHORS file for more details\n");
 	fprintf(file,"\n");
+}
+
+void print_version() {
+	printf("\n%s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
+	printf("The current version of %s was compiled on %s, %s\n\n", PACKAGE_NAME, __DATE__, __TIME__);
+	printf("ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm.cl>\n");
+	printf("Please refer to the AUTHORS file for more details\n");
+	printf("\n");
 }
 
 void parse_options(int args, char *argv[]) {
@@ -65,7 +71,7 @@ void parse_options(int args, char *argv[]) {
 
 	config.verbosity = 0;
 
-	while( (opt = getopt(args, argv, "cvhHs:?")) != -1 ) {
+	while( (opt = getopt(args, argv, "cvhHVs:?")) != -1 ) {
 
 		switch(opt) {
 			case 'v':
@@ -89,6 +95,11 @@ void parse_options(int args, char *argv[]) {
 			case 'h':
 			case 'H':
 				usage(stdout,argv);
+				exit(EXIT_SUCCESS);
+				break;
+
+			case 'V':
+				print_version();
 				exit(EXIT_SUCCESS);
 				break;
 
