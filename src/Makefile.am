@@ -4,6 +4,7 @@ imanes_SOURCES = \
      cnrom.c \
      common.c \
      cpu.c \
+     frame_control.c \
      gui.c \
      imaconfig.c \
      instruction_set.c \

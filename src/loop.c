@@ -20,14 +20,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#ifdef _MSC_VER
-#include <Windows.h>
-#endif
 
 #include "common.h"
 #include "cpu.h"
 #include "debug.h"
+#include "frame_control.h"
 #include "gui.h"
 #include "instruction_set.h"
 #include "loop.h"
@@ -36,47 +33,24 @@
 #include "screen.h"
 #include "states.h"
 
-#define DUMPS   1
-
 int run_loop;
 
 int main_loop(void *args) {
 
 	uint8_t opcode;
 	int standard_lines;
-	int i;
 	unsigned long int cycles;
-	uint16_t pc_dumps[DUMPS] = { 0xffff };
 	operand operand = { 0, 0 };
 	instruction inst;
-#ifndef _MSC_VER
-	long tmp;
-	struct timespec sleepTime = { 0, (long)2e7 };
-	struct timespec startTime;
-	struct timespec endTime;
-#else
-	time_t tmp;
-	time_t secs;
-	LARGE_INTEGER freq;
-	LARGE_INTEGER startTime;
-	LARGE_INTEGER endTime;
-	LARGE_INTEGER sleepTime;
-#endif
 
-	PPU->frames = 0;
 	cycles = 0;
 	standard_lines = 0;
+	PPU->frames = 0;
 	PPU->lines = -1;
 	PPU->scanline_timeout = CYCLES_PER_SCANLINE;
 
 	/* Get the initial time for the first screen drawing */
-#ifndef _MSC_VER
-	clock_gettime(CLOCK_REALTIME, &startTime);
-#else
-	QueryPerformanceFrequency(&freq);
-	QueryPerformanceCounter(&startTime);
-	time(&secs);
-#endif
+	start_timing();
 
 	execute_reset();
 
@@ -146,10 +120,6 @@ int main_loop(void *args) {
 		PPU->scanline_timeout -= (int)(CPU->cycles - cycles);
 		cycles = CPU->cycles;
 
-		for(i=0;i!=DUMPS;i++)
-			if(CPU->PC == pc_dumps[i])
-				DEBUG( dump_cpu() );
-
 		/* A line has ended its scanning, draw it */
 		if( PPU->scanline_timeout <= 0 ) {
 
@@ -205,64 +175,8 @@ int main_loop(void *args) {
 
 					PPU->lines = 0;
 					end_vblank();
+					frame_sleep();
 
-					/* Calculate how much we should sleep for 50/60 FPS */
-					/* For this, we calculate the next "start" time,    */
-					/* and then we calculate the different between it   */
-					/* the actual time                                  */
-#ifndef _MSC_VER
-					tmp = endTime.tv_sec;
-					clock_gettime(CLOCK_REALTIME, &endTime);
-					startTime.tv_nsec += (long)1.666666e7;
-
-					if( startTime.tv_nsec > 1e9 ) {
-						startTime.tv_sec++;
-						startTime.tv_nsec -= (long)1e9;
-					}
-	
-					if( endTime.tv_sec != tmp ) {
-						show_fps(PPU->frames);
-						PPU->frames = 0;
-					}
-
-					sleepTime.tv_nsec = startTime.tv_nsec - endTime.tv_nsec;
-					sleepTime.tv_sec  = startTime.tv_sec  - endTime.tv_sec;
-					if( sleepTime.tv_nsec < 0 ) {
-						sleepTime.tv_sec--;
-						sleepTime.tv_nsec += (long)1e9;
-					}
-#else
-					tmp = secs;
-					QueryPerformanceCounter(&endTime);
-					time(&secs);
-					startTime.QuadPart += (LONGLONG)(1.6666e-2 * freq.QuadPart);
-					sleepTime.QuadPart = startTime.QuadPart - endTime.QuadPart;
-
-					if( tmp != secs ) {
-						show_fps(PPU->frames);
-						PPU->frames = 0;
-					}
-#endif
-
-#ifndef _MSC_VER
-
-					/* We were on pause or in fast run */
-					if( sleepTime.tv_sec > 0 || sleepTime.tv_nsec > 1.666666e7 ) {
-						clock_gettime(CLOCK_REALTIME, &startTime);
-						sleepTime.tv_sec = 0;
-						sleepTime.tv_nsec = 0;
-					}
-					if( sleepTime.tv_sec >= 0 && !config.run_fast )
-						nanosleep(&sleepTime, NULL);
-#else
-					if( sleepTime.QuadPart > (LONGLONG)(1.6666e-2 * freq.QuadPart) ) {
-						QueryPerformanceCounter(&startTime);
-						sleepTime.QuadPart = 0;
-					}
-
-					if( sleepTime.QuadPart > 0 && !config.run_fast )
-						Sleep((DWORD)((double)sleepTime.QuadPart*1000/(double)freq.QuadPart));
-#endif
 				}
 			}
 		}

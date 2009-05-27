@@ -189,6 +189,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\src\frame_control.c"
+			>
+		</File>
+		<File
 			RelativePath=".\src\gui.c"
 			>
 		</File>
