@@ -1,10 +1,15 @@
 #ifndef platform_h
 #define platform_h
 
+#undef IMANES_OPEN   /* open() function */
 #undef IMANES_CLOSE  /* close() function */
 #undef IMANES_WRITE  /* write() function */
 #undef IMANES_READ   /* read() function */
+#undef IMANES_MKDIR  /* mkdir() function */
 #undef RW_RET        /* Type returned by read()/write() */
+
+#define IMANES_OPEN_READ  0
+#define IMANES_OPEN_WRITE 1
 
 /* Definitions necessary for compilation issues */
 #ifdef _MSC_VER
@@ -12,6 +17,12 @@
 
 	#define RW_RET      int
 
+	#define IMANES_OPEN(fd,file,how) do { \
+	            if( how == IMANES_OPEN_READ ) \
+	                _sopen_s(&(fd),file, O_RDONLY|O_BINARY, SH_DENYWR, S_IREAD|S_IWRITE); \
+	            else if( how == IMANES_OPEN_WRITE ) \
+	                _sopen_s(&(fd),file, O_WRONLY|O_CREAT|O_BINARY, SH_DENYWR, S_IREAD|S_IWRITE); \
+	            } while (0)
 	#define IMANES_CLOSE        _close
 	#define IMANES_WRITE        _write
 	#define IMANES_READ         _read
@@ -21,6 +32,12 @@
 
 	#define RW_RET      ssize_t
 
+	#define IMANES_OPEN(fd,file,how) do { \
+	            if( how == IMANES_OPEN_READ ) \
+	                fd = open(file, O_RDONLY); \
+	            else \
+	                fd = open(file, O_CREAT|O_RDWR|O_SYNC|O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH); \
+	            } while (0)
 	#define IMANES_CLOSE        close
 	#define IMANES_WRITE        write
 	#define IMANES_READ         read
