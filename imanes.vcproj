@@ -181,6 +181,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\src\clock.c"
+			>
+		</File>
+		<File
 			RelativePath=".\src\common.c"
 			>
 		</File>
