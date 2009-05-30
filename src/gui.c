@@ -24,6 +24,7 @@
 #endif
 
 #include "common.h"
+#include "debug.h"
 #include "frame_control.h"
 #include "imaconfig.h"
 #include "loop.h"
@@ -91,7 +92,7 @@ void gui_loop() {
 					}
 	
 				case SDL_QUIT:
-					printf("Quiting ImaNES\n");
+					INFO( printf("Quiting ImaNES\n") );
 					run_loop = 0;
 					config.pause = 0;
 					return;
