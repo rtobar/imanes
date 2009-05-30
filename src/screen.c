@@ -107,8 +107,6 @@ void draw_pixel(int x, int y, nes_palette color) {
 	else
 		colour = (color.red<<16) | ((color.green)<<8) | (color.blue);
 	
-	/* x = x*4 (32 bits per pixel); y = y*WIDTH*4 for the same reason */
-
 	pixmem32 = (Uint32*)nes_screen->pixels;
 
 	if( config.video_scale != 1 ) {

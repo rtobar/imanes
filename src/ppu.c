@@ -137,6 +137,8 @@ void draw_line(int line, int frame) {
 	if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) ) {
 		for(i=0;i!=64;i++) {
 			tmp = *(PPU->SPR_RAM + 4*i) + 1;
+			if( tmp == 0 )
+				continue;
 			if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
 				if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR ) {
 					back_sprites[bck_sprites++] = i;
@@ -266,7 +268,7 @@ void draw_line(int line, int frame) {
 					drawn_background[drawn_background_idx++] = x;
 
 					for(j=0;!(PPU->SR&HIT_FLAG)&&j!=drawn_back_sprites_idx;j++) {
-						if( x == drawn_back_sprites[j] ) {
+						if( x == drawn_back_sprites[j] && x < NES_SCREEN_WIDTH-1 && line < NES_SCREEN_HEIGHT ) {
 							PPU->SR |= HIT_FLAG;
 							break;
 						}
@@ -349,7 +351,7 @@ void draw_line(int line, int frame) {
 						/* Check Sprite#0 Hit flag*/
 						if( !(PPU->SR&HIT_FLAG) && front_sprites[i] == 0) {
 							for(j=drawn_background_idx;j>=0; j--) {
-								if( x == drawn_background[j] ) {
+								if( x == drawn_background[j] && x < NES_SCREEN_WIDTH-1 && line < NES_SCREEN_HEIGHT ) {
 									PPU->SR |= HIT_FLAG;
 									break;
 								}
