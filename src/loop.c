@@ -34,6 +34,14 @@
 #include "screen.h"
 #include "states.h"
 
+/* When VBLANK ends, we clear some flags */
+#define END_VBLANK() \
+	do { \
+		PPU->SR &= ~VBLANK_FLAG; \
+		PPU->SR &= ~HIT_FLAG; \
+		PPU->SR &= ~MAX_SPRITES_DRAWN; \
+	} while(0)
+
 int run_loop;
 
 int main_loop(void *args) {
@@ -105,7 +113,7 @@ int main_loop(void *args) {
 
 		if( (CLK->nmi_ccycles + inst.cycles) >= 2270 &&
 		    (PPU->SR&VBLANK_FLAG) ) {
-			end_vblank();
+			END_VBLANK();
 		}
 
 		/* Execute the given instruction */
@@ -176,7 +184,7 @@ int main_loop(void *args) {
 				if( standard_lines == 20 ) {
 
 					PPU->lines = 0;
-					end_vblank();
+					END_VBLANK();
 					frame_sleep();
 
 				}
@@ -186,13 +194,4 @@ int main_loop(void *args) {
 	}
 
 	return 0;
-}
-
-void end_vblank() {
-
-	PPU->SR &= ~VBLANK_FLAG;
-	PPU->SR &= ~HIT_FLAG;
-	PPU->SR &= ~MAX_SPRITES_DRAWN;
-
-	return;
 }
