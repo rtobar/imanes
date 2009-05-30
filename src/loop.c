@@ -86,6 +86,7 @@ int main_loop(void *args) {
 		else if( config.load_state == 1 ) {
 			load_state(config.current_state);
 			config.load_state = 0;
+			ppu_cycles = CLK->ppu_cycles;
 		}
 
 		/* If we need to reset, call the reset routine */
