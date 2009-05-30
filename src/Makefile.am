@@ -3,6 +3,7 @@ bin_PROGRAMS = imanes
 imanes_SOURCES = \
      cnrom.c \
      common.c \
+     clock.c \
      cpu.c \
      frame_control.c \
      gui.c \

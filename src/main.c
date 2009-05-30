@@ -29,6 +29,7 @@
 
 #include "cpu.h"
 #include "common.h"
+#include "clock.h"
 #include "debug.h"
 #include "gui.h"
 #include "imaconfig.h"
@@ -144,6 +145,7 @@ int main(int args, char *argv[]) {
 	initialize_instruction_set();
 	initialize_cpu();
 	initialize_ppu();
+	initialize_clock();
 	initialize_pads();
 
 	/* Read the ines file and get all the ROM/VROM */

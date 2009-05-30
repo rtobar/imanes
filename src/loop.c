@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "clock.h"
 #include "cpu.h"
 #include "debug.h"
 #include "frame_control.h"
@@ -39,11 +40,11 @@ int main_loop(void *args) {
 
 	uint8_t opcode;
 	int standard_lines;
-	unsigned long int cycles;
+	unsigned long int ppu_cycles;
 	operand operand = { 0, 0 };
 	instruction inst;
 
-	cycles = 0;
+	ppu_cycles = 0;
 	standard_lines = 0;
 	PPU->frames = 0;
 	PPU->lines = -1;
@@ -76,7 +77,6 @@ int main_loop(void *args) {
 		}
 		else if( config.load_state == 1 ) {
 			load_state(config.current_state);
-			cycles = CPU->cycles;
 			config.load_state = 0;
 		}
 
@@ -91,7 +91,7 @@ int main_loop(void *args) {
 		inst = instructions[opcode];
 		instructions[opcode].executed++;
 
-		DEBUG( printf("%04d 0x%04x - %02x: ",CPU->nmi_cycles, CPU->PC, opcode) );
+		DEBUG( printf("%04u 0x%04x - %02x: ",CLK->nmi_ccycles, CPU->PC, opcode) );
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
 			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
@@ -103,7 +103,7 @@ int main_loop(void *args) {
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, CPU->PC);
 
-		if( (CPU->nmi_cycles + inst.cycles) >= 2270 &&
+		if( (CLK->nmi_ccycles + inst.cycles) >= 2270 &&
 		    (PPU->SR&VBLANK_FLAG) ) {
 			end_vblank();
 		}
@@ -115,16 +115,17 @@ int main_loop(void *args) {
 		CPU->PC += inst.size;
 
 		/* Update cycles count */
-		CPU->cycles += inst.cycles;
-		CPU->nmi_cycles  += (unsigned int)(CPU->cycles - cycles);
-		PPU->scanline_timeout -= (int)(CPU->cycles - cycles);
-		cycles = CPU->cycles;
+		ADD_CPU_CYCLES(inst.cycles);
+		PPU->scanline_timeout -= (int)(CLK->ppu_cycles - ppu_cycles);
+		ppu_cycles = CLK->ppu_cycles;
 
 		/* A line has ended its scanning, draw it */
 		if( PPU->scanline_timeout <= 0 ) {
 
+			/* Get the user's input and process it */
 			screen_loop();
-			/* First, we set again the timeout to check the scanline */
+
+			/* Set again the timeout to check the scanline */
 			PPU->scanline_timeout += CYCLES_PER_SCANLINE;
 
 			/* The NTSC screen works as follows:
@@ -154,11 +155,12 @@ int main_loop(void *args) {
 			else if( PPU->lines == NES_SCREEN_HEIGHT + 1 ) {
 
 				PPU->SR |= VBLANK_FLAG;
-				CPU->nmi_cycles = 0;
+				CLK->nmi_ccycles = 0;
+				CLK->nmi_pcycles = 0;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					execute_nmi();
 					PPU->scanline_timeout -= 7;
-					cycles = CPU->cycles;
+					ppu_cycles = CLK->ppu_cycles;
 				}
 
 				PPU->lines++;

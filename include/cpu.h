@@ -20,10 +20,6 @@ typedef struct _cpu {
 	uint8_t  SR;  /* Status register */
 	uint8_t  SP;  /* Stack pointer */
 
-	/* Cycles stuff */
-	unsigned long int cycles;  /* How many cycles has it given in total */
-	unsigned int nmi_cycles;    /* Cycles given since the last NMI */
-
 	/* Memory */
 	uint8_t *RAM;
 

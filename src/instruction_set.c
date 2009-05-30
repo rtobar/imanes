@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "clock.h"
 #include "cpu.h"
 #include "debug.h"
 #include "instruction_set.h"
@@ -489,7 +490,7 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 			oper.address = address + CPU->X;
 			if( ((address&0x100) != (oper.address&0x100)) &&
 			    inst.cycle_change == CYCLE_PAGE )
-				CPU->cycles++;
+				ADD_CPU_CYCLES(1);
 			break;
 
 		case ADDR_ABS_INDY:
@@ -498,7 +499,7 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 			oper.address = address + CPU->Y;
 			if( ((address&0x100) != (oper.address&0x100)) &&
 			    inst.cycle_change == CYCLE_PAGE )
-				CPU->cycles++;
+				ADD_CPU_CYCLES(1);
 			break;
 
 		case ADDR_IND_INDIR:
@@ -521,7 +522,7 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 			oper.address |= read_cpu_ram(address+1) << 8;
 			if( ((oper.address&0x100) != ((oper.address+CPU->Y)&0x100)) &&
 			    inst.cycle_change == CYCLE_PAGE )
-				CPU->cycles++;
+				ADD_CPU_CYCLES(1);
 			oper.address += CPU->Y;
 			break;
 

@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "clock.h"
 #include "cpu.h"
 #include "debug.h"
 #include "instruction_set.h"
@@ -41,8 +42,6 @@ void initialize_cpu() {
 	CPU->SR = R_FLAG; /* It is never ever used, but always set */
 	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
 
-	CPU->cycles = 0;
-	CPU->nmi_cycles = 0;
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
 	CPU->reset = 1;
 	CPU->sram_enabled = 0;
@@ -749,7 +748,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			address = value*0x100;
 			for(i=0;i!=256;i++)
 				PPU->SPR_RAM[PPU->spr_addr++] = read_cpu_ram(address+i);
-			CPU->cycles += 512;
+			ADD_CPU_CYCLES(512);
 			break;
 
 		/* 1st joystick */			
@@ -934,8 +933,7 @@ void execute_nmi() {
 	stack_push( CPU->SR );
 	CPU->PC = (*(CPU->RAM + 0xFFFA) | (*(CPU->RAM + 0xFFFB)<<8) );
 
-	CPU->cycles += 7;
-	CPU->nmi_cycles = 7;
+	ADD_CPU_CYCLES(7);
 }
 
 void execute_reset() {
@@ -966,14 +964,14 @@ void add_cycles(uint8_t type, int8_t value) {
 
 	if( type == CYCLE_BRANCH ) {
 		if( ((CPU->PC+2)&0x100) == ((CPU->PC + value + 2)&0x100) )
-			CPU->cycles++;
+			ADD_CPU_CYCLES(1);
 		else
-			CPU->cycles += 2;
+			ADD_CPU_CYCLES(2);
 	}
 
 	else if( type == CYCLE_PAGE ) {
 		if( ((CPU->PC+2)&0x100) != ((CPU->PC + value + 2)&0x100) )
-			CPU->cycles++;
+			ADD_CPU_CYCLES(1);
 	}
 
 }
