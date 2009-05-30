@@ -24,9 +24,13 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include "clock.h"
+#include "cpu.h"
 #include "debug.h"
 #include "imaconfig.h"
+#include "mapper.h"
 #include "platform.h"
+#include "ppu.h"
 #include "states.h"
 
 static void *state;
@@ -44,11 +48,12 @@ void load_state(int i) {
 
 	/* This is the total size of the state */
 	total_size = 
-	/* CPU registers*/  7+sizeof(unsigned long int)+sizeof(unsigned int)+
+	/* CPU registers*/  7 +
 	/* RAM dump */      0x0800 + 0xBFDF +
 	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
+	/* CLK */           2*sizeof(unsigned int) + 2*sizeof(unsigned long) +
 	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count;
 
 	/* If we are loading the last state that we saved,
@@ -95,10 +100,6 @@ void load_state(int i) {
 	memcpy(&(CPU->SP),     buffer, 1); buffer++;
 	memcpy(&(CPU->SR),     buffer, 1); buffer++;
 	memcpy(&(CPU->PC),     buffer, 2); buffer += 2;
-	memcpy(&(CPU->cycles), buffer, sizeof(unsigned long int));
-	buffer += sizeof(unsigned long int);
-	memcpy(&(CPU->nmi_cycles), buffer, sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
 
 	/* RAM dumping */
 	memcpy(CPU->RAM, buffer, 0x0800);
@@ -130,6 +131,16 @@ void load_state(int i) {
 	/* SPR-RAM dumping */
 	memcpy(PPU->SPR_RAM, buffer, 0x100);
 	buffer += 0x100;
+
+	/* CLK dumping */
+	memcpy(&(CLK->cpu_cycles), buffer, sizeof(unsigned long));
+	buffer += sizeof(unsigned long);
+	memcpy(&(CLK->ppu_cycles), buffer, sizeof(unsigned long));
+	buffer += sizeof(unsigned long);
+	memcpy(&(CLK->nmi_ccycles), buffer, sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
+	memcpy(&(CLK->nmi_pcycles), buffer, sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
 
 	/* Mapper dumping */
 	memcpy(&(mapper->id), buffer, 1);  buffer++;
@@ -163,11 +174,12 @@ void save_state(int i) {
 
 	/* This is the total size of the state */
 	total_size = 
-	/* CPU registers*/  7+sizeof(unsigned long int)+sizeof(unsigned int)+
+	/* CPU registers*/  7 +
 	/* RAM dump */      0x0800 + 0xBFDF +
 	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
+	/* CLK */           2*sizeof(unsigned int) + 2*sizeof(unsigned long) +
 	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count;
 
 	/* Memory allocation for state information */
@@ -180,10 +192,6 @@ void save_state(int i) {
 	memcpy(buffer, &(CPU->SP), 1); buffer++;
 	memcpy(buffer, &(CPU->SR), 1); buffer++;
 	memcpy(buffer, &(CPU->PC), 2); buffer += 2;
-	memcpy(buffer, &(CPU->cycles), sizeof(unsigned long int));
-	buffer += sizeof(unsigned long int);
-	memcpy(buffer, &(CPU->nmi_cycles), sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
 
 	/* RAM dumping */
 	/* We only need to dump the following sections:
@@ -222,6 +230,16 @@ void save_state(int i) {
 	/* SPR-RAM dumping */
 	memcpy(buffer, PPU->SPR_RAM, 0x100);
 	buffer += 0x100;
+
+	/* CLK dumping */
+	memcpy(buffer, &(CLK->cpu_cycles), sizeof(unsigned long));
+	buffer += sizeof(unsigned long);
+	memcpy(buffer, &(CLK->ppu_cycles), sizeof(unsigned long));
+	buffer += sizeof(unsigned long);
+	memcpy(buffer, &(CLK->nmi_ccycles), sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
+	memcpy(buffer, &(CLK->nmi_pcycles), sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
 
 	/* Mapper dumping */
 	memcpy(buffer, &(mapper->id), 1);  buffer++;
