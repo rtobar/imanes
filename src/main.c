@@ -27,9 +27,9 @@
 #include <unistd.h>
 #endif
 
-#include "cpu.h"
-#include "common.h"
 #include "clock.h"
+#include "common.h"
+#include "cpu.h"
 #include "debug.h"
 #include "gui.h"
 #include "imaconfig.h"
