@@ -1,0 +1,52 @@
+Version 0.1
+===========
+
+<Summary>
+ * First public release!!! :)
+ * Correct CPU/PPU emulation
+ * 2 players support through keyboard
+ * Pause emulation
+ * Soft reset
+ * Fast run
+ * Hide/show different screen layers
+ * Load/save internal states
+ * Load/save catridge's internal SRAM
+ * Take screenshots during the game
+ * Per-user data
+ * Supported mappers:
+   * UNROM
+   * NROM
+   * CNROM
+   * MMC1 (may behave buggy)
+   * MMC3 (may behave buggy)
+ * Still no sound :(
+
+<Technical details>
+
+ * General:
+   * Pause emulation with ESC
+   * Take screenshots in BMP format, 256x224 with F1
+   * Load internal state with F2
+   * Choose state with F3
+   * Save state with F4
+   * Soft reset with F5
+   * Fast run with Backspace
+ * CPU emulation:
+   * Full correct CPU logic emulation (legal opcodes)
+   * Most of illegal opcodes also emulated correctly
+   * Correct timing on all opcodes
+   * All addressing modes correctly supported
+ * PPU emulation:
+   * Correct sprite #0 hit flag recognition
+   * Per-scanline emulation
+   * Draws correctly the four layers: BG color, back sprites, BG, front sprites
+ * Clock:
+   * Emulating NTSC hardware: 341 PPU clocks per scanline, 29780.66 CPU clocks
+   per frame
+   * VBlank triggered near the 2270 CPU clocks after the NMI
+ * Joypads:
+   * Non-configurable keys for 1st and 2nd players
+   * UP, DOWN, LEFT, RIGHT, A, B, START, SELECT are:
+      * 1st player: w,s,a,d,j,k,Intro,RCtrl
+      * 2nd player: up,down,left,right,z,x,LShift,LCtrl
+  * Still no sound, but it's comming ;)
