@@ -751,7 +751,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			ADD_CPU_CYCLES(512);
 			break;
 
-		/* 1st joystick */			
+		/* 1st and 2nd joysticks strobe */
 		case 0x4016:
 			if( value == 0x01 )
 				strobe_pad = 1;
@@ -764,7 +764,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 		/* 2nd joystick */			
 		case 0x4017:
-			/* TODO: Check better what to do when writting here */
+			/* This has to do with the sound */
 			break;
 
 		/* Normal RAM memory area */
