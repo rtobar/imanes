@@ -165,6 +165,7 @@ int main(int args, char *argv[]) {
 	free_ines_file(nes_rom);
 	INFO( printf("Saving SRAM... ") );
 	save_sram(save_file);
+	free(save_file);
 	INFO( printf("done!\n") );
 
 	return 0;
