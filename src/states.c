@@ -82,15 +82,16 @@ void load_state(int i) {
 			free(ss_file);
 			return;
 		}
-		free(ss_file);
 		buffer = (char *)malloc(total_size);
 		read_bytes = IMANES_READ(fd, buffer, total_size);
 		IMANES_CLOSE(fd);
 
 		if( read_bytes != total_size ) {
 			fprintf(stderr,"File '%s' is not a valid state file\n", ss_file);
+			free(ss_file);
 			return;
 		}
+		free(ss_file);
 	}
 
 	/* CPU dumping */
