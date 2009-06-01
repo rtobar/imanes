@@ -636,8 +636,8 @@ void update_flags(int8_t value, uint8_t flags) {
 
 	/* 7th bit is set (negative number) */
 	if( flags & N_FLAG ) {
-		if( (value >> 7) )   CPU->SR |= N_FLAG;
-		else                 CPU->SR &= ~N_FLAG;
+		if( value >> 7 )   CPU->SR |= N_FLAG;
+		else               CPU->SR &= ~N_FLAG;
 	}
 
 	if( flags & Z_FLAG ) {
