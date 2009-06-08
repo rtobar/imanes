@@ -28,6 +28,7 @@ typedef struct _cpu {
 
 	/* Enable SRAM storage */
 	uint8_t sram_enabled;
+
 } nes_cpu;
 
 extern nes_cpu *CPU;
