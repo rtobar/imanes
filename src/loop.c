@@ -144,6 +144,8 @@ int main_loop(void *args) {
 
 			/* Set again the timeout to check the scanline */
 			PPU->scanline_timeout += CYCLES_PER_SCANLINE;
+			if( (PPU->CR2 & SHOW_BACKGROUND) && !(PPU->frames%2) && (PPU->lines == 19) )
+				PPU->scanline_timeout--;
 
 			/* The NTSC screen works as follows:
 			 *
@@ -157,19 +159,15 @@ int main_loop(void *args) {
 			 * doesn't get drawn.
 			 **/
 
-			if( PPU->lines < NES_SCREEN_HEIGHT ) {
-				mapper->update();
+			if( (int)PPU->lines < NES_SCREEN_HEIGHT ) {
 				draw_line(PPU->lines++, PPU->frames);
 				if( PPU->lines == (NES_SCREEN_HEIGHT - 8) &&
 				    (!config.run_fast || !(PPU->frames%2)) )
 					redraw_screen();
 			}
-			/* "Dummy" scanline at the end of the drawn scanlines */
-			else if( PPU->lines == NES_SCREEN_HEIGHT )
-				PPU->lines++;
 
 			/* Start VBLANK period */
-			else if( PPU->lines == NES_SCREEN_HEIGHT + 1 ) {
+			else if( PPU->lines == NES_SCREEN_HEIGHT ) {
 
 				PPU->SR |= VBLANK_FLAG;
 				CLK->nmi_pcycles = (CYCLES_PER_SCANLINE - PPU->scanline_timeout)*3;
@@ -191,8 +189,9 @@ int main_loop(void *args) {
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
 
-					PPU->lines = 0;
+					PPU->lines = -1;
 					END_VBLANK();
+					vblank_ended = 0;
 					frame_sleep();
 
 				}
