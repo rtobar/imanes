@@ -37,9 +37,13 @@
 /* When VBLANK ends, we clear some flags */
 #define END_VBLANK() \
 	do { \
-		PPU->SR &= ~VBLANK_FLAG; \
-		PPU->SR &= ~HIT_FLAG; \
-		PPU->SR &= ~MAX_SPRITES_DRAWN; \
+		if( !vblank_ended ) { \
+			DEBUG( printf("Ending VBlank\n") ); \
+			PPU->SR &= ~VBLANK_FLAG; \
+			PPU->SR &= ~HIT_FLAG; \
+			PPU->SR &= ~MAX_SPRITES_DRAWN; \
+		} \
+		vblank_ended = 1; \
 	} while(0)
 
 int run_loop;
@@ -48,6 +52,8 @@ int main_loop(void *args) {
 
 	uint8_t opcode;
 	int standard_lines;
+	int vblank_ended = 0;
+	int a12_raised = 0;
 	unsigned long int ppu_cycles;
 	operand operand = { 0, 0 };
 	instruction inst;
