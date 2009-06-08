@@ -99,6 +99,12 @@ int main_loop(void *args) {
 		if( CPU->reset )
 			execute_reset();
 
+		/* A12 rising edge occurs at PPU cycle #260 on the scanline */
+		if( !a12_raised && PPU->scanline_timeout <= 76 && (int)PPU->lines < NES_SCREEN_HEIGHT ) {
+			mapper->update();
+			a12_raised = 1;
+		}
+
 		/* Read opcode and full instruction :) */
 		/* We don't read with read_cpu_ram since we're in PGR RAM section
 		   and there's nor mirroring nor mm IOs there */
@@ -123,7 +129,11 @@ int main_loop(void *args) {
 		if( CLK->nmi_pcycles + inst.cycles*3 >= 6820 &&
 		    (PPU->SR&VBLANK_FLAG) )
 			END_VBLANK();
-		}
+
+		/* Set the VBLANK flag if the execution of the instruction
+		 * passes the instant when the VBLANK flag is set */
+		if( (PPU->lines == NES_SCREEN_HEIGHT+1) && PPU->scanline_timeout <= 1 )
+			PPU->SR |= VBLANK_FLAG;
 
 		/* Execute the given instruction */
 		execute_instruction(inst,operand);
@@ -138,6 +148,9 @@ int main_loop(void *args) {
 
 		/* A line has ended its scanning, draw it */
 		if( PPU->scanline_timeout <= 0 ) {
+
+			/* Clear A12 flag to check again in the next line */
+			a12_raised = 0;
 
 			/* Get the user's input and process it */
 			screen_loop();
@@ -169,6 +182,7 @@ int main_loop(void *args) {
 			/* Start VBLANK period */
 			else if( PPU->lines == NES_SCREEN_HEIGHT ) {
 
+				mapper->update();
 				PPU->SR |= VBLANK_FLAG;
 				CLK->nmi_pcycles = (CYCLES_PER_SCANLINE - PPU->scanline_timeout)*3;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
