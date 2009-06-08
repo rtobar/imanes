@@ -30,6 +30,7 @@
 #include "pad.h"
 #include "palette.h"
 #include "ppu.h"
+#include "screen.h"
 
 static int prev_a12_state  = 0;
 static int prev_a12_cycles = 0;
@@ -838,7 +839,8 @@ uint8_t read_cpu_ram(uint16_t address) {
 	/* PPU Status Register */
 	else if( address == 0x2002 ) {
 		ret_val = PPU->SR;
-		PPU->SR &= ~VBLANK_FLAG;
+		if( !(PPU->scanline_timeout <= 1 && PPU->lines == NES_SCREEN_HEIGHT ) )
+			PPU->SR &= ~VBLANK_FLAG;
 		PPU->latch = 1;
 	}
 
