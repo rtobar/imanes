@@ -264,11 +264,15 @@ void mmc3_reset() {
 
 void mmc3_update() {
 
-	if( irq_counter == 0 )
+	if( irq_counter == 0 ) {
 		irq_counter = irq_tmp+1;
+		DEBUG( printf("MMC3: Setting irq_counter to %u\n", irq_counter) );
+	}
 	else {
-		if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) )
+		if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) ) {
 			irq_counter--;
+			DEBUG( printf("MMC3: Decrementing irq_counter. New value: %u\n", irq_counter) );
+		}
 
 		if( irq_counter == 0 && irq_enabled ) {
 			DEBUG( printf("MMC3: Triggering IRQ\n") );
