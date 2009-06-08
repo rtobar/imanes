@@ -31,6 +31,9 @@
 #include "palette.h"
 #include "ppu.h"
 
+static int prev_a12_state  = 0;
+static int prev_a12_cycles = 0;
+
 nes_cpu *CPU;
 
 void initialize_cpu() {
@@ -670,7 +673,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 	}
 
 	/* SRAM can be disabled or in RO mode */
-	if( 0x6000 <= address && address < 0x8000 && 
+	if( 0x6000 <= address && address < 0x8000 &&
 	 ( !(CPU->sram_enabled&SRAM_ENABLE) || CPU->sram_enabled&SRAM_RO ) ) {
 		DEBUG( printf("Write to %04x not allowed\n", address) );
 		return;
@@ -726,8 +729,17 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			}
 			/* Second write */
 			else {
-				PPU->temp_addr = (PPU->temp_addr&0xFF00) | value;
-				PPU->vram_addr = PPU->temp_addr;
+				PPU->temp_addr  = (PPU->temp_addr&0xFF00) | value;
+				PPU->vram_addr  = PPU->temp_addr;
+
+				/* Check rising edge of A12 on PPU bus (needed by MMC3) */
+				if( (PPU->vram_addr & 0x1000) &&
+				    !prev_a12_state )
+					mapper->update();
+					
+				/* Save the A12 line status (needed by MMC3) */
+				prev_a12_state  = PPU->vram_addr & 0x1000;
+				prev_a12_cycles = CLK->ppu_cycles;
 				PPU->latch = 1;
 			}
 			break;
@@ -740,6 +752,15 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 					PPU->vram_addr += 32;
 				else
 					PPU->vram_addr++;
+				
+				/* Check rising edge of A12 on PPU bus (needed by MMC3) */
+				if( (PPU->vram_addr & 0x1000) &&
+				    !prev_a12_state )
+					mapper->update();
+					
+				/* Save the A12 line status (needed by MMC3) */
+				prev_a12_state  = PPU->vram_addr & 0x1000;
+				prev_a12_cycles = CLK->ppu_cycles;
 			}
 			break;
 
@@ -778,7 +799,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		return;
 	}
 
-	XTREME( 
+	XTREME(
 	printf("%04x: ", address & 0xfff0 );
 	for(i=0;i!=0x10;i++)
 		printf("%02x ", CPU->RAM[(address&0xfff0) + i]);
@@ -847,6 +868,15 @@ uint8_t read_cpu_ram(uint16_t address) {
 			PPU->vram_addr += 32;
 		else
 			PPU->vram_addr++;
+
+		/* Check rising edge of A12 on PPU bus (needed by MMC3) */
+		if( (PPU->vram_addr & 0x1000) &&
+			!prev_a12_state )
+			mapper->update();
+			
+		/* Save the A12 line status (needed by MMC3) */
+		prev_a12_state  = PPU->vram_addr & 0x1000;
+		prev_a12_cycles = CLK->ppu_cycles;
 	}
 
 	/* 1st Joystick */
@@ -958,6 +988,7 @@ void execute_irq() {
 	stack_push( (CPU->PC+2) & 0xFF );
 	stack_push( CPU->SR );
 	CPU->PC = ( CPU->RAM[0xFFFE] | ( CPU->RAM[0xFFFF]<<8 ) );
+
 }
 
 void add_cycles(uint8_t type, int8_t value) {
