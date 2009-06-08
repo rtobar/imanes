@@ -29,8 +29,6 @@ void initialize_clock() {
 
 	CLK = (nes_clock *)malloc(sizeof(nes_clock));
 
-	CLK->cpu_cycles  = 0;
-	CLK->nmi_ccycles = 0;
 	CLK->ppu_cycles  = 0;
 	CLK->nmi_pcycles = 0;
 
@@ -38,7 +36,6 @@ void initialize_clock() {
 
 void dump_clock() {
 
-	printf("CPU --- Total: %010ld    NMI: %05d       ", CLK->cpu_cycles, CLK->nmi_ccycles);
-	printf("PPU --- Total: %010ld    NMI: %05d\n", CLK->ppu_cycles, CLK->nmi_pcycles);
+	printf("Total: %010ld    NMI: %05d\n", CLK->ppu_cycles, CLK->nmi_pcycles);
 
 }

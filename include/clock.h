@@ -14,10 +14,6 @@
  */
 typedef struct _clock {
 
-	/* CPU counter */
-	unsigned long int cpu_cycles;   /* CPU cycles counter */
-	unsigned int nmi_ccycles;       /* CPU cycles since the last NMI */
-
 	/* PPU counter */
 	unsigned long int ppu_cycles;  /* PPU cycles */
 	unsigned int nmi_pcycles;      /* PPU cycles since the last NMI */
@@ -31,8 +27,6 @@ extern nes_clock *CLK;
  */
 #define ADD_CPU_CYCLES(N) \
 	do { \
-		CLK->cpu_cycles  += N; \
-		CLK->nmi_ccycles += N; \
 		CLK->ppu_cycles  += 3*(N); \
 		CLK->nmi_pcycles += 3*(N); \
 	} while (0)

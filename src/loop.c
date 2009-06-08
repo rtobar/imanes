@@ -100,7 +100,7 @@ int main_loop(void *args) {
 		inst = instructions[opcode];
 		instructions[opcode].executed++;
 
-		DEBUG( printf("%04u 0x%04x - %02x: ",CLK->nmi_ccycles, CPU->PC, opcode) );
+		DEBUG( printf("%04.0f 0x%04x - %02x: ",CLK->nmi_pcycles/3., CPU->PC, opcode) );
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
 			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
@@ -112,8 +112,10 @@ int main_loop(void *args) {
 		/* Select operand depending on the addressing node */
 		operand = get_operand(inst, CPU->PC);
 
-		if( (CLK->nmi_ccycles + inst.cycles) >= 2270 &&
-		    (PPU->SR&VBLANK_FLAG) ) {
+		/* Clear the VBLANK flag if the execution of the instruction
+		 * passes the instant when the VBLANK flag is cleared */
+		if( CLK->nmi_pcycles + inst.cycles*3 >= 6820 &&
+		    (PPU->SR&VBLANK_FLAG) )
 			END_VBLANK();
 		}
 
@@ -164,8 +166,7 @@ int main_loop(void *args) {
 			else if( PPU->lines == NES_SCREEN_HEIGHT + 1 ) {
 
 				PPU->SR |= VBLANK_FLAG;
-				CLK->nmi_ccycles = 0;
-				CLK->nmi_pcycles = 0;
+				CLK->nmi_pcycles = (CYCLES_PER_SCANLINE - PPU->scanline_timeout)*3;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
 					execute_nmi();
 					PPU->scanline_timeout -= 7;

@@ -53,7 +53,7 @@ void load_state(int i) {
 	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
-	/* CLK */           2*sizeof(unsigned int) + 2*sizeof(unsigned long) +
+	/* CLK */           sizeof(unsigned int) + sizeof(unsigned long) +
 	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count;
 
 	/* If we are loading the last state that we saved,
@@ -134,12 +134,8 @@ void load_state(int i) {
 	buffer += 0x100;
 
 	/* CLK dumping */
-	memcpy(&(CLK->cpu_cycles), buffer, sizeof(unsigned long));
-	buffer += sizeof(unsigned long);
 	memcpy(&(CLK->ppu_cycles), buffer, sizeof(unsigned long));
 	buffer += sizeof(unsigned long);
-	memcpy(&(CLK->nmi_ccycles), buffer, sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
 	memcpy(&(CLK->nmi_pcycles), buffer, sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 
@@ -180,7 +176,7 @@ void save_state(int i) {
 	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
-	/* CLK */           2*sizeof(unsigned int) + 2*sizeof(unsigned long) +
+	/* CLK */           sizeof(unsigned int) + sizeof(unsigned long) +
 	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count;
 
 	/* Memory allocation for state information */
@@ -233,12 +229,8 @@ void save_state(int i) {
 	buffer += 0x100;
 
 	/* CLK dumping */
-	memcpy(buffer, &(CLK->cpu_cycles), sizeof(unsigned long));
-	buffer += sizeof(unsigned long);
 	memcpy(buffer, &(CLK->ppu_cycles), sizeof(unsigned long));
 	buffer += sizeof(unsigned long);
-	memcpy(buffer, &(CLK->nmi_ccycles), sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
 	memcpy(buffer, &(CLK->nmi_pcycles), sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 
