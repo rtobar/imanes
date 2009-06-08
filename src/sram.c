@@ -83,8 +83,10 @@ char *load_sram(char *rom_file) {
 	free(save_dir);
 
 	/* If SRAM is not enabled, just return the name of the file */
-	if( !CPU->sram_enabled )
+	if( !CPU->sram_enabled ) {
+		INFO( printf("SRAM disabled, not loading anything\n") );
 		return save_file;
+	}
 
 	IMANES_OPEN(fd,save_file, IMANES_OPEN_READ);
 
@@ -97,7 +99,7 @@ char *load_sram(char *rom_file) {
 	read_bytes = IMANES_READ(fd, CPU->RAM + 0x6000, 0x2000);
 
 	if( read_bytes != 0x2000 ) {
-		fprintf(stderr,"File '%s' is not a valid SRAM dump file, SRAM not loaded.", save_file);
+		fprintf(stderr,"File '%s' is not a valid SRAM dump file, SRAM not loaded.\n", save_file);
 		memset(CPU->RAM + 0x6000, 0, 0x2000);
 	}
 
