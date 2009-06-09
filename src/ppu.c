@@ -61,7 +61,7 @@ void dump_ppu() {
 
 	printf("Frame:%02d  ", PPU->frames);
 	printf("Line:%03d   ", PPU->lines);
-	printf("ScanlineT:%.3f\n", PPU->scanline_timeout);
+	printf("ScanlineT:%05u\n", PPU->scanline_timeout);
 
 }
 
