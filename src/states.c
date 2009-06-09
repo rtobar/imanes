@@ -50,7 +50,7 @@ void load_state(int i) {
 	total_size = 
 	/* CPU registers*/  7 +
 	/* RAM dump */      0x0800 + 0xBFDF +
-	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
+	/* PPU registers */ 12 + 3*sizeof(unsigned int) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
 	/* CLK */           sizeof(unsigned int) + sizeof(unsigned long) +
@@ -118,8 +118,8 @@ void load_state(int i) {
 	memcpy(&(PPU->vram_addr), buffer, 2); buffer += 2;
 	memcpy(&(PPU->temp_addr), buffer, 2); buffer += 2;
 	memcpy(&(PPU->spr_addr), buffer, 2);  buffer += 2;
-	memcpy(&(PPU->scanline_timeout), buffer, sizeof(float));
-	buffer += sizeof(float);
+	memcpy(&(PPU->scanline_timeout), buffer, sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
 	memcpy(&(PPU->lines), buffer, sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 	memcpy(&(PPU->frames), buffer, sizeof(unsigned int));
@@ -173,7 +173,7 @@ void save_state(int i) {
 	total_size = 
 	/* CPU registers*/  7 +
 	/* RAM dump */      0x0800 + 0xBFDF +
-	/* PPU registers */ 12 + 2*sizeof(unsigned int) + sizeof(float) +
+	/* PPU registers */ 12 + 3*sizeof(unsigned int) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
 	/* CLK */           sizeof(unsigned int) + sizeof(unsigned long) +
@@ -213,8 +213,8 @@ void save_state(int i) {
 	memcpy(buffer, &(PPU->vram_addr), 2); buffer += 2;
 	memcpy(buffer, &(PPU->temp_addr), 2); buffer += 2;
 	memcpy(buffer, &(PPU->spr_addr), 2);  buffer += 2;
-	memcpy(buffer, &(PPU->scanline_timeout), sizeof(float));
-	buffer += sizeof(float);
+	memcpy(buffer, &(PPU->scanline_timeout), sizeof(unsigned int));
+	buffer += sizeof(unsigned int);
 	memcpy(buffer, &(PPU->lines), sizeof(unsigned int));
 	buffer += sizeof(unsigned int);
 	memcpy(buffer, &(PPU->frames), sizeof(unsigned int));

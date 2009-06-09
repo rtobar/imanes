@@ -55,7 +55,7 @@ typedef struct _ppu {
 	uint8_t spr_addr;   /* Address to be written by 0x2004 CPU RAM */
 
 	uint8_t mirroring;     /* Type of mirroring */
-	float scanline_timeout;  /* CPU cycles to next scanline */
+	unsigned int scanline_timeout;  /* PPU cycles to next scanline */
 	unsigned int lines;    /* Current scanline */
 	unsigned int frames;   /* Frame counting */
 
