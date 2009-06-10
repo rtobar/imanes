@@ -132,7 +132,7 @@ int main_loop(void *args) {
 
 		/* Set the VBLANK flag if the execution of the instruction
 		 * passes the instant when the VBLANK flag is set */
-		if( (PPU->lines == NES_SCREEN_HEIGHT+1) && PPU->scanline_timeout <= 1 )
+		if( (PPU->lines == NES_SCREEN_HEIGHT) && PPU->scanline_timeout <= 1 )
 			PPU->SR |= VBLANK_FLAG;
 
 		/* Execute the given instruction */
