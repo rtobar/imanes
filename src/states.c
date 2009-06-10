@@ -50,11 +50,11 @@ void load_state(int i) {
 	total_size = 
 	/* CPU registers*/  7 +
 	/* RAM dump */      0x0800 + 0xBFDF +
-	/* PPU registers */ 12 + 3*sizeof(unsigned int) +
+	/* PPU registers */ 12 + 3*sizeof(int) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
-	/* CLK */           sizeof(unsigned int) + sizeof(unsigned long) +
-	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count;
+	/* CLK */           sizeof(int) + sizeof(long) +
+	/* Mapper */        1 + sizeof(int) + mapper->reg_count;
 
 	/* If we are loading the last state that we saved,
 	 * we don't need to go and read the state file */
@@ -118,12 +118,12 @@ void load_state(int i) {
 	memcpy(&(PPU->vram_addr), buffer, 2); buffer += 2;
 	memcpy(&(PPU->temp_addr), buffer, 2); buffer += 2;
 	memcpy(&(PPU->spr_addr), buffer, 2);  buffer += 2;
-	memcpy(&(PPU->scanline_timeout), buffer, sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
-	memcpy(&(PPU->lines), buffer, sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
-	memcpy(&(PPU->frames), buffer, sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
+	memcpy(&(PPU->scanline_timeout), buffer, sizeof(int));
+	buffer += sizeof(int);
+	memcpy(&(PPU->lines), buffer, sizeof(int));
+	buffer += sizeof(int);
+	memcpy(&(PPU->frames), buffer, sizeof(int));
+	buffer += sizeof(int);
 
 	/* VRAM dumping */
 	memcpy(PPU->VRAM, buffer, 0x4000);
@@ -134,15 +134,15 @@ void load_state(int i) {
 	buffer += 0x100;
 
 	/* CLK dumping */
-	memcpy(&(CLK->ppu_cycles), buffer, sizeof(unsigned long));
-	buffer += sizeof(unsigned long);
-	memcpy(&(CLK->nmi_pcycles), buffer, sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
+	memcpy(&(CLK->ppu_cycles), buffer, sizeof(long));
+	buffer += sizeof(long);
+	memcpy(&(CLK->nmi_pcycles), buffer, sizeof(int));
+	buffer += sizeof(int);
 
 	/* Mapper dumping */
 	memcpy(&(mapper->id), buffer, 1);  buffer++;
-	memcpy(&(mapper->reg_count), buffer, sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
+	memcpy(&(mapper->reg_count), buffer, sizeof(int));
+	buffer += sizeof(int);
 	memcpy(mapper->regs, buffer, mapper->reg_count);
 
 	mapper->reset();
@@ -173,11 +173,11 @@ void save_state(int i) {
 	total_size = 
 	/* CPU registers*/  7 +
 	/* RAM dump */      0x0800 + 0xBFDF +
-	/* PPU registers */ 12 + 3*sizeof(unsigned int) +
+	/* PPU registers */ 12 + 3*sizeof(int) +
 	/* VRAM dump */     0x4000 +
 	/* SPR-RAM dump */  0x100 +
-	/* CLK */           sizeof(unsigned int) + sizeof(unsigned long) +
-	/* Mapper */        1 + sizeof(unsigned int) + mapper->reg_count;
+	/* CLK */           sizeof(int) + sizeof(long) +
+	/* Mapper */        1 + sizeof(int) + mapper->reg_count;
 
 	/* Memory allocation for state information */
 	buffer = (char *)malloc(total_size);
@@ -213,12 +213,12 @@ void save_state(int i) {
 	memcpy(buffer, &(PPU->vram_addr), 2); buffer += 2;
 	memcpy(buffer, &(PPU->temp_addr), 2); buffer += 2;
 	memcpy(buffer, &(PPU->spr_addr), 2);  buffer += 2;
-	memcpy(buffer, &(PPU->scanline_timeout), sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
-	memcpy(buffer, &(PPU->lines), sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
-	memcpy(buffer, &(PPU->frames), sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
+	memcpy(buffer, &(PPU->scanline_timeout), sizeof(int));
+	buffer += sizeof(int);
+	memcpy(buffer, &(PPU->lines), sizeof(int));
+	buffer += sizeof(int);
+	memcpy(buffer, &(PPU->frames), sizeof(int));
+	buffer += sizeof(int);
 
 	/* VRAM dumping */
 	memcpy(buffer, PPU->VRAM, 0x4000);
@@ -229,15 +229,15 @@ void save_state(int i) {
 	buffer += 0x100;
 
 	/* CLK dumping */
-	memcpy(buffer, &(CLK->ppu_cycles), sizeof(unsigned long));
-	buffer += sizeof(unsigned long);
-	memcpy(buffer, &(CLK->nmi_pcycles), sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
+	memcpy(buffer, &(CLK->ppu_cycles), sizeof(long));
+	buffer += sizeof(long);
+	memcpy(buffer, &(CLK->nmi_pcycles), sizeof(int));
+	buffer += sizeof(int);
 
 	/* Mapper dumping */
 	memcpy(buffer, &(mapper->id), 1);  buffer++;
-	memcpy(buffer, &(mapper->reg_count), sizeof(unsigned int));
-	buffer += sizeof(unsigned int);
+	memcpy(buffer, &(mapper->reg_count), sizeof(int));
+	buffer += sizeof(int);
 	memcpy(buffer, mapper->regs, mapper->reg_count);
 	buffer += mapper->reg_count;
 
