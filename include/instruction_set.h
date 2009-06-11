@@ -120,7 +120,7 @@ typedef struct _instruction {
 	long executed;        /* Times that the instruction been executed */
 } instruction;
 
-extern instruction *instructions;
+extern instruction instructions[OPCODES_NUMBER];
 
 
 /**

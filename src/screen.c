@@ -86,6 +86,7 @@ void init_screen() {
 
 void end_screen() {
 
+	SDL_FreeSurface(nes_screen);
 	SDL_Quit();
 
 }

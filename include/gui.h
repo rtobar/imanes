@@ -16,4 +16,9 @@ void gui_loop();
  */
 void gui_set_background();
 
+/**
+ * Frees all the resources used by the GUI
+ **/
+void end_gui();
+
 #endif /* gui_h */

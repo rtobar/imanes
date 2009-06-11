@@ -29,6 +29,9 @@ typedef struct _mapper {
 	/* Updates internal registers at the end of each scanline */
 	void (*update)();
 
+	/* Frees the resources used by the mapper */
+	void (*end_mapper)();
+
 	/* Registers */
 	uint8_t *regs;
 

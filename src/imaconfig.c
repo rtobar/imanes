@@ -66,8 +66,16 @@ void initialize_configuration() {
 
 void load_user_configuration() {
 
-	get_user_imanes_dir();
+	char *user_dir;
 
+	user_dir = get_user_imanes_dir();
+
+	if( user_dir == NULL ) {
+		fprintf(stderr,"Couldn't find user's configuration\n");
+		return;
+	}
+
+	free(user_dir);
 	return;
 }
 
@@ -168,5 +176,6 @@ char *get_imanes_dir(imanes_dir dir) {
 			break;
 	}
 
+	free(user_imanes_dir);
 	return specific_dir;
 }

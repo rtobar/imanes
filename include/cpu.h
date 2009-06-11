@@ -116,4 +116,9 @@ void execute_irq();
  */
 void add_cycles(uint8_t type, int8_t value);
 
+/**
+ * Frees all the resources used by the CPU 
+ */
+void end_cpu();
+
 #endif /* cpu_h */

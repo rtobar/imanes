@@ -11,5 +11,6 @@ int  cnrom_check_address(uint16_t address);
 void cnrom_switch_banks();
 void cnrom_reset();
 void cnrom_update();
+void cnrom_end_mapper();
 
 #endif /* cnrom_h */

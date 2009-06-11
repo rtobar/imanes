@@ -156,3 +156,10 @@ void gui_set_background() {
 	SDL_BlitSurface(gui_cover, NULL, gui_bg, &dst);
 
 }
+
+void end_gui() {
+
+	SDL_FreeSurface(gui_bg);
+	SDL_FreeSurface(gui_cover);
+
+}

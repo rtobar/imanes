@@ -35,6 +35,7 @@
 #include "imaconfig.h"
 #include "instruction_set.h"
 #include "loop.h"
+#include "mapper.h"
 #include "pad.h"
 #include "palette.h"
 #include "parse_file.h"
@@ -161,12 +162,18 @@ int main(int args, char *argv[]) {
 	/* Main execution loop */
 	main_loop();
 
-	end_screen();
-	free_ines_file(nes_rom);
 	INFO( printf("Saving SRAM... ") );
 	save_sram(save_file);
 	free(save_file);
 	INFO( printf("done!\n") );
+
+	/* Free all the used resources */
+	mapper->end_mapper();
+	end_screen();
+	end_gui();
+	end_ppu();
+	end_cpu();
+	free_ines_file(nes_rom);
 
 	return 0;
 }

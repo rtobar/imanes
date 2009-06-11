@@ -230,3 +230,7 @@ void mmc1_reset() {
 void mmc1_update() {
 	return;
 }
+
+void mmc1_end_mapper() {
+	free(mapper->regs);
+}

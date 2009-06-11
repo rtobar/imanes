@@ -96,4 +96,9 @@ void dump_ppu();
  */
 void dump_spr_ram();
 
+/**
+ * Frees the resouces used by the PPU
+ */
+void end_ppu();
+
 #endif /* ppu_h */

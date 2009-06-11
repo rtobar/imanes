@@ -27,12 +27,9 @@
 #include "debug.h"
 #include "instruction_set.h"
 
-instruction *instructions;
+instruction instructions[OPCODES_NUMBER];
 
 void initialize_instruction_set() {
-
-	instructions = (instruction *)malloc(sizeof(instruction)*
-	                                     OPCODES_NUMBER);
 
 	/*********************/
 	/** "Legal" opcodes **/

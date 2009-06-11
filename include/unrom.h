@@ -11,5 +11,6 @@ int  unrom_check_address(uint16_t address);
 void unrom_switch_banks();
 void unrom_reset();
 void unrom_update();
+void unrom_end_mapper();
 
 #endif /* unrom_h */

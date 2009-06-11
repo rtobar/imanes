@@ -47,6 +47,7 @@ void initialize_cpu() {
 	CPU->SP  = 0xff; /* It decrements when pushing, increments when pulling */
 
 	CPU->RAM = (uint8_t *)malloc(NES_RAM_SIZE);
+	memset(CPU->RAM, 0, NES_RAM_SIZE);
 	CPU->reset = 1;
 	CPU->sram_enabled = 0;
 	CPU->sram_enabled &= ~SRAM_ENABLE;
@@ -1007,4 +1008,12 @@ void add_cycles(uint8_t type, int8_t value) {
 			ADD_CPU_CYCLES(1);
 	}
 
+}
+
+void end_cpu() {
+
+	if( CPU->RAM != NULL )
+		free(CPU->RAM);
+	if( CPU != NULL )
+		free(CPU);
 }

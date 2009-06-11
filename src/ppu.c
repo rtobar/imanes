@@ -38,6 +38,8 @@ void initialize_ppu() {
 	PPU->VRAM = (uint8_t *)malloc(NES_VRAM_SIZE);
 	PPU->SPR_RAM = (uint8_t *)malloc(NES_SPR_RAM_SIZE);
 
+	memset(PPU->VRAM, 0, NES_VRAM_SIZE);
+
 	PPU->x = 0;
 	PPU->latch = 1;
 	PPU->vram_addr = 0;
@@ -567,4 +569,15 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 	PPU->VRAM[address] = value;
 
 	return;
+}
+
+void end_ppu() {
+
+	if( PPU->VRAM != NULL )
+		free(PPU->VRAM);
+	if( PPU->SPR_RAM != NULL )
+		free(PPU->SPR_RAM);
+	if( PPU != NULL )
+		free(PPU);
+
 }

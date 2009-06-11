@@ -177,6 +177,11 @@ void map_rom_memory(ines_file *nes_rom) {
 
 void free_ines_file(ines_file *file) {
 
+	if( file->rom != NULL )
+		free(file->rom);
+	if( file->vrom != NULL )
+		free(file->vrom);
+
 	free(file);
 
 }

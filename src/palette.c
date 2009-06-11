@@ -27,13 +27,10 @@
 
 nes_palette *system_palette;
 
-static nes_palette *loopy_palette;
-static nes_palette *other_palette;
+static nes_palette loopy_palette[NES_PALETTE_COLORS];
+static nes_palette other_palette[NES_PALETTE_COLORS];
 
 void initialize_palette() {
-
-	loopy_palette = (nes_palette *)malloc(sizeof(nes_palette)*NES_PALETTE_COLORS);
-	other_palette = (nes_palette *)malloc(sizeof(nes_palette)*NES_PALETTE_COLORS);
 
 	/* Loopy palette */
 	FILL_NES_PALETTE(loopy_palette, 0x00, 0x75, 0x75, 0x75);

@@ -283,3 +283,7 @@ void mmc3_update() {
 
 	return;
 }
+
+void mmc3_end_mapper() {
+	free(mapper->regs);
+}

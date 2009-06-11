@@ -64,3 +64,7 @@ void unrom_reset()
 void unrom_update() {
 	return;
 }
+
+void unrom_end_mapper() {
+	free(mapper->regs);
+}

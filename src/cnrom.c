@@ -66,3 +66,7 @@ void cnrom_reset()
 void cnrom_update() {
 	return;
 }
+
+void cnrom_end_mapper() {
+	free(mapper->regs);
+}

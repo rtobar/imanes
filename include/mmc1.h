@@ -11,5 +11,6 @@ int  mmc1_check_address(uint16_t address);
 void mmc1_switch_banks();
 void mmc1_reset();
 void mmc1_update();
+void mmc1_end_mapper();
 
 #endif /* mmc1_h */

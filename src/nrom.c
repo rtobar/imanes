@@ -67,3 +67,7 @@ void nrom_reset()
 void nrom_update() {
 	return;
 }
+
+void nrom_end_mapper() {
+	return;
+}
