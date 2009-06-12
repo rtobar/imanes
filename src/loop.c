@@ -182,7 +182,6 @@ int main_loop(void *args) {
 			/* Start VBLANK period */
 			else if( PPU->lines == NES_SCREEN_HEIGHT ) {
 
-				mapper->update();
 				PPU->SR |= VBLANK_FLAG;
 				CLK->nmi_pcycles = (CYCLES_PER_SCANLINE - PPU->scanline_timeout)*3;
 				if( PPU->CR1 & VBLANK_ENABLE ) {
@@ -198,7 +197,6 @@ int main_loop(void *args) {
 			/* VBLANK period */
 			else {
 				standard_lines++;
-				PPU->lines++;
 
 				/* End of VBLANK period */
 				if( standard_lines == 20 ) {
