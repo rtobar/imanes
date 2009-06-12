@@ -27,9 +27,6 @@
 #include "mmc3.h"
 #include "ppu.h"
 
-#undef  DEBUG
-#define DEBUG(X) X
-
 typedef enum _mmc3_action {
 	SetCommand,
 	SwapBanks,
@@ -224,19 +221,20 @@ void mmc3_switch_banks() {
 			break;
 
 		case SetIRQ:
-			printf("MMC3: Escribiendo %02x a 0xC000\n", mapper->regs[4]);
+			DEBUG( printf("MMC3: Writting %02x to 0xC000\n", mapper->regs[4]) );
 			if( mapper->regs[4] ) {
 				irq_tmp = mapper->regs[4];
 				zero_written = 0;
 			}
 			else
+				irq_tmp = 0;
 				zero_written = 1;
 				if( !zero_written )
 					irq_triggered = 1;
 			break;
 
 		case ResetIRQ:
-			printf("MMC3: Reseting counter to 0\n");
+			DEBUG( printf("MMC3: Reseting counter to 0\n") );
 			irq_counter = 0;
 			zero_written = 0;
 			irq_triggered = 0;
