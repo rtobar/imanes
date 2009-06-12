@@ -72,57 +72,71 @@ void mmc3_initialize_mapper() {
 	return;
 }
 
-int  mmc3_check_address(uint16_t address) {
+void mmc3_debug(int reg) {
+	printf("MMC3: Reg[%d] = $%02X at %d\n", reg, mapper->regs[reg], PPU->lines);
+}
+
+int mmc3_check_address(uint16_t address) {
 
 	if( address < 0x8000 )
 		return 0;
+
+	address &= 0xE001;
 
 	/* This only set values, does not take any action */
 	if( address == 0x8000 ) {
 		mapper->regs[0] = CPU->RAM[address];
 		action = SetCommand;
+		mmc3_debug(0);
 		return 1;
 	}
 
 	if( address == 0x8001 ) {
 		mapper->regs[1] = CPU->RAM[address];
 		action = SwapBanks;
+		mmc3_debug(1);
 		return 1;
 	}
 
 	if( address == 0xA000 ) {
 		mapper->regs[2] = CPU->RAM[address];
 		action = ChangeMirroring;
+		mmc3_debug(2);
 		return 1;
 	}
 
 	if( address == 0xA001 ) {
 		mapper->regs[3] = CPU->RAM[address];
 		action = ToogleSRAM;
+		mmc3_debug(3);
 		return 1;
 	}
 
 	if( address == 0xC000 ) {
 		mapper->regs[4] = CPU->RAM[address];
 		action = SetIRQ;
+		mmc3_debug(4);
 		return 1;
 	}
 
 	if( address == 0xC001 ) {
 		mapper->regs[5] = CPU->RAM[address];
 		action = ResetIRQ;
+		mmc3_debug(5);
 		return 1;
 	}
 
 	if( address == 0xE000 ) {
 		mapper->regs[6] = CPU->RAM[address];
 		action = DisableIRQ;
+		mmc3_debug(6);
 		return 1;
 	}
 
 	if( address == 0xE001 ) {
 		mapper->regs[7] = CPU->RAM[address];
 		action = EnableIRQ;
+		mmc3_debug(7);
 		return 1;
 	}
 
