@@ -29,7 +29,8 @@ PPU:
  * [DONE] Fix sprite drawing (they seem to be 1 pixel above)
  * [DONE] Support for vertical flip sprites feature
  * [DONE] Support background scrolling
- * [TESTING] Recognize and set "pixel 0 bit"
+ * [DONE] Recognize and set "pixel 0 bit"
+ * [    ] Proper hit flag timing
  * [DONE] Add support for 8x16 sprites
  * [DONE] Fix the back and front sprites drawing
 
