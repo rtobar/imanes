@@ -158,7 +158,6 @@ void mmc3_switch_banks() {
 		case SwapBanks:
 			bank = mapper->regs[1];
 			command = (mapper->regs[0]&0x7);
-			DEBUG( printf("MMC3: bank:%02x   command:%02x   reg0:%02x\n", bank, command, mapper->regs[0]) );
 
 			/* Switch VROM page */
 			if( command <= 5 ) {
