@@ -27,6 +27,9 @@
 #include "mmc3.h"
 #include "ppu.h"
 
+#undef  DEBUG
+#define DEBUG(X) X
+
 typedef enum _mmc3_action {
 	SetCommand,
 	SwapBanks,
@@ -48,6 +51,8 @@ static int powering_on;
 static int swapping_control;
 
 static int irq_enabled;
+static int irq_triggered;
+static int zero_written;
 static uint8_t irq_tmp;
 static uint8_t irq_counter;
 
@@ -61,6 +66,11 @@ void mmc3_initialize_mapper() {
 	swapping_control = 0;
 
 	irq_counter = 0;
+	irq_tmp = 0;
+
+	/* This will prevent for initial updates on the counter */
+	zero_written = 1;
+	irq_triggered = 0;
 
 	return;
 }
@@ -214,11 +224,22 @@ void mmc3_switch_banks() {
 			break;
 
 		case SetIRQ:
-			irq_tmp = mapper->regs[4];
+			printf("MMC3: Escribiendo %02x a 0xC000\n", mapper->regs[4]);
+			if( mapper->regs[4] ) {
+				irq_tmp = mapper->regs[4];
+				zero_written = 0;
+			}
+			else
+				zero_written = 1;
+				if( !zero_written )
+					irq_triggered = 1;
 			break;
 
 		case ResetIRQ:
+			printf("MMC3: Reseting counter to 0\n");
 			irq_counter = 0;
+			zero_written = 0;
+			irq_triggered = 0;
 			break;
 
 		case DisableIRQ:
@@ -263,6 +284,19 @@ void mmc3_reset() {
 }
 
 void mmc3_update() {
+
+	/* Writting 0x00 to 0xC000 will produce a single IRQ 
+	 * The process will be stopped until a non-zero value 
+	 * is written in 0xC000*/
+	if( zero_written ) {
+		if( irq_triggered && irq_enabled ) {
+			DEBUG( printf("MMC3: Triggering IRQ caused by 0 writing to 0xC000\n") );
+			CPU->SR &= ~B_FLAG;
+			execute_irq();
+			irq_triggered = 0;
+		}
+		return;
+	}
 
 	if( irq_counter == 0 ) {
 		irq_counter = irq_tmp+1;
