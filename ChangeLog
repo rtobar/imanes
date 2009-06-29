@@ -17,8 +17,8 @@ Version 0.1
    * UNROM
    * NROM
    * CNROM
-   * MMC1 (may behave buggy)
-   * MMC3 (may behave buggy)
+   * MMC1 (still a little buggy)
+   * MMC3 (still a little buggy)
  * Still no sound :(
 
 <Technical details>
