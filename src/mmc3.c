@@ -239,11 +239,12 @@ void mmc3_switch_banks() {
 				irq_tmp = mapper->regs[4];
 				zero_written = 0;
 			}
-			else
+			else {
 				irq_tmp = 0;
-				zero_written = 1;
 				if( !zero_written )
 					irq_triggered = 1;
+				zero_written = 1;
+			}
 			break;
 
 		case ResetIRQ:

@@ -16,9 +16,6 @@ AC_CHECK_FUNC( [clock_gettime] , ,
 	)
 )
 
-CPPFLAGS="$CFLAGS $SDL_INCLUDEDIR"
-LDFLAGS="$LDFLAGS $SDL_LIBDIR"
-
 AC_CHECK_HEADER( [SDL/SDL.h], ,
 	AC_MSG_ERROR([Couldn't find SDL headers])
 )
