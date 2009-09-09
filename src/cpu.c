@@ -99,7 +99,7 @@ void execute_instruction(instruction inst, operand oper) {
 
 	switch(inst.instr_id) {
 
-		case ADC: /* TODO: check C and V flags */
+		case ADC:
 			if( inst.addr_mode != ADDR_IMMEDIATE )
 				oper.value = read_cpu_ram(oper.address);
 			tmp16 = CPU->A + oper.value + (CPU->SR & C_FLAG);
@@ -936,8 +936,7 @@ void stack_push(uint8_t value) {
 
 	/* The stack is top down. When someone pushes, the SP decreases */
 	/* We need to use write_cpu_ram because of the mirroring */
-	write_cpu_ram( BEGIN_STACK + CPU->SP , value);
-	CPU->SP--;
+	write_cpu_ram(BEGIN_STACK + CPU->SP--, value);
 
 	return;
 }
@@ -945,8 +944,7 @@ void stack_push(uint8_t value) {
 uint8_t stack_pull() {
 
 	/* The stack is top down. When someone pulls, the SP increases */
-	CPU->SP++;
-	return CPU->RAM[BEGIN_STACK + CPU->SP];
+	return CPU->RAM[BEGIN_STACK + ++CPU->SP];
 }
 
 /* Note: NMI is executed after inscreasing the PC! */
