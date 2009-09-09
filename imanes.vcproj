@@ -177,6 +177,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\src\apu.c"
+			>
+		</File>
+		<File
 			RelativePath=".\src\cnrom.c"
 			>
 		</File>

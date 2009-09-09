@@ -1,6 +1,7 @@
 bin_PROGRAMS = imanes
 
 imanes_SOURCES = \
+     apu.c \
      cnrom.c \
      common.c \
      clock.c \

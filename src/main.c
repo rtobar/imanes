@@ -27,6 +27,7 @@
 #include <unistd.h>
 #endif
 
+#include "apu.h"
 #include "clock.h"
 #include "common.h"
 #include "cpu.h"
@@ -144,6 +145,7 @@ int main(int args, char *argv[]) {
 	initialize_configuration();
 	initialize_palette();
 	initialize_instruction_set();
+	initialize_apu();
 	initialize_cpu();
 	initialize_ppu();
 	initialize_clock();
@@ -173,6 +175,7 @@ int main(int args, char *argv[]) {
 	end_gui();
 	end_ppu();
 	end_cpu();
+	end_apu();
 	free_ines_file(nes_rom);
 
 	return 0;
