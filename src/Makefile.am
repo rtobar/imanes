@@ -26,6 +26,7 @@ imanes_SOURCES = \
      sram.c \
      states.c \
      unrom.c \
+     $(top_srcdir)/include/apu.h \
      $(top_srcdir)/include/clock.h \
      $(top_srcdir)/include/cnrom.h \
      $(top_srcdir)/include/common.h \
