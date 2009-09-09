@@ -30,6 +30,10 @@ void initialize_apu() {
 
 	APU = (nes_apu *)malloc(sizeof(nes_apu));
 
+	APU->length_ctr = 0;
+	APU->commons = 0;
+	APU->clock_timeout = PPUCYCLES_STEP4;
+
 	return;
 }
 

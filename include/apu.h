@@ -14,10 +14,19 @@
 #define STEP_MODE5        0x80
 #define DISABLE_FRAME_INT 0x40
 
+/* Number or PPU cycles which define a step, rounded */
+#define PPUCYCLES_STEP4  (27919) /* 27919.375 */
+#define PPUCYCLES_STEP5  (22336) /* 22335.5 */
+
 typedef struct _apu {
 
+	/* Registers */
 	uint8_t length_ctr; /* 0x4015 */
 	uint8_t commons;    /* 0x4017 */
+
+	/* Internals */
+	int step;           /* In which step we are (1 ... 4/5) */
+	int clock_timeout;  /* PPU cycles until the next sequencer clock */
 
 } nes_apu;
 
