@@ -12,7 +12,7 @@
 
 /* Flags for the 0x4017 register */
 #define STEP_MODE5        0x80
-#define DISABLE_FRAME_INT 0x40
+#define DISABLE_FRAME_IRQ 0x40
 
 /* Number or PPU cycles which define a step, rounded */
 #define PPUCYCLES_STEP4  (27919) /* 27919.375 */

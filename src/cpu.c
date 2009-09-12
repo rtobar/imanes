@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "apu.h"
 #include "clock.h"
 #include "common.h"
 #include "cpu.h"
@@ -785,9 +786,14 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			}
 			break;
 
-		/* 2nd joystick */			
+		/* APU Lenght Control */
+		case 0x4015:
+			APU->length_ctr = value & 0x1F;
+			break;
+
+		/* APU common */
 		case 0x4017:
-			/* This has to do with the sound */
+			APU->commons = value & 0xC0;
 			break;
 
 		/* Normal RAM memory area */
