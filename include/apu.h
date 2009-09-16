@@ -34,6 +34,12 @@ extern nes_apu *APU;
 
 
 /**
+ * Lookup tables used to get the final normalized output
+ * from the DACs.
+ */
+
+
+/**
  * Initialize the APU with its registers
  */
 void initialize_apu();
@@ -42,6 +48,16 @@ void initialize_apu();
  * Dumps the current contents of the APU to the stdout
  */
 void dump_apu();
+
+/**
+ * Clocks the frame sequencer.
+ * When the frame sequencer is clocked,
+ * a series of events are triggered,
+ * depending on some flags and on the state of some counters.
+ *
+ * This method is called from the main loop of the emulation
+ */
+void clock_apu_sequencer();
 
 /**
  * Frees all the resources used by the APU 

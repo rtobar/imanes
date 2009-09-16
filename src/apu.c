@@ -32,6 +32,7 @@ void initialize_apu() {
 
 	APU->length_ctr = 0;
 	APU->commons = 0;
+	APU->step = 0;
 	APU->clock_timeout = PPUCYCLES_STEP4;
 
 	return;
@@ -43,6 +44,26 @@ void dump_apu() {
 	printf("0x4017:%02x  ", APU->commons);
 
 	return;
+}
+
+void clock_apu_sequencer() {
+
+	/* Reset the clock timeout depending on the sequencer mode */
+	APU->clock_timeout += ( (APU->commons & STEP_MODE5) ?
+	                        PPUCYCLES_STEP5 : PPUCYCLES_STEP4);
+
+	/* Finally, we increase the step counter */
+	APU->step++;
+	if( APU->commons & STEP_MODE5 ) {
+		if( APU->step == 5 ) {
+			APU->step = 0;
+		}
+	}
+	else
+		if( APU->step == 4 ) {
+			APU->step = 0;
+		}
+
 }
 
 void end_apu() {

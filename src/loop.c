@@ -148,24 +148,12 @@ int main_loop(void *args) {
 		APU->clock_timeout -= (int)(CLK->ppu_cycles - ppu_cycles);
 		ppu_cycles = CLK->ppu_cycles;
 
+		/* TODO: Add the other APU timers: square/triangle */
+
 		/* The APU sequencer needs to clock */
-		if( APU->clock_timeout <= 0 ) {
-
-			/* Reset the clock timeout depending on the sequencer mode */
-			APU->clock_timeout += ( (APU->commons & STEP_MODE5) ?
-			                        PPUCYCLES_STEP5 : PPUCYCLES_STEP4);
-
-			/* Finally, we increase the step counter */
-			APU->step++;
-			if( APU->commons & STEP_MODE5 ) {
-				if( APU->step == 5 )
-					APU->step = 0;
-			}
-			else
-				if( APU->step == 4 )
-					APU->step = 0;
-
-		}
+		/* This sequencer then triggers */
+		if( APU->clock_timeout <= 0 )
+			clock_apu_sequencer();
 
 		/* A line has ended its scanning, draw it */
 		if( PPU->scanline_timeout <= 0 ) {
