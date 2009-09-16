@@ -39,6 +39,7 @@ void initialize_ppu() {
 	PPU->SPR_RAM = (uint8_t *)malloc(NES_SPR_RAM_SIZE);
 
 	memset(PPU->VRAM, 0, NES_VRAM_SIZE);
+	memset(PPU->SPR_RAM, 0, NES_SPR_RAM_SIZE);
 
 	PPU->x = 0;
 	PPU->latch = 1;
