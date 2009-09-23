@@ -32,6 +32,21 @@ $> make install
 Check the INSTALL file for further details
 
 
+Windows compilation
+===================
+
+To compile ImaNES under Windows you will need the following
+
+ * SDL runtime library (SDL.dll) installed in the system32 folder.
+ * SDL library linking information (SDL.lib and SDLmain.lib) installed
+   at a side of the MVC++ .lib files.
+ * SDL development files (.h files) installed at a side of the MVC++ .h files
+
+You can get these files at http://www.libsdl.org/
+
+Once SDL is installed, open the imanes.sln in Microsoft Visual C++,
+and compile the solution. You can compile it with or without debug symbols.
+
 Contact
 =======
 
