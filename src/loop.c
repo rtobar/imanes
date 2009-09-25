@@ -175,7 +175,7 @@ int main_loop(void *args) {
 			 * 2) 240 scanlines where pixels are drawn
 			 *    (only 224 are actually shown)
 			 * 3) 1 dummy scanline
-			 * 4) VBlank period
+			 * 4) VBlank period (20 scanlines)
 			 *
 			 * The pre-render scanline works as all the others, but
 			 * doesn't get drawn.
