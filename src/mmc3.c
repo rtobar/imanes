@@ -73,7 +73,7 @@ void mmc3_initialize_mapper() {
 }
 
 void mmc3_debug(int reg) {
-	printf("MMC3: Reg[%d] = $%02X at %d\n", reg, mapper->regs[reg], PPU->lines);
+/*	printf("MMC3: Reg[%d] = $%02X at %d\n", reg, mapper->regs[reg], PPU->lines); */
 }
 
 int mmc3_check_address(uint16_t address) {

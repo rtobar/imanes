@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "apu.h"
+#include "cpu.h"
 #include "debug.h"
 
 nes_apu *APU;
@@ -32,8 +33,11 @@ void initialize_apu() {
 
 	APU->length_ctr = 0;
 	APU->commons = 0;
-	APU->step = 0;
-	APU->clock_timeout = PPUCYCLES_STEP4;
+
+	/* Frame sequencer initialization */
+	APU->frame_seq.step = 0;
+	APU->frame_seq.clock_timeout = PPUCYCLES_STEP4;
+	APU->frame_seq.int_flag = 0;
 
 	return;
 }
@@ -42,6 +46,7 @@ void dump_apu() {
 
 	printf("0x4015:%02x  ", APU->length_ctr);
 	printf("0x4017:%02x  ", APU->commons);
+	printf("FS: %d/%d\n", APU->frame_seq.step, APU->frame_seq.int_flag);
 
 	return;
 }
@@ -49,19 +54,53 @@ void dump_apu() {
 void clock_apu_sequencer() {
 
 	/* Reset the clock timeout depending on the sequencer mode */
-	APU->clock_timeout += ( (APU->commons & STEP_MODE5) ?
-	                        PPUCYCLES_STEP5 : PPUCYCLES_STEP4);
+	APU->frame_seq.clock_timeout += ( (APU->commons & STEP_MODE5) ?
+	                                PPUCYCLES_STEP5 : PPUCYCLES_STEP4);
+
+
+	INFO( dump_apu() );
+
+	/* At any time, if the interrupt flag is set
+    * and the IRQ disable is clear, CPU's IRQ is asserted */
+	if( APU->frame_seq.int_flag && !(APU->commons & DISABLE_FRAME_IRQ) ) {
+		printf("Triggering IRQ from APU\n");
+		execute_irq();
+	}
+
+	/* Different actions depending on the step number
+    * and the step mode of the frame sequencer */
+	if( APU->commons & STEP_MODE5 ) {
+	}
+	else {
+
+		switch(APU->frame_seq.step) {
+
+			case 1:
+				break;
+
+			case 2:
+				break;
+
+			case 3:
+				break;
+
+			case 4:
+				APU->frame_seq.int_flag = 1;
+				break;
+
+		}
+	}
 
 	/* Finally, we increase the step counter */
-	APU->step++;
+	APU->frame_seq.step++;
 	if( APU->commons & STEP_MODE5 ) {
-		if( APU->step == 5 ) {
-			APU->step = 0;
+		if( APU->frame_seq.step == 5 ) {
+			APU->frame_seq.step = 0;
 		}
 	}
 	else
-		if( APU->step == 4 ) {
-			APU->step = 0;
+		if( APU->frame_seq.step == 4 ) {
+			APU->frame_seq.step = 0;
 		}
 
 }

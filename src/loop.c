@@ -145,14 +145,14 @@ int main_loop(void *args) {
 		/* Update cycles count */
 		ADD_CPU_CYCLES(inst.cycles);
 		PPU->scanline_timeout -= (int)(CLK->ppu_cycles - ppu_cycles);
-		APU->clock_timeout -= (int)(CLK->ppu_cycles - ppu_cycles);
+		APU->frame_seq.clock_timeout -= (int)(CLK->ppu_cycles - ppu_cycles);
 		ppu_cycles = CLK->ppu_cycles;
 
 		/* TODO: Add the other APU timers: square/triangle */
 
 		/* The APU sequencer needs to clock */
 		/* This sequencer then triggers */
-		if( APU->clock_timeout <= 0 )
+		if( APU->frame_seq.clock_timeout <= 0 )
 			clock_apu_sequencer();
 
 		/* A line has ended its scanning, draw it */

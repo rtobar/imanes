@@ -18,20 +18,28 @@
 #define PPUCYCLES_STEP4  (27919) /* 27919.375 */
 #define PPUCYCLES_STEP5  (22336) /* 22335.5 */
 
+/* Frame Sequencer structure */
+typedef struct _frame_seq {
+
+	int clock_timeout;  /* PPU cycles until the next sequencer clock */
+	int8_t step;         /* In which step we are (1 ... 4/5) */
+	int8_t int_flag;    /* Internal interrupt flag */
+
+} nes_frame_seq;
+
+/* APU final structure */
 typedef struct _apu {
 
 	/* Registers */
 	uint8_t length_ctr; /* 0x4015 */
 	uint8_t commons;    /* 0x4017 */
 
-	/* Internals */
-	int step;           /* In which step we are (1 ... 4/5) */
-	int clock_timeout;  /* PPU cycles until the next sequencer clock */
+	/* Frame sequencer */
+	nes_frame_seq frame_seq;
 
 } nes_apu;
 
 extern nes_apu *APU;
-
 
 /**
  * Lookup tables used to get the final normalized output

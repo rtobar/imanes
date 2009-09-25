@@ -794,6 +794,15 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* APU common */
 		case 0x4017:
 			APU->commons = value & 0xC0;
+
+			/* Reset the frame sequencer */
+			if( APU->commons & STEP_MODE5 )
+				APU->frame_seq.clock_timeout = PPUCYCLES_STEP5;
+			else
+				APU->frame_seq.clock_timeout = PPUCYCLES_STEP4;
+
+			APU->frame_seq.step = 0;
+			clock_apu_sequencer();
 			break;
 
 		/* Normal RAM memory area */
@@ -886,6 +895,15 @@ uint8_t read_cpu_ram(uint16_t address) {
 		/* Save the A12 line status (needed by MMC3) */
 		prev_a12_state  = PPU->vram_addr & 0x1000;
 		prev_a12_cycles = CLK->ppu_cycles;
+	}
+
+	/* APU Status Register */
+	else if( address == 0x4015 ) {
+		/* TODO: Fill with missing info (lenght counter status, etc) */
+		ret_val |= ( (APU->frame_seq.int_flag & 0x1) << 6 );
+
+		/* Finally, clear the FS interrupt flag */
+		APU->frame_seq.int_flag = 0;
 	}
 
 	/* 1st Joystick */
