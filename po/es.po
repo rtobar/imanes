@@ -86,7 +86,7 @@ msgstr "  -h,-?     Muestra esta ayuda y finaliza\n"
 msgid ""
 "  -V        Show the current version of ImaNES and exit\n"
 "\n"
-msgstr "  -V        Muestra la versión actual de ImaNES y finaliza\n"
+msgstr "  -V        Muestra la versión actual de ImaNES y finaliza\n\n"
 
 #: src/main.c:59 src/main.c:67
 #, c-format
