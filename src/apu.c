@@ -24,10 +24,16 @@
 #include "apu.h"
 #include "cpu.h"
 #include "debug.h"
+#include "i18n.h"
 
 nes_apu *APU;
 
+static int audio_initialized;
+static SDL_AudioSpec audio_spec;
+
 void initialize_apu() {
+
+	SDL_AudioSpec desired;
 
 	APU = (nes_apu *)malloc(sizeof(nes_apu));
 
@@ -38,6 +44,23 @@ void initialize_apu() {
 	APU->frame_seq.step = 0;
 	APU->frame_seq.clock_timeout = PPUCYCLES_STEP4;
 	APU->frame_seq.int_flag = 0;
+
+	/* Initialize the SDL Audio subsytem */
+	desired.freq     = 22050;
+	desired.format   = AUDIO_U8;
+	desired.channels = 1;
+	desired.silence  = 0;    /* Calculated? */
+	desired.samples  = 1024;
+	desired.size     = 0;    /* Calculated? */
+	desired.callback = apu_fill_buffer;
+	desired.userdata = (void *)NULL;
+
+
+	if( SDL_OpenAudio(&desired, &audio_spec) == -1 ) {
+		fprintf(stderr,_("Cannot initialize audio: %s\n"), SDL_GetError());
+		audio_initialized = 0;
+	}
+	audio_initialized = 1;
 
 	return;
 }
@@ -148,8 +171,18 @@ void clock_lc_sweep() {
 
 }
 
+void apu_fill_buffer(void *userdata, Uint8 *stream, int len) {
+
+}
+
+void apu_pause(int pause_on) {
+	SDL_PauseAudio(pause_on);
+}
+
 void end_apu() {
 
+	apu_pause(1);
 	if( APU != NULL )
 		free(APU);
+
 }
