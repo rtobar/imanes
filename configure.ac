@@ -1,5 +1,7 @@
 AC_INIT( [ImaNES],[git], [https://csrg.inf.utfsm.cl/flyspray/index.php?project=10],[imanes])
 
+AM_GNU_GETTEXT([external])
+
 AM_INIT_AUTOMAKE
 AC_PROG_CC
 
@@ -20,7 +22,7 @@ AC_CHECK_HEADER( [SDL/SDL.h], ,
 	AC_MSG_ERROR([Couldn't find SDL headers])
 )
 
-AC_OUTPUT([
+AC_OUTPUT([ po/Makefile.in
 Makefile
 src/Makefile
 ])

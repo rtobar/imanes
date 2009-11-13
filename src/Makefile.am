@@ -35,6 +35,7 @@ imanes_SOURCES = \
      $(top_srcdir)/include/frame_control.h \
      $(top_srcdir)/include/gui.h \
      $(top_srcdir)/include/imaconfig.h \
+     $(top_srcdir)/i18n.h \
      $(top_srcdir)/include/instruction_set.h \
      $(top_srcdir)/include/loop.h \
      $(top_srcdir)/include/mapper.h \
@@ -52,4 +53,8 @@ imanes_SOURCES = \
      $(top_srcdir)/include/states.h \
      $(top_srcdir)/include/unrom.h
 
+imanes_LDFLAGS = $(LIBINTL)
+
 AM_CPPFLAGS = -I$(top_srcdir)/include -Wall -O3 -pedantic
+
+DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@

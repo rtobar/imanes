@@ -33,6 +33,7 @@
 #include "cpu.h"
 #include "debug.h"
 #include "gui.h"
+#include "i18n.h"
 #include "imaconfig.h"
 #include "instruction_set.h"
 #include "loop.h"
@@ -45,26 +46,26 @@
 #include "sram.h"
 
 void usage(FILE *file, char *argv[]) {
-	fprintf(file,"\n%s: I'm a NES\n\n", PACKAGE_NAME);
-	fprintf(file,"This program is licensed under the GPLv3 license.\n");
-	fprintf(file,"For bug reports, please refer to %s\n\n", PACKAGE_BUGREPORT);
-	fprintf(file,"Usage: %s [options] <rom file>\n\n",argv[0]);
-	fprintf(file,"Options:\n");
-	fprintf(file,"  -v        Increase verbosity. More -v, more verbose. Default: 0\n");
-	fprintf(file,"  -s <n>    Video scaling facotr. Default: 1\n");
-	fprintf(file,"  -c        Use SDL color construction. Default: no\n\n");
-	fprintf(file,"  -h,-?     Show this help and exit\n");
-	fprintf(file,"  -V        Show the current version of ImaNES and exit\n\n");
-	fprintf(file,"ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm.cl>\n");
-	fprintf(file,"Please refer to the AUTHORS file for more details\n");
+	fprintf(file,_("\n%s: I'm a NES\n\n"), PACKAGE_NAME);
+	fprintf(file,_("This program is licensed under the GPLv3 license.\n"));
+	fprintf(file,_("For bug reports, please refer to %s\n\n"), PACKAGE_BUGREPORT);
+	fprintf(file,_("Usage: %s [options] <rom file>\n\n"),argv[0]);
+	fprintf(file,_("Options:\n"));
+	fprintf(file,_("  -v        Increase verbosity. More -v, more verbose. Default: 0\n"));
+	fprintf(file,_("  -s <n>    Video scaling factor. Default: 1\n"));
+	fprintf(file,_("  -c        Use SDL color construction. Default: no\n\n"));
+	fprintf(file,_("  -h,-?     Show this help and exit\n"));
+	fprintf(file,_("  -V        Show the current version of ImaNES and exit\n\n"));
+	fprintf(file,_("ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm.cl>\n"));
+	fprintf(file,_("Please refer to the AUTHORS file for more details\n"));
 	fprintf(file,"\n");
 }
 
 void print_version() {
-	printf("\n%s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
-	printf("The current version of %s was compiled on %s, %s\n\n", PACKAGE_NAME, __DATE__, __TIME__);
-	printf("ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm.cl>\n");
-	printf("Please refer to the AUTHORS file for more details\n");
+	printf(_("\n%s version %s\n"), PACKAGE_NAME, PACKAGE_VERSION);
+	printf(_("The current version of %s was compiled on %s, %s\n\n"), PACKAGE_NAME, __DATE__, __TIME__);
+	printf(_("ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm.cl>\n"));
+	printf(_("Please refer to the AUTHORS file for more details\n"));
 	printf("\n");
 }
 
@@ -84,7 +85,7 @@ void parse_options(int args, char *argv[]) {
 			case 's':
 				config.video_scale = atoi(optarg);
 				if( config.video_scale == 0 ) {
-					fprintf(stderr,"Error: invalid video scale factor. Must be an integer value\n");
+					fprintf(stderr,_("Error: invalid video scale factor. Must be an integer value\n"));
 					usage(stderr, argv);
 					exit(EXIT_FAILURE);
 				}
@@ -115,7 +116,7 @@ void parse_options(int args, char *argv[]) {
 	}
 
 	if( optind >= args ) {
-		fprintf(stderr,"%s: Error: Expected ROM file, none given\n", argv[0]);
+		fprintf(stderr,_("%s: Error: Expected ROM file, none given\n"), argv[0]);
 		usage(stderr,argv);
 		exit(EXIT_FAILURE);
 	}
@@ -135,6 +136,11 @@ int main(int args, char *argv[]) {
 	setbuf(stdout,NULL);
 	setbuf(stderr,NULL);
 #endif
+
+	/* i18n stuff */
+	setlocale(LC_ALL, "");
+	bindtextdomain(PACKAGE, LOCALEDIR);
+	textdomain(PACKAGE);
 
 	/* Parse command line options */
 	parse_options(args, argv);
@@ -164,10 +170,10 @@ int main(int args, char *argv[]) {
 	/* Main execution loop */
 	main_loop();
 
-	INFO( printf("Saving SRAM... ") );
+	INFO( printf(_("Saving SRAM... ")) );
 	save_sram(save_file);
 	free(save_file);
-	INFO( printf("done!\n") );
+	INFO( printf(_("done!\n")) );
 
 	/* Free all the used resources */
 	mapper->end_mapper();
