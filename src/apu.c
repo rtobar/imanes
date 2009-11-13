@@ -70,22 +70,56 @@ void clock_apu_sequencer() {
 	/* Different actions depending on the step number
     * and the step mode of the frame sequencer */
 	if( APU->commons & STEP_MODE5 ) {
+
+		switch(APU->frame_seq.step) {
+
+			case 1:
+				// Clock envelopes and triangle's linear counter
+				// clock lenght counter and sweep units
+				break;
+
+			case 2:
+				// Clock envelopes and triangle's linear counter
+				break;
+
+			case 3:
+				// Clock envelopes and triangle's linear counter
+				// clock lenght counter and sweep units
+				break;
+
+			case 4:
+				// Clock envelopes and triangle's linear counter
+				break;
+
+			case 5:
+				// Doesn't do anything
+				break;
+		}
+
 	}
 	else {
 
 		switch(APU->frame_seq.step) {
 
 			case 1:
+				// Clock envelopes and triangle's linear counter
 				break;
 
 			case 2:
+				// Clock envelopes and triangle's linear counter
+				// clock lenght counter and sweep units
 				break;
 
 			case 3:
+				// Clock envelopes and triangle's linear counter
 				break;
 
 			case 4:
-				APU->frame_seq.int_flag = 1;
+				// Clock envelopes and triangle's linear counter
+				// clock lenght counter and sweep units
+				if( !(APU->frame_seq.int_flag & DISABLE_FRAME_IRQ) ) {
+					execute_irq();
+				}
 				break;
 
 		}
