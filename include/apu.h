@@ -67,6 +67,18 @@ void dump_apu();
  */
 void clock_apu_sequencer();
 
+
+/**
+ * Clocks all the evelope units
+ * and the triangle channel's linear counter
+ */
+void clock_envelopes_tlc();
+
+/**
+ * Clocks all linear counters and sweep units
+ */
+void clock_lc_sweep();
+
 /**
  * Frees all the resources used by the APU 
  */

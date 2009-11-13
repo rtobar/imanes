@@ -74,25 +74,25 @@ void clock_apu_sequencer() {
 		switch(APU->frame_seq.step) {
 
 			case 1:
-				// Clock envelopes and triangle's linear counter
-				// clock lenght counter and sweep units
+				clock_lc_sweep();
+				clock_envelopes_tlc();
 				break;
 
 			case 2:
-				// Clock envelopes and triangle's linear counter
+				clock_envelopes_tlc();
 				break;
 
 			case 3:
-				// Clock envelopes and triangle's linear counter
-				// clock lenght counter and sweep units
+				clock_lc_sweep();
+				clock_envelopes_tlc();
 				break;
 
 			case 4:
-				// Clock envelopes and triangle's linear counter
+				clock_envelopes_tlc();
 				break;
 
 			case 5:
-				// Doesn't do anything
+				/* Doesn't do anything */
 				break;
 		}
 
@@ -102,21 +102,22 @@ void clock_apu_sequencer() {
 		switch(APU->frame_seq.step) {
 
 			case 1:
-				// Clock envelopes and triangle's linear counter
+				clock_envelopes_tlc();
 				break;
 
 			case 2:
-				// Clock envelopes and triangle's linear counter
-				// clock lenght counter and sweep units
+				clock_lc_sweep();
+				clock_envelopes_tlc();
 				break;
 
 			case 3:
-				// Clock envelopes and triangle's linear counter
+				clock_envelopes_tlc();
 				break;
 
 			case 4:
-				// Clock envelopes and triangle's linear counter
-				// clock lenght counter and sweep units
+				clock_lc_sweep();
+				clock_envelopes_tlc();
+
 				if( !(APU->frame_seq.int_flag & DISABLE_FRAME_IRQ) ) {
 					execute_irq();
 				}
@@ -136,6 +137,14 @@ void clock_apu_sequencer() {
 		if( APU->frame_seq.step == 4 ) {
 			APU->frame_seq.step = 0;
 		}
+
+}
+
+void clock_envelopes_tlc() {
+
+}
+
+void clock_lc_sweep() {
 
 }
 
