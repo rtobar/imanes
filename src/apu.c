@@ -140,10 +140,6 @@ void clock_apu_sequencer() {
 			case 4:
 				clock_lc_sweep();
 				clock_envelopes_tlc();
-
-				if( !(APU->frame_seq.int_flag & DISABLE_FRAME_IRQ) ) {
-					execute_irq();
-				}
 				break;
 
 		}

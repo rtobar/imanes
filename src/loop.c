@@ -45,7 +45,7 @@
 			PPU->SR &= ~MAX_SPRITES_DRAWN; \
 		} \
 		vblank_ended = 1; \
-	} while(0)
+	} while(0);
 
 int run_loop;
 
