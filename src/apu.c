@@ -169,6 +169,7 @@ void clock_lc_sweep() {
 
 void apu_fill_buffer(void *userdata, Uint8 *stream, int len) {
 
+	printf(_("Entering to the callback function :)\n"));
 }
 
 void apu_pause(int pause_on) {
