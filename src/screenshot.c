@@ -27,6 +27,7 @@
 
 #include "common.h"
 #include "debug.h"
+#include "i18n.h"
 #include "imaconfig.h"
 #include "platform.h"
 #include "screen.h"
@@ -104,7 +105,7 @@ void save_screenshot() {
 
 	ss_dir = get_imanes_dir(Snapshots);
 	if( ss_dir == NULL ) {
-		fprintf(stderr,"Couldn't save screenshot\n");
+		fprintf(stderr,_("Couldn't save screenshot\n"));
 		free(buffer);
 		free(ss_dir);
 		return;
@@ -137,13 +138,13 @@ void save_screenshot() {
 	written = IMANES_WRITE(fd, (void *)buffer, total_size);
 
 	if( written != total_size ) {
-		perror("Error while saving snapshot");
+		perror(_("Error while saving snapshot"));
 		free(ss_file);
 		return;
 	}
 	IMANES_CLOSE(fd);
 
-	INFO( printf("Saved screenshot at '%s'\n", ss_file) );
+	INFO( printf(_("Saved screenshot at '%s'\n"), ss_file) );
 
 	free(ss_file);
 	free(buffer);

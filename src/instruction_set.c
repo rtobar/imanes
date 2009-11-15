@@ -25,6 +25,7 @@
 #include "common.h"
 #include "cpu.h"
 #include "debug.h"
+#include "i18n.h"
 #include "instruction_set.h"
 
 instruction instructions[OPCODES_NUMBER];
@@ -548,7 +549,7 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 			break;
 
 		default:
-			fprintf(stderr,"Hey!!! You haven't written the %d addressing mode!!!\n", inst.addr_mode);
+			fprintf(stderr,_("Hey!!! You haven't written the %d addressing mode!!!\n"), inst.addr_mode);
 	}
 
 	DEBUG( printf("\n") );

@@ -23,6 +23,7 @@
 
 #include "common.h"
 #include "debug.h"
+#include "i18n.h"
 #include "imaconfig.h"
 #include "loop.h"
 #include "pad.h"
@@ -53,7 +54,7 @@ void screen_loop() {
 				}
 
 			case SDL_QUIT:
-				INFO( printf("Quiting ImaNES\n") );
+				INFO( printf(_("Quiting ImaNES\n")) );
 				run_loop = 0;
 				return;
 		}
@@ -67,14 +68,14 @@ void init_screen() {
 	char window_title[13];
 
 	if( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
-		fprintf(stderr,"Error when initializing screen: %s\n", SDL_GetError());
+		fprintf(stderr,_("Error when initializing screen: %s\n"), SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
 
 	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*config.video_scale, NES_NTSC_HEIGHT*config.video_scale, NES_SCREEN_BPP, 0);
 
 	if( nes_screen == NULL ) {
-		fprintf(stderr,"Error while setting video mode: %s\n", SDL_GetError());
+		fprintf(stderr,_("Error while setting video mode: %s\n"), SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
 
@@ -129,8 +130,8 @@ void redraw_screen() {
 	}
 
 	if( SDL_Flip(nes_screen) == -1 ) {
-		fprintf(stderr,"Couldn't refresh screen :(\n");
-		fprintf(stderr,"I'm exiting now\n");
+		fprintf(stderr,_("Couldn't refresh screen :(\n"));
+		fprintf(stderr,_("I'm exiting now\n"));
 		SDL_Quit();
 		exit(EXIT_FAILURE);
 	}

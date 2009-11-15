@@ -25,6 +25,7 @@
 
 #include "common.h"
 #include "debug.h"
+#include "i18n.h"
 #include "imaconfig.h"
 #include "palette.h"
 #include "ppu.h"
@@ -375,7 +376,7 @@ void draw_line(int line, int frame) {
 
 	DEBUG(
 	if( prev_hit != (PPU->SR & HIT_FLAG) && (PPU->SR & HIT_FLAG) )
-		printf("Set Hit flag at scanline %d\n", line);
+		printf(_("Set Hit flag at scanline %d\n"), line);
 	);
 
 }
@@ -391,21 +392,21 @@ uint8_t read_ppu_vram(uint16_t address) {
 
 	/* After palette mirroring */
 	if( 0x3F20 <= address && address < 0x4000) {
-		XTREME( printf("PPU Address mirroring: from %04x to ", address) );
+		XTREME( printf(_("PPU Address mirroring: from %04x to "), address) );
 		address = address - 0x20 * ((((address - 0x3F20) >> 5) & 0x7) + 1);
 		XTREME( printf("%04x\n",address) );
 	}
 
 	/* Name and attribute tables before palette  */
 	if( 0x3000 <= address && address < 0x3F00 ) {
-		XTREME( printf("PPU Address mirroring: from %04x to ", address) );
+		XTREME( printf(_("PPU Address mirroring: from %04x to "), address) );
 		address = address - 0x1000;
 		XTREME( printf("%04x\n",address) );
 	}
 
 	/* Inter palette mirroring */
 	if( 0x3F10 <= address && address < 0x3F20 && !(address&0x03) ) {
-		XTREME( printf("Palette mirroring: from %04x to ", address) );
+		XTREME( printf(_("Palette mirroring: from %04x to "), address) );
 		address -= 0x10;
 		XTREME( printf("%04x\n",address) );
 	}
@@ -416,17 +417,17 @@ uint8_t read_ppu_vram(uint16_t address) {
 
 		case HORIZONTAL_MIRRORING:
 			if( (0x2400 <= address && address < 0x2800) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x400;
 				DEBUG(printf("%04x\n",address));
 			}
 			if( (0x2800 <= address && address < 0x2C00) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x400;
 				DEBUG(printf("%04x\n",address));
 			}
 			if( (0x2C00 <= address && address < 0x3000) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x800;
 				DEBUG(printf("%04x\n",address));
 			}
@@ -434,7 +435,7 @@ uint8_t read_ppu_vram(uint16_t address) {
 
 		case VERTICAL_MIRRORING:
 			if( 0x2800 <= address && address < 0x3000 ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address &= 0x27FF;
 				DEBUG(printf("%04x\n",address));
 			}
@@ -442,7 +443,7 @@ uint8_t read_ppu_vram(uint16_t address) {
 
 		case SINGLE_SCREEN_MIRRORING_A:
 			if( 0x2400 <= address && address < 0x3000 ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address &= 0x23FF;
 				DEBUG(printf("%04x\n",address));
 			}
@@ -450,17 +451,17 @@ uint8_t read_ppu_vram(uint16_t address) {
 
 		case SINGLE_SCREEN_MIRRORING_B:
 			if( (0x2000 <= address && address < 0x2400) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address += 0x400;
 				DEBUG(printf("%04x\n",address));
 			}
 			if( (0x2800 <= address && address < 0x2C00) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x400;
 				DEBUG(printf("%04x\n",address));
 			}
 			if( (0x2C00 <= address && address < 0x3000) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x800;
 				DEBUG(printf("%04x\n",address));
 			}
@@ -484,21 +485,21 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 
 	/* After palette mirroring */
 	if( 0x3F20 <= address ) {
-		XTREME( printf("PPU Address mirroring: from %04x to ", address) );
+		XTREME( printf(_("PPU Address mirroring: from %04x to "), address) );
 		address = address - 0x20 * ((((address - 0x3F20) >> 5) & 0x7) + 1);
 		XTREME( printf("%04x\n",address) );
 	}
 
 	/* Name and attribute tables before palette  */
 	if( 0x3000 <= address && address < 0x3F00 ) {
-		XTREME( printf("PPU Address mirroring: from %04x to ", address) );
+		XTREME( printf(_("PPU Address mirroring: from %04x to "), address) );
 		address = address - 0x1000;
 		XTREME( printf("%04x\n",address) );
 	}
 
 	/* Inter palette mirroring */
 	if( 0x3F10 <= address && address < 0x3F20 && !(address&0x03) ) {
-		XTREME( printf("Palette mirroring: from %04x to ", address) );
+		XTREME( printf(_("Palette mirroring: from %04x to "), address) );
 		address -= 0x10;
 		XTREME( printf("%04x\n",address) );
 	}
@@ -509,17 +510,17 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 
 		case HORIZONTAL_MIRRORING:
 			if( (0x2400 <= address && address < 0x2800) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x400;
 				DEBUG(printf("%04x\n",address));
 			}
 			if( (0x2800 <= address && address < 0x2C00) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x400;
 				DEBUG(printf("%04x\n",address));
 			}
 			if( (0x2C00 <= address && address < 0x3000) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x800;
 				DEBUG(printf("%04x\n",address));
 			}
@@ -527,7 +528,7 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 
 		case VERTICAL_MIRRORING:
 			if( 0x2800 <= address && address < 0x3000 ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address &= 0x27FF;
 				DEBUG(printf("%04x\n",address));
 			}
@@ -535,7 +536,7 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 
 		case SINGLE_SCREEN_MIRRORING_A:
 			if( 0x2400 <= address && address < 0x3000 ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address &= 0x23FF;
 				DEBUG(printf("%04x\n",address));
 			}
@@ -543,17 +544,17 @@ void write_ppu_vram(uint16_t address, uint8_t value) {
 
 		case SINGLE_SCREEN_MIRRORING_B:
 			if( (0x2000 <= address && address < 0x2400) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address += 0x400;
 				DEBUG(printf("%04x\n",address));
 			}
 			if( (0x2800 <= address && address < 0x2C00) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x400;
 				DEBUG(printf("%04x\n",address));
 			}
 			if( (0x2C00 <= address && address < 0x3000) ) {
-				DEBUG(printf("PPU Address mirroring: from %04x to ", address));
+				DEBUG(printf(_("PPU Address mirroring: from %04x to "), address));
 				address -= 0x800;
 				DEBUG(printf("%04x\n",address));
 			}

@@ -26,6 +26,7 @@
 #include "common.h"
 #include "debug.h"
 #include "frame_control.h"
+#include "i18n.h"
 #include "imaconfig.h"
 #include "loop.h"
 #include "platform.h"
@@ -92,7 +93,7 @@ void gui_loop() {
 					}
 	
 				case SDL_QUIT:
-					INFO( printf("Quiting ImaNES\n") );
+					INFO( printf(_("Quiting ImaNES\n")) );
 					run_loop = 0;
 					config.pause = 0;
 					return;
@@ -139,8 +140,8 @@ void redraw_gui() {
 	SDL_BlitSurface(imanes_cursor, NULL, nes_screen, &dst); */
 
 	if( SDL_Flip(nes_screen) == -1 ) {
-		fprintf(stderr,"Couldn't refresh screen :(\n");
-		fprintf(stderr,"I'm exiting now\n");
+		fprintf(stderr,_("Couldn't refresh screen :(\n"));
+		fprintf(stderr,_("I'm exiting now\n"));
 		SDL_Quit();
 		exit(EXIT_FAILURE);
 	}

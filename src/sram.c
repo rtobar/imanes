@@ -25,6 +25,7 @@
 
 #include "cpu.h"
 #include "debug.h"
+#include "i18n.h"
 #include "platform.h"
 #include "sram.h"
 
@@ -40,7 +41,7 @@ void save_sram(char *save_file) {
 	IMANES_OPEN(fd,save_file, IMANES_OPEN_WRITE);
 
 	if( fd == -1 ) {
-		fprintf(stderr,"Error while opening '%s': ", save_file);
+		fprintf(stderr,_("Error while opening '%s': "), save_file);
 		perror(NULL);
 		return;
 	}
@@ -48,7 +49,7 @@ void save_sram(char *save_file) {
 	written_bytes = IMANES_WRITE(fd, CPU->RAM + 0x6000, 0x2000);
 
 	if( written_bytes != 0x2000 ) {
-		fprintf(stderr,"Couldn't dump SRAM data to '%s': ", save_file);
+		fprintf(stderr,_("Couldn't dump SRAM data to '%s': "), save_file);
 		perror(NULL);
 	}
 
@@ -65,11 +66,11 @@ char *load_sram(char *rom_file) {
 	char *tmp;
 	RW_RET read_bytes;
 
-	INFO( printf("Loading SRAM... ") );
+	INFO( printf(_("Loading SRAM... ")) );
 	save_dir = get_imanes_dir(Saves);
 
 	if( save_dir == NULL ) {
-		fprintf(stderr,"Couldn't load SRAM because saves direcory cannot be accessed\n");
+		fprintf(stderr,_("Couldn't load SRAM because saves direcory cannot be accessed\n"));
 		free(save_dir);
 		return NULL;
 	}
@@ -84,14 +85,14 @@ char *load_sram(char *rom_file) {
 
 	/* If SRAM is not enabled, just return the name of the file */
 	if( !CPU->sram_enabled ) {
-		INFO( printf("SRAM disabled, not loading anything\n") );
+		INFO( printf(_("SRAM disabled, not loading anything\n")) );
 		return save_file;
 	}
 
 	IMANES_OPEN(fd,save_file, IMANES_OPEN_READ);
 
 	if( fd == -1 ) {
-		fprintf(stderr,"Error while opening '%s': ", save_file);
+		fprintf(stderr,_("Error while opening '%s': "), save_file);
 		perror(NULL);
 		return save_file;
 	}
@@ -99,12 +100,12 @@ char *load_sram(char *rom_file) {
 	read_bytes = IMANES_READ(fd, CPU->RAM + 0x6000, 0x2000);
 
 	if( read_bytes != 0x2000 ) {
-		fprintf(stderr,"File '%s' is not a valid SRAM dump file, SRAM not loaded.\n", save_file);
+		fprintf(stderr,_("File '%s' is not a valid SRAM dump file, SRAM not loaded.\n"), save_file);
 		memset(CPU->RAM + 0x6000, 0, 0x2000);
 	}
 
 	IMANES_CLOSE(fd);
 
-	INFO( printf("done!\n") );
+	INFO( printf(_("done!\n")) );
 	return save_file;
 }

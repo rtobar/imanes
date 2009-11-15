@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "cnrom.h"
+#include "i18n.h"
 #include "mapper.h"
 #include "mmc1.h"
 #include "mmc3.h"
@@ -56,6 +57,6 @@ void dump_mapper() {
 		printf("\n");
 	}
 	else {
-		printf("<no registers>\n");
+		printf(_("<no registers>\n"));
 	}
 }

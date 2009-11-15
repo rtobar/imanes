@@ -24,6 +24,7 @@
 #include <sys/stat.h>
 
 #include "debug.h"
+#include "i18n.h"
 #include "imaconfig.h"
 #include "platform.h"
 
@@ -71,7 +72,7 @@ void load_user_configuration() {
 	user_dir = get_user_imanes_dir();
 
 	if( user_dir == NULL ) {
-		fprintf(stderr,"Couldn't find user's configuration\n");
+		fprintf(stderr,_("Couldn't find user's configuration\n"));
 		return;
 	}
 
@@ -91,11 +92,11 @@ int check_and_create(char *dir) {
 
 	/* Not found, let's create it (we assume that $HOME exists) */
 	if( tmp == -1 ) {
-		fprintf(stderr,"Directory '%s' not found, creating it...\n", dir);
+		fprintf(stderr,_("Directory '%s' not found, creating it...\n"), dir);
 		tmp = IMANES_MKDIR(dir);
 
 		if( tmp == -1 ) {
-			fprintf(stderr,"Error while creating directory '%s': ", dir);
+			fprintf(stderr,_("Error while creating directory '%s': "), dir);
 			perror(NULL);
 			return -1;
 		}
@@ -117,7 +118,7 @@ char *get_user_imanes_dir() {
 #endif
 
 	if( user_home == NULL ) {
-		fprintf(stderr, "Couldn't find user's home directory. Will not load user configuration\n");
+		fprintf(stderr, _("Couldn't find user's home directory. Will not load user configuration\n"));
 		return NULL;
 	}
 

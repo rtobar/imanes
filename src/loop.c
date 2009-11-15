@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "frame_control.h"
 #include "gui.h"
+#include "i18n.h"
 #include "instruction_set.h"
 #include "loop.h"
 #include "mapper.h"
@@ -39,7 +40,7 @@
 #define END_VBLANK() \
 	do { \
 		if( !vblank_ended ) { \
-			DEBUG( printf("Ending VBlank\n") ); \
+			DEBUG( printf(_("Ending VBlank\n")) ); \
 			PPU->SR &= ~VBLANK_FLAG; \
 			PPU->SR &= ~HIT_FLAG; \
 			PPU->SR &= ~MAX_SPRITES_DRAWN; \
@@ -119,9 +120,9 @@ int main_loop(void *args) {
 		DEBUG( printf("%04.0f 0x%04x - %02x: ",CLK->nmi_pcycles/3., CPU->PC, opcode) );
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
-			fprintf(stderr,"\n\nUndocumented instruction: %02x\n",opcode);
-			fprintf(stderr,"I'm exiting now... sorry :(\n");
-			fprintf(stderr,"Close the window when finished\n");
+			fprintf(stderr,_("\n\nUndocumented instruction: %02x\n"),opcode);
+			fprintf(stderr,_("I'm exiting now... sorry :(\n"));
+			fprintf(stderr,_("Close the window when finished\n"));
 			return -1;
 		}
 

@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "i18n.h"
 #include "palette.h"
 #include "ppu.h"
 
@@ -171,7 +172,7 @@ void dump_palette() {
 
 	int i;
 
-	printf("No | Picture       | Sprites\n");
+	printf(_("No | Picture       | Sprites\n"));
 	for(i=0;i!=16;i++) {
 		printf("%2d | %02x           | %02x\n", i, *(PPU->VRAM + 0x3F00 + i), *(PPU->VRAM + 0x3F10 + i) );
 	}

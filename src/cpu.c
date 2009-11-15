@@ -26,6 +26,7 @@
 #include "common.h"
 #include "cpu.h"
 #include "debug.h"
+#include "i18n.h"
 #include "instruction_set.h"
 #include "mapper.h"
 #include "pad.h"
@@ -632,7 +633,7 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		default:
-			fprintf(stderr,"%s: Still unimplemented\n", inst.name);
+			fprintf(stderr,_("%s: Still unimplemented\n"), inst.name);
 			break;
 	}
 
@@ -659,18 +660,18 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 	int i;
 
 	XTREME( if( 0x2000 <= address && address <= 0x2006 ) {
-		printf("PPU: Write to PPU[%d]=$%02X PC=%04X\n", address - 0x2000, value, CPU->PC);
+		printf(_("PPU: Write to PPU[%d]=$%02X PC=%04X\n"), address - 0x2000, value, CPU->PC);
 	} );
 
 	/* Convert the address to handle mirroring */
 	if( 0x0800 <= address && address < 0x2000 ) {
-		DEBUG( printf("CPU Address mirroring: from %04x to ", address) );
+		DEBUG( printf(_("CPU Address mirroring: from %04x to "), address) );
 		address &= 0x7FF;
 		DEBUG( printf("%04x\n",address) );
 	}
 
 	if( 0x2008 <= address && address < 0x4000 ) {
-		DEBUG( printf("CPU Address mirroring: from %04x to ", address) );
+		DEBUG( printf(_("CPU Address mirroring: from %04x to "), address) );
 		address = (address&0x7) + 0x2000;
 		DEBUG( printf("%04x\n",address) );
 	}
@@ -678,7 +679,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 	/* SRAM can be disabled or in RO mode */
 	if( 0x6000 <= address && address < 0x8000 &&
 	 ( !(CPU->sram_enabled&SRAM_ENABLE) || CPU->sram_enabled&SRAM_RO ) ) {
-		DEBUG( printf("Write to %04x not allowed\n", address) );
+		DEBUG( printf(_("Write to %04x not allowed\n"), address) );
 		return;
 	}
 
@@ -833,13 +834,13 @@ uint8_t read_cpu_ram(uint16_t address) {
 
 	/* Convert the address to handle mirroring */
 	if( 0x0800 <= address && address < 0x2000 ) {
-		DEBUG( printf("CPU Adress mirroring: from %04x to ", address) );
+		DEBUG( printf(_("CPU Adress mirroring: from %04x to "), address) );
 		address &= 0x7FF;
 		DEBUG( printf("%04x\n",address) );
 	}
 
 	if( 0x2008 <= address && address < 0x4000 ) {
-		DEBUG( printf("CPU Address mirroring: from %04x to ", address) );
+		DEBUG( printf(_("CPU Address mirroring: from %04x to "), address) );
 		address = (address&0x7) + 0x2000;
 		DEBUG( printf("%04x\n",address) );
 	}
@@ -951,7 +952,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 	else
 		ret_val = CPU->RAM[address];
 
-	XTREME( printf("Returning %02x from %04x\n", ret_val, address) );
+	XTREME( printf(_("Returning %02x from %04x\n"), ret_val, address) );
 	return ret_val;
 }
 
@@ -976,7 +977,7 @@ void execute_nmi() {
 
 	/* This interrupt is not maskable, so we don't check
 	 * the interrupt flag on the processor status register */
-	DEBUG( printf("Executing NMI!\n") );
+	DEBUG( printf(_("Executing NMI!\n")) );
 
 	/* NMI clears the B_FLAG from CPU status */
 	CPU->SR &= ~B_FLAG;

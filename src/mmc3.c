@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "debug.h"
+#include "i18n.h"
 #include "mapper.h"
 #include "mmc3.h"
 #include "ppu.h"
@@ -162,7 +163,7 @@ void mmc3_switch_banks() {
 			else
 				offset = 0xC000;
 
-			DEBUG( printf("MMC3: Reg0:%02x, Swapping {-2} bank to %04x\n", mapper->regs[0], offset) );
+			DEBUG( printf(_("MMC3: Reg0:%02x, Swapping {-2} bank to %04x\n"), mapper->regs[0], offset) );
 			memcpy( CPU->RAM + offset,
 			   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
 			   ROM_BANK_SIZE/2);
@@ -181,14 +182,14 @@ void mmc3_switch_banks() {
 				if( command <= 1 ) {
 					offset = 0x800*command + ((mapper->regs[0]&0x80) << 5);
 					bank &= 0xFE;
-					DEBUG( printf("MMC3: Switching VROM bank %d to %04x\n", bank,offset) );
+					DEBUG( printf(_("MMC3: Switching VROM bank %d to %04x\n"), bank,offset) );
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 2*1024);
 				}
 				/* Copy 1 Kb VROM page */
 				else {
 					offset = (command-2)*0x400 + (!(mapper->regs[0]&0x80))*0x1000;
-					DEBUG( printf("MMC3: Switching VROM bank %d to %04x\n", bank,offset) );
+					DEBUG( printf(_("MMC3: Switching VROM bank %d to %04x\n"), bank,offset) );
 					memcpy(PPU->VRAM+offset,
 					       mapper->file->vrom+bank*1024, 1024);
 				}
@@ -203,7 +204,7 @@ void mmc3_switch_banks() {
 				else if( mapper->regs[0] & 0x40 )
 					offset += 0x4000;
 
-				DEBUG( printf("MMC3: Switching ROM bank %02x into %04x\n", bank, offset) );
+				DEBUG( printf(_("MMC3: Switching ROM bank %02x into %04x\n"), bank, offset) );
 				memcpy(CPU->RAM + offset,
 				       mapper->file->rom + bank*ROM_BANK_SIZE/2,
 				       ROM_BANK_SIZE/2);
@@ -220,12 +221,12 @@ void mmc3_switch_banks() {
 		case ToogleSRAM:
 			command = (mapper->regs[3] & 0x80) >> 7;
 			if( command != CPU->sram_enabled ) {
-				DEBUG( printf("%s SRAM\n", (command ? "Enabling" : "Disabling" ) ) );
+				DEBUG( printf("%s SRAM\n", (command ? _("Enabling") : _("Disabling") ) ) );
 				CPU->sram_enabled = command;
 			}
 			command = (mapper->regs[3] & 0x40) >> 6;
 			if( command != (CPU->sram_enabled & SRAM_RO) ) {
-				DEBUG( printf("SRAM switching to %s mode\n", (command ? "RO": "RW") ) );
+				DEBUG( printf(_("SRAM switching to %s mode\n"), (command ? "RO": "RW") ) );
 				if( command )
 					CPU->sram_enabled |= SRAM_RO;
 				else
@@ -234,7 +235,7 @@ void mmc3_switch_banks() {
 			break;
 
 		case SetIRQ:
-			DEBUG( printf("MMC3: Writting %02x to 0xC000\n", mapper->regs[4]) );
+			DEBUG( printf(_("MMC3: Writting %02x to 0xC000\n"), mapper->regs[4]) );
 			if( mapper->regs[4] ) {
 				irq_tmp = mapper->regs[4];
 				zero_written = 0;
@@ -248,7 +249,7 @@ void mmc3_switch_banks() {
 			break;
 
 		case ResetIRQ:
-			DEBUG( printf("MMC3: Reseting counter to 0\n") );
+			DEBUG( printf(_("MMC3: Reseting counter to 0\n")) );
 			irq_counter = 0;
 			zero_written = 0;
 			irq_triggered = 0;
@@ -302,7 +303,7 @@ void mmc3_update() {
 	 * is written in 0xC000*/
 	if( zero_written ) {
 		if( irq_triggered && irq_enabled ) {
-			DEBUG( printf("MMC3: Triggering IRQ caused by 0 writing to 0xC000\n") );
+			DEBUG( printf(_("MMC3: Triggering IRQ caused by 0 writing to 0xC000\n")) );
 			CPU->SR &= ~B_FLAG;
 			execute_irq();
 			irq_triggered = 0;
@@ -312,16 +313,16 @@ void mmc3_update() {
 
 	if( irq_counter == 0 ) {
 		irq_counter = irq_tmp+1;
-		DEBUG( printf("MMC3: Setting irq_counter to %u\n", irq_counter) );
+		DEBUG( printf(_("MMC3: Setting irq_counter to %u\n"), irq_counter) );
 	}
 	else {
 		if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) ) {
 			irq_counter--;
-			DEBUG( printf("MMC3: Decrementing irq_counter. New value: %u\n", irq_counter) );
+			DEBUG( printf(_("MMC3: Decrementing irq_counter. New value: %u\n"), irq_counter) );
 		}
 
 		if( irq_counter == 0 && irq_enabled ) {
-			DEBUG( printf("MMC3: Triggering IRQ\n") );
+			DEBUG( printf(_("MMC3: Triggering IRQ\n")) );
 			CPU->SR &= ~B_FLAG;
 			execute_irq();
 		}

@@ -55,7 +55,7 @@ void initialize_apu() {
 	desired.callback = apu_fill_buffer;
 	desired.userdata = (void *)NULL;
 
-
+	/* Inform if we cannot initialize the audio subsystem */
 	if( SDL_OpenAudio(&desired, &audio_spec) == -1 ) {
 		fprintf(stderr,_("Cannot initialize audio: %s\n"), SDL_GetError());
 		audio_initialized = 0;
@@ -169,7 +169,7 @@ void clock_lc_sweep() {
 
 void apu_fill_buffer(void *userdata, Uint8 *stream, int len) {
 
-	printf(_("Entering to the callback function :)\n"));
+	printf("Entering to the callback function :)\n");
 }
 
 void apu_pause(int pause_on) {

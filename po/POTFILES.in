@@ -1,3 +1,23 @@
 # List of source files which contain translatable strings.
 
+src/apu.c
+src/cnrom.c
+src/cpu.c
+src/gui.c
+src/imaconfig.c
+src/instruction_set.c
+src/loop.c
 src/main.c
+src/mapper.c
+src/mmc1.c
+src/mmc3.c
+src/nrom.c
+src/pad.c
+src/palette.c
+src/parse_file.c
+src/ppu.c
+src/screen.c
+src/screenshot.c
+src/sram.c
+src/states.c
+src/unrom.c

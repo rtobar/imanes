@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "debug.h"
+#include "i18n.h"
 #include "mapper.h"
 #include "mmc1.h"
 #include "ppu.h"
@@ -75,19 +76,19 @@ int  mmc1_check_address(uint16_t address) {
 
 			DEBUG( 
 			if( mapper->regs[0] != prev[0] ) {
-				printf("MMC1: reg0: Changed from %02x to %02x\n", prev[0], mapper->regs[0]);
+				printf(_("MMC1: reg0: Changed from %02x to %02x\n"), prev[0], mapper->regs[0]);
 				prev[0] = mapper->regs[0];
 			}
 			if( mapper->regs[1] != prev[1] ) {
-				printf("MMC1: reg1: Changed from %02x to %02x\n", prev[1], mapper->regs[1]);
+				printf(_("MMC1: reg1: Changed from %02x to %02x\n"), prev[1], mapper->regs[1]);
 				prev[1] = mapper->regs[1];
 			}
 			if( mapper->regs[2] != prev[2] ) {
-				printf("MMC1: reg2: Changed from %02x to %02x\n", prev[2], mapper->regs[2]);
+				printf(_("MMC1: reg2: Changed from %02x to %02x\n"), prev[2], mapper->regs[2]);
 				prev[2] = mapper->regs[2];
 			}
 			if( mapper->regs[3] != prev[3] ) {
-				printf("MMC1: reg3: Changed from %02x to %02x\n", prev[3], mapper->regs[3]);
+				printf(_("MMC1: reg3: Changed from %02x to %02x\n"), prev[3], mapper->regs[3]);
 				prev[3] = mapper->regs[3];
 			}
 			);
@@ -152,14 +153,14 @@ void mmc1_switch_banks() {
 		 * In both cases we fill form 0x0000 to 0x2000. */
 		if( !(mapper->regs[0] & 0x10) ) {
 			bank = mapper->regs[1]&0x1F;
-			DEBUG( printf("MMC1: Switching 8 Kb VROM bank %d. Offset is ",  bank) );
+			DEBUG( printf(_("MMC1: Switching 8 Kb VROM bank %d. Offset is "),  bank) );
 			offset = bank * VROM_BANK_SIZE/2;
 			DEBUG( printf("%04x\n", offset) );
 			memcpy( PPU->VRAM, mapper->file->vrom+offset, VROM_BANK_SIZE);
 		}
 		else {
 			bank = mapper->regs[1]&0x1F;
-			DEBUG( printf("MMC1: Switching 4 Kb VROM banks %d/%d. Offsets are ", bank, mapper->regs[2]&0x0F) );
+			DEBUG( printf(_("MMC1: Switching 4 Kb VROM banks %d/%d. Offsets are "), bank, mapper->regs[2]&0x0F) );
 
 			offset = bank * VROM_BANK_SIZE/2;
 			DEBUG( printf("%04x/", offset) );
@@ -198,14 +199,14 @@ void mmc1_switch_banks() {
 			/* Select the actual bank that will be switched */
 			bank = (mapper->regs[3] & 0x0E);
 			offset += bank * ROM_BANK_SIZE;
-			DEBUG( printf("MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n", bank, offset) );
+			DEBUG( printf(_("MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n"), bank, offset) );
 			memcpy( CPU->RAM+0x8000, mapper->file->rom + offset,
 			        ROM_BANK_SIZE*2);
 		}
 		else {
 			bank = (mapper->regs[3] & 0x0F);
 			offset += bank * ROM_BANK_SIZE;
-			DEBUG( printf("MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n", bank, offset, 0x8000 + (mapper->regs[0]&0x04?0:0x4000)) );
+			DEBUG( printf(_("MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n"), bank, offset, 0x8000 + (mapper->regs[0]&0x04?0:0x4000)) );
 
 			/* Depending where we switch banks, the other remains hard-wired */
 			memcpy( CPU->RAM+0x8000 + ( mapper->regs[0]&0x04 ? 0 : 0x4000),

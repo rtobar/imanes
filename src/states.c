@@ -27,6 +27,7 @@
 #include "clock.h"
 #include "cpu.h"
 #include "debug.h"
+#include "i18n.h"
 #include "imaconfig.h"
 #include "mapper.h"
 #include "platform.h"
@@ -72,12 +73,12 @@ void load_state(int i) {
 		free(tmp);
 
 		if( fd == -1 && errno == ENOENT) {
-			fprintf(stderr,"Cannot load state %d because it doesn't exist\n", config.current_state);
+			fprintf(stderr,_("Cannot load state %d because it doesn't exist\n"), config.current_state);
 			free(ss_file);
 			return;
 		}
 		else if( fd == -1 ) {
-			fprintf(stderr,"Error while opening '%s': ", ss_file);
+			fprintf(stderr,_("Error while opening '%s': "), ss_file);
 			perror(NULL);
 			free(ss_file);
 			return;
@@ -87,7 +88,7 @@ void load_state(int i) {
 		IMANES_CLOSE(fd);
 
 		if( read_bytes != total_size ) {
-			fprintf(stderr,"File '%s' is not a valid state file\n", ss_file);
+			fprintf(stderr,_("File '%s' is not a valid state file\n"), ss_file);
 			free(ss_file);
 			return;
 		}
@@ -148,7 +149,7 @@ void load_state(int i) {
 	mapper->reset();
 	mapper->switch_banks();
 
-	INFO( printf("Loaded state %d\n", config.current_state) );
+	INFO( printf(_("Loaded state %d\n"), config.current_state) );
 
 	return;
 }
@@ -165,7 +166,7 @@ void save_state(int i) {
 
 	ss_dir = get_imanes_dir(States);
 	if( ss_dir == NULL ) {
-		fprintf(stderr,"Couldn't save state: cannot reach states dir\n");
+		fprintf(stderr,_("Couldn't save state: cannot reach states dir\n"));
 		return;
 	}
 
@@ -257,7 +258,7 @@ void save_state(int i) {
 	written = IMANES_WRITE(fd, (void *)buffer, total_size);
 
 	if( written != total_size )
-		perror("Error while saving state to file");
+		perror(_("Error while saving state to file"));
 
 	IMANES_CLOSE(fd);
 
@@ -268,7 +269,7 @@ void save_state(int i) {
 	last_save = config.current_state;
 
 	free(buffer);
-	INFO( printf("Saved state %d\n", config.current_state) );
+	INFO( printf(_("Saved state %d\n"), config.current_state) );
 
 	return;
 }

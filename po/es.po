@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes 0.1\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-13 22:39+0100\n"
+"POT-Creation-Date: 2009-11-15 15:43+0100\n"
 "PO-Revision-Date: 2009-11-13 21:09+0100\n"
 "Last-Translator: Rodrigo Tobar Carrizo <rtobar@csrg.inf.utfsm.cl>\n"
 "Language-Team: Spanish\n"
@@ -16,6 +16,114 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/apu.c:60
+#, c-format
+msgid "Cannot initialize audio: %s\n"
+msgstr "No se puede iniciar el audio: %s\n"
+
+#: src/cnrom.c:51
+#, c-format
+msgid "Performing switch to bank %d of VROM\n"
+msgstr ""
+
+#: src/cpu.c:636
+#, c-format
+msgid "%s: Still unimplemented\n"
+msgstr ""
+
+#: src/cpu.c:663
+#, c-format
+msgid "PPU: Write to PPU[%d]=$%02X PC=%04X\n"
+msgstr ""
+
+#: src/cpu.c:668 src/cpu.c:674 src/cpu.c:843
+#, c-format
+msgid "CPU Address mirroring: from %04x to "
+msgstr ""
+
+#: src/cpu.c:682
+#, c-format
+msgid "Write to %04x not allowed\n"
+msgstr ""
+
+#: src/cpu.c:837
+#, c-format
+msgid "CPU Adress mirroring: from %04x to "
+msgstr ""
+
+#: src/cpu.c:955
+#, c-format
+msgid "Returning %02x from %04x\n"
+msgstr ""
+
+#: src/cpu.c:980
+#, c-format
+msgid "Executing NMI!\n"
+msgstr ""
+
+#: src/gui.c:96 src/screen.c:57
+#, c-format
+msgid "Quiting ImaNES\n"
+msgstr ""
+
+#: src/gui.c:143 src/screen.c:177
+#, c-format
+msgid "Couldn't refresh screen :(\n"
+msgstr ""
+
+#: src/gui.c:144 src/screen.c:178
+#, c-format
+msgid "I'm exiting now\n"
+msgstr ""
+
+#: src/imaconfig.c:75
+#, c-format
+msgid "Couldn't find user's configuration\n"
+msgstr ""
+
+#: src/imaconfig.c:95
+#, c-format
+msgid "Directory '%s' not found, creating it...\n"
+msgstr ""
+
+#: src/imaconfig.c:99
+#, c-format
+msgid "Error while creating directory '%s': "
+msgstr ""
+
+#: src/imaconfig.c:121
+#, c-format
+msgid "Couldn't find user's home directory. Will not load user configuration\n"
+msgstr ""
+
+#: src/instruction_set.c:552
+#, c-format
+msgid "Hey!!! You haven't written the %d addressing mode!!!\n"
+msgstr ""
+
+#: src/loop.c:43
+#, c-format
+msgid "Ending VBlank\n"
+msgstr ""
+
+#: src/loop.c:123
+#, c-format
+msgid ""
+"\n"
+"\n"
+"Undocumented instruction: %02x\n"
+msgstr ""
+
+#: src/loop.c:124
+#, c-format
+msgid "I'm exiting now... sorry :(\n"
+msgstr ""
+
+#: src/loop.c:125
+#, c-format
+msgid "Close the window when finished\n"
+msgstr ""
 
 #: src/main.c:49
 #, c-format
@@ -86,7 +194,9 @@ msgstr "  -h,-?     Muestra esta ayuda y finaliza\n"
 msgid ""
 "  -V        Show the current version of ImaNES and exit\n"
 "\n"
-msgstr "  -V        Muestra la versión actual de ImaNES y finaliza\n\n"
+msgstr ""
+"  -V        Muestra la versión actual de ImaNES y finaliza\n"
+"\n"
 
 #: src/main.c:59 src/main.c:67
 #, c-format
@@ -136,7 +246,350 @@ msgstr "%s: Error: Se esperaba un archivo ROM, no se indicó ninguno\n"
 msgid "Saving SRAM... "
 msgstr "Salvando la SRAM..."
 
-#: src/main.c:176
+#: src/main.c:176 src/sram.c:109
 #, c-format
 msgid "done!\n"
 msgstr "¡listo!\n"
+
+#: src/mapper.c:60
+#, c-format
+msgid "<no registers>\n"
+msgstr ""
+
+#: src/mmc1.c:79
+#, c-format
+msgid "MMC1: reg0: Changed from %02x to %02x\n"
+msgstr ""
+
+#: src/mmc1.c:83
+#, c-format
+msgid "MMC1: reg1: Changed from %02x to %02x\n"
+msgstr ""
+
+#: src/mmc1.c:87
+#, c-format
+msgid "MMC1: reg2: Changed from %02x to %02x\n"
+msgstr ""
+
+#: src/mmc1.c:91
+#, c-format
+msgid "MMC1: reg3: Changed from %02x to %02x\n"
+msgstr ""
+
+#: src/mmc1.c:156
+#, c-format
+msgid "MMC1: Switching 8 Kb VROM bank %d. Offset is "
+msgstr ""
+
+#: src/mmc1.c:163
+#, c-format
+msgid "MMC1: Switching 4 Kb VROM banks %d/%d. Offsets are "
+msgstr ""
+
+#: src/mmc1.c:202
+#, c-format
+msgid "MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n"
+msgstr ""
+
+#: src/mmc1.c:209
+#, c-format
+msgid "MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n"
+msgstr ""
+
+#: src/mmc3.c:166
+#, c-format
+msgid "MMC3: Reg0:%02x, Swapping {-2} bank to %04x\n"
+msgstr ""
+
+#: src/mmc3.c:185 src/mmc3.c:192
+#, c-format
+msgid "MMC3: Switching VROM bank %d to %04x\n"
+msgstr ""
+
+#: src/mmc3.c:207
+#, c-format
+msgid "MMC3: Switching ROM bank %02x into %04x\n"
+msgstr ""
+
+#: src/mmc3.c:224
+msgid "Enabling"
+msgstr ""
+
+#: src/mmc3.c:224
+msgid "Disabling"
+msgstr ""
+
+#: src/mmc3.c:229
+#, c-format
+msgid "SRAM switching to %s mode\n"
+msgstr ""
+
+#: src/mmc3.c:238
+#, c-format
+msgid "MMC3: Writting %02x to 0xC000\n"
+msgstr ""
+
+#: src/mmc3.c:252
+#, c-format
+msgid "MMC3: Reseting counter to 0\n"
+msgstr ""
+
+#: src/mmc3.c:306
+#, c-format
+msgid "MMC3: Triggering IRQ caused by 0 writing to 0xC000\n"
+msgstr ""
+
+#: src/mmc3.c:316
+#, c-format
+msgid "MMC3: Setting irq_counter to %u\n"
+msgstr ""
+
+#: src/mmc3.c:321
+#, c-format
+msgid "MMC3: Decrementing irq_counter. New value: %u\n"
+msgstr ""
+
+#: src/mmc3.c:325
+#, c-format
+msgid "MMC3: Triggering IRQ\n"
+msgstr ""
+
+#: src/nrom.c:61
+#, c-format
+msgid "Copying VROM to VRAM\n"
+msgstr ""
+
+#: src/pad.c:45
+#, c-format
+msgid "Pad %d. Pressed button: "
+msgstr ""
+
+#: src/pad.c:168
+#, c-format
+msgid "Background %s\n"
+msgstr ""
+
+#: src/pad.c:174
+#, c-format
+msgid "Front sprites %s\n"
+msgstr ""
+
+#: src/pad.c:180
+#, c-format
+msgid "Back sprites %s\n"
+msgstr ""
+
+#: src/pad.c:185
+#, c-format
+msgid "Screen background %s\n"
+msgstr ""
+
+#: src/pad.c:218
+#, c-format
+msgid "Reseting NES\n"
+msgstr ""
+
+#: src/pad.c:223
+#, c-format
+msgid "Show frames per second %s\n"
+msgstr ""
+
+#: src/pad.c:230
+#, c-format
+msgid "Instructions never executed:\n"
+msgstr ""
+
+#: src/pad.c:237
+#, c-format
+msgid "%s emulation\n"
+msgstr ""
+
+#: src/pad.c:237
+msgid "Resuming"
+msgstr ""
+
+#: src/pad.c:237
+msgid "Pausing"
+msgstr ""
+
+#: src/palette.c:175
+#, c-format
+msgid "No | Picture       | Sprites\n"
+msgstr ""
+
+#: src/parse_file.c:66
+#, c-format
+msgid "Error: %s is not a valid NES ROM, incompatible header information\n"
+msgstr ""
+
+#: src/parse_file.c:73 src/parse_file.c:79 src/parse_file.c:91
+#: src/parse_file.c:132 src/parse_file.c:141
+#, c-format
+msgid "Error: %s is not a valid NES ROM\n"
+msgstr ""
+
+#: src/parse_file.c:83
+#, c-format
+msgid "File contains %hu 16kb ROM banks and %hu 8kb VROM banks\n"
+msgstr ""
+
+#: src/parse_file.c:102
+#, c-format
+msgid "Mirroring type: %d\n"
+msgstr ""
+
+#: src/parse_file.c:105
+#, c-format
+msgid "SRAM is %s\n"
+msgstr ""
+
+#: src/parse_file.c:105
+msgid "enabled"
+msgstr ""
+
+#: src/parse_file.c:105
+msgid "disabled"
+msgstr ""
+
+#: src/parse_file.c:116
+#, c-format
+msgid "ROM mapper is '%s'\n"
+msgstr ""
+
+#: src/parse_file.c:121
+#, c-format
+msgid "Sorry, but we currently support cartridges using the mapper %d\n"
+msgstr ""
+
+#: src/parse_file.c:122
+#, c-format
+msgid ""
+"I'm exiting now.\n"
+"\n"
+msgstr ""
+
+#: src/parse_file.c:138
+#, c-format
+msgid "Trainer present in ROM file\n"
+msgstr ""
+
+#: src/parse_file.c:162
+#, c-format
+msgid "Error: malformed file (ROM not complete)\n"
+msgstr ""
+
+#: src/parse_file.c:170
+#, c-format
+msgid "Error: malformed file (VROM not complete)\n"
+msgstr ""
+
+#: src/ppu.c:379
+#, c-format
+msgid "Set Hit flag at scanline %d\n"
+msgstr ""
+
+#: src/ppu.c:395 src/ppu.c:402 src/ppu.c:420 src/ppu.c:425 src/ppu.c:430
+#: src/ppu.c:438 src/ppu.c:446 src/ppu.c:454 src/ppu.c:459 src/ppu.c:464
+#: src/ppu.c:488 src/ppu.c:495 src/ppu.c:513 src/ppu.c:518 src/ppu.c:523
+#: src/ppu.c:531 src/ppu.c:539 src/ppu.c:547 src/ppu.c:552 src/ppu.c:557
+#, c-format
+msgid "PPU Address mirroring: from %04x to "
+msgstr ""
+
+#: src/ppu.c:409 src/ppu.c:502
+#, c-format
+msgid "Palette mirroring: from %04x to "
+msgstr ""
+
+#: src/screen.c:107
+#, c-format
+msgid "Error when initializing screen: %s\n"
+msgstr ""
+
+#: src/screen.c:114
+#, c-format
+msgid "Could not load ImaNES icon :(\n"
+msgstr ""
+
+#: src/screen.c:123
+#, c-format
+msgid "Error while setting video mode: %s\n"
+msgstr ""
+
+#: src/screenshot.c:108
+#, c-format
+msgid "Couldn't save screenshot\n"
+msgstr ""
+
+#: src/screenshot.c:141
+msgid "Error while saving snapshot"
+msgstr ""
+
+#: src/screenshot.c:147
+#, c-format
+msgid "Saved screenshot at '%s'\n"
+msgstr ""
+
+#: src/sram.c:44 src/sram.c:95 src/states.c:81
+#, c-format
+msgid "Error while opening '%s': "
+msgstr ""
+
+#: src/sram.c:52
+#, c-format
+msgid "Couldn't dump SRAM data to '%s': "
+msgstr ""
+
+#: src/sram.c:69
+#, fuzzy, c-format
+msgid "Loading SRAM... "
+msgstr "Cargando la SRAM..."
+
+#: src/sram.c:73
+#, c-format
+msgid "Couldn't load SRAM because saves direcory cannot be accessed\n"
+msgstr "No se pudo cargar la SRAM porque el directorio de guardado no se pudo acceder\n"
+
+#: src/sram.c:88
+#, c-format
+msgid "SRAM disabled, not loading anything\n"
+msgstr "SRAM deshabilitada, no se cargará nada\n"
+
+#: src/sram.c:103
+#, c-format
+msgid "File '%s' is not a valid SRAM dump file, SRAM not loaded.\n"
+msgstr "El archivo '%s' no es un archivo de SRAM válido, la SRAM no se cargó.\n"
+
+#: src/states.c:76
+#, c-format
+msgid "Cannot load state %d because it doesn't exist\n"
+msgstr "No se pudo cargar el estado %d porque no existe\n"
+
+#: src/states.c:91
+#, c-format
+msgid "File '%s' is not a valid state file\n"
+msgstr "El archivo '%s' no es un archivo de estado válido\n"
+
+#: src/states.c:152
+#, c-format
+msgid "Loaded state %d\n"
+msgstr "Estado %d cargado\n"
+
+#: src/states.c:169
+#, c-format
+msgid "Couldn't save state: cannot reach states dir\n"
+msgstr "No se pudo guardar el estado: no se pudo encontrar el directorio de estados\n"
+
+#: src/states.c:261
+msgid "Error while saving state to file"
+msgstr "Error al guardar archivo de estado"
+
+#: src/states.c:272
+#, c-format
+msgid "Saved state %d\n"
+msgstr "Estado %d guardado"
+
+#: src/unrom.c:50
+#, c-format
+msgid "Performing bank switching: Switching to bank %d of ROM\n"
+msgstr ""

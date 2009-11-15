@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "debug.h"
+#include "i18n.h"
 #include "mapper.h"
 #include "nrom.h"
 #include "ppu.h"
@@ -57,7 +58,7 @@ void nrom_reset()
 
 	/* Dump the VROM into the PPU VRAM area */
 	if( mapper->file->vromBanks == 1 ) {
-		INFO( printf("Copying VROM to VRAM\n") );
+		INFO( printf(_("Copying VROM to VRAM\n")) );
 		memcpy( PPU->VRAM , mapper->file->vrom, 0x2000);
 	}
 
