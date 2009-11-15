@@ -6,6 +6,8 @@ General:
  * [DONE] Screenshot support
  * [TO FIX] Internal state saving
  * [DONE] SRAM saving
+ * [v0.2] Add audio support
+ * [v0.2] Add internationalization (i18n)
 
 CPU:
 ====

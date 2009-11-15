@@ -1,0 +1,42 @@
+ImaNES default keys
+===================
+
+ImaNES includes several functionalities within it, which are reachable through different keys on the keyboard. This is the list of the default keys and their bindings. In future versions, the user will be allowed to change these keys and customize it to his/her favorite flavor
+
+
+
+--------------------------------------------------------------------------|
+|   Category    |  Keyboard   |   Function                                |
+--------------------------------------------------------------------------|
+|               |  F1         | Take a screenshot of current screen       |
+|               |  F2         | Save the current state                    |
+|    General    |  F3         | Select current state                      |
+|               |  F4         | Reload the current state                  |
+|               |  F5         | Reset the NES emulation                   |
+|               |  F6         | Toggle show/hide fps in window title      |
+|               |  ESC        | Toggle pause/resume emulation             |
+|               |  BACKSPACE  | Run as fast as possible                   |
+--------------------------------------------------------------------------|
+|               |  1          | Toggle show/hide screen background layer  |
+|    Layers     |  2          | Toggle show/hide background sprites layer |
+|               |  3          | Toggle show/hide background layer         |
+|               |  4          | Toggle show/hide front sprites layer      |
+--------------------------------------------------------------------------|
+|               |  k, K       | A                                         |
+|               |  j, J       | B                                         |
+|               |  ENTER      | Start                                     |
+|  1st player   |  Right CTRL | Select                                    |
+|  Controller   |  w, W       | Up                                        |
+|               |  s, S       | Down                                      |
+|               |  a, A       | Left                                      |
+|               |  d, D       | Right                                     |
+--------------------------------------------------------------------------|
+|               |  n, N       | A                                         |
+|               |  m, M       | B                                         |
+|               |  Left SHIFT | Start                                     |
+|  2nd player   |  Right CTRL | Select                                    |
+|  Controller   |  UP         | Up                                        |
+|               |  DOWN       | Down                                      |
+|               |  LEFT       | Left                                      |
+|               |  RIGHT      | Right                                     |
+--------------------------------------------------------------------------|
