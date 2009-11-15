@@ -163,27 +163,28 @@ void nes_keydown(SDL_keysym keysym) {
 		/*****************/
 		/* ImaNES layers */
 		/*****************/
-		/* Show background */
+		/* Show screen background */
 		case SDLK_1:
+			INFO( printf(_("Screen background %s\n"), (config.show_screen_bg ? "OFF" : "ON")) );
+			config.show_screen_bg = ( !config.show_screen_bg );
+			break;
+
+		/* Show back sprites */
+		case SDLK_2:
+			INFO( printf(_("Back sprites %s\n"), (config.show_back_spr ? "OFF": "ON")) );
+			config.show_back_spr = ( !config.show_back_spr );
+			break;
+
+		/* Show background */
+		case SDLK_3:
 			INFO( printf(_("Background %s\n"), (config.show_bg  ? "OFF" : "ON")) );
 			config.show_bg  = ( !config.show_bg );
 			break;
 
 		/* Show front sprites */
-		case SDLK_2:
+		case SDLK_4:
 			INFO( printf(_("Front sprites %s\n"), (config.show_front_spr ? "OFF": "ON")) );
 			config.show_front_spr = ( !config.show_front_spr );
-			break;
-
-		/* Show front sprites */
-		case SDLK_3:
-			INFO( printf(_("Back sprites %s\n"), (config.show_back_spr ? "OFF": "ON")) );
-			config.show_back_spr = ( !config.show_back_spr );
-			break;
-
-		case SDLK_4:
-			INFO( printf(_("Screen background %s\n"), (config.show_screen_bg ? "OFF" : "ON")) );
-			config.show_screen_bg = ( !config.show_screen_bg );
 			break;
 
 		/******************/
