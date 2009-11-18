@@ -30,12 +30,12 @@ msgstr ""
 #: src/cpu.c:636
 #, c-format
 msgid "%s: Still unimplemented\n"
-msgstr ""
+msgstr "%s: Todavía sin implementar"
 
 #: src/cpu.c:663
 #, c-format
 msgid "PPU: Write to PPU[%d]=$%02X PC=%04X\n"
-msgstr ""
+msgstr "PPU: Escribir en PPU[%d]=$%02X PC=%04X\n"
 
 #: src/cpu.c:668 src/cpu.c:674 src/cpu.c:843
 #, c-format
@@ -45,7 +45,7 @@ msgstr ""
 #: src/cpu.c:682
 #, c-format
 msgid "Write to %04x not allowed\n"
-msgstr ""
+msgstr "Escritura en %04x no permitida\n"
 
 #: src/cpu.c:837
 #, c-format
@@ -55,52 +55,53 @@ msgstr ""
 #: src/cpu.c:955
 #, c-format
 msgid "Returning %02x from %04x\n"
-msgstr ""
+msgstr "Retornando %02x desde %04x\n"
 
 #: src/cpu.c:980
 #, c-format
 msgid "Executing NMI!\n"
-msgstr ""
+msgstr "¡Ejecutando NMI!\n"
 
 #: src/gui.c:96 src/screen.c:57
 #, c-format
 msgid "Quiting ImaNES\n"
-msgstr ""
+msgstr "Saliendo de ImaNES\n"
 
 #: src/gui.c:143 src/screen.c:177
 #, c-format
 msgid "Couldn't refresh screen :(\n"
-msgstr ""
+msgstr "No se pudo actualizar la pantalla :(\n"
 
 #: src/gui.c:144 src/screen.c:178
 #, c-format
 msgid "I'm exiting now\n"
-msgstr ""
+msgstr "Ahora estoy saliendo\n"
 
 #: src/imaconfig.c:75
 #, c-format
 msgid "Couldn't find user's configuration\n"
-msgstr ""
+msgstr "No se pudo encontrar la configuración del usuario\n"
 
 #: src/imaconfig.c:95
 #, c-format
 msgid "Directory '%s' not found, creating it...\n"
-msgstr ""
+msgstr "No se encontró el directorio '%s', creándolo..."
 
 #: src/imaconfig.c:99
 #, c-format
 msgid "Error while creating directory '%s': "
-msgstr ""
+msgstr "Error al crear el directorio '%s': "
 
 #: src/imaconfig.c:121
 #, c-format
 msgid "Couldn't find user's home directory. Will not load user configuration\n"
-msgstr ""
+msgstr "No se pudo encontrar el directorio del usuario."
+"No se cargará la configuración de usuario\n"
 
 #: src/instruction_set.c:552
 #, c-format
 msgid "Hey!!! You haven't written the %d addressing mode!!!\n"
-msgstr ""
+msgstr "¡Hey! ¡No has escrito el modo de direccionamiento %d!"
 
 #: src/loop.c:43
 #, c-format
@@ -114,16 +115,19 @@ msgid ""
 "\n"
 "Undocumented instruction: %02x\n"
 msgstr ""
+"\n"
+"\n"
+"Instrucción no documentada: %02x\n"
 
 #: src/loop.c:124
 #, c-format
 msgid "I'm exiting now... sorry :(\n"
-msgstr ""
+msgstr "Ahora estoy saliendo... perdón :(\n"
 
 #: src/loop.c:125
 #, c-format
 msgid "Close the window when finished\n"
-msgstr ""
+msgstr "Cierra la ventana cuando termines\n""
 
 #: src/main.c:49
 #, c-format
@@ -254,7 +258,7 @@ msgstr "Â¡listo!\n"
 #: src/mapper.c:60
 #, c-format
 msgid "<no registers>\n"
-msgstr ""
+msgstr "<ningún registro>\n"
 
 #: src/mmc1.c:79
 #, c-format
@@ -426,7 +430,7 @@ msgstr ""
 #: src/parse_file.c:132 src/parse_file.c:141
 #, c-format
 msgid "Error: %s is not a valid NES ROM\n"
-msgstr ""
+msgstr "Error: %s no es un ROM NES válido\n"
 
 #: src/parse_file.c:83
 #, c-format
@@ -509,7 +513,7 @@ msgstr ""
 #: src/screen.c:114
 #, c-format
 msgid "Could not load ImaNES icon :(\n"
-msgstr ""
+msgstr "No se pudo cargar el ícono de ImaNES :(\n"
 
 #: src/screen.c:123
 #, c-format
@@ -519,21 +523,21 @@ msgstr ""
 #: src/screenshot.c:108
 #, c-format
 msgid "Couldn't save screenshot\n"
-msgstr ""
+msgstr "No se pudo guardar la captura de pantalla\n"
 
 #: src/screenshot.c:141
 msgid "Error while saving snapshot"
-msgstr ""
+msgstr "Error al guardar el pantallazo"
 
 #: src/screenshot.c:147
 #, c-format
 msgid "Saved screenshot at '%s'\n"
-msgstr ""
+msgstr "Captura de pantalla guardada en '%s'\n"
 
 #: src/sram.c:44 src/sram.c:95 src/states.c:81
 #, c-format
 msgid "Error while opening '%s': "
-msgstr ""
+msgstr "Error al abrir '%s': "
 
 #: src/sram.c:52
 #, c-format
