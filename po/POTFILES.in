@@ -15,6 +15,7 @@ src/nrom.c
 src/pad.c
 src/palette.c
 src/parse_file.c
+src/playback.c
 src/ppu.c
 src/screen.c
 src/screenshot.c

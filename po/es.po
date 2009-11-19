@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes 0.1\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-18 10:12+0100\n"
+"POT-Creation-Date: 2009-11-19 17:49+0100\n"
 "PO-Revision-Date: 2009-11-13 21:09+0100\n"
 "Last-Translator: Rodrigo Tobar Carrizo <rtobar@csrg.inf.utfsm.cl>\n"
 "Language-Team: Spanish\n"
@@ -16,11 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: src/apu.c:60
-#, c-format
-msgid "Cannot initialize audio: %s\n"
-msgstr "No se puede iniciar el audio: %s\n"
 
 #: src/cnrom.c:51
 #, c-format
@@ -130,7 +125,7 @@ msgstr "Ahora estoy saliendo... perdón :(\n"
 msgid "Close the window when finished\n"
 msgstr "Cierra la ventana cuando termines\n"
 
-#: src/main.c:49
+#: src/main.c:50
 #, c-format
 msgid ""
 "\n"
@@ -141,12 +136,12 @@ msgstr ""
 "%s: I'm a NES (Soy un NES)\n"
 "\n"
 
-#: src/main.c:50
+#: src/main.c:51
 #, c-format
 msgid "This program is licensed under the GPLv3 license.\n"
 msgstr "Este programa estÃ¡ licenciado bajo la licencia GPLv3.\n"
 
-#: src/main.c:51
+#: src/main.c:52
 #, c-format
 msgid ""
 "For bug reports, please refer to %s\n"
@@ -155,7 +150,7 @@ msgstr ""
 "Para reporte de fallos, por favor dirÃ­jase a %s\n"
 "\n"
 
-#: src/main.c:52
+#: src/main.c:53
 #, c-format
 msgid ""
 "Usage: %s [options] <rom file>\n"
@@ -164,23 +159,23 @@ msgstr ""
 "Uso: %s [opciones] <archivo rom>\n"
 "\n"
 
-#: src/main.c:53
+#: src/main.c:54
 #, c-format
 msgid "Options:\n"
 msgstr "Opciones:\n"
 
-#: src/main.c:54
+#: src/main.c:55
 #, c-format
 msgid "  -v        Increase verbosity. More -v, more verbose. Default: 0\n"
 msgstr ""
 "  -v        Incrementa la verbosidad. MÃ¡s -v, mÃ¡s verboso. Por defecto: 0\n"
 
-#: src/main.c:55
+#: src/main.c:56
 #, c-format
 msgid "  -s <n>    Video scaling factor. Default: 1\n"
 msgstr "  -s <n>    Factor de escalamiento del video. Por defecto: 1\n"
 
-#: src/main.c:56
+#: src/main.c:57
 #, c-format
 msgid ""
 "  -c        Use SDL color construction. Default: no\n"
@@ -189,12 +184,12 @@ msgstr ""
 "  -c        Usar contrucciÃ³n de colores de SDL. Por defecto: no\n"
 "\n"
 
-#: src/main.c:57
+#: src/main.c:58
 #, c-format
 msgid "  -h,-?     Show this help and exit\n"
 msgstr "  -h,-?     Muestra esta ayuda y finaliza\n"
 
-#: src/main.c:58
+#: src/main.c:59
 #, c-format
 msgid ""
 "  -V        Show the current version of ImaNES and exit\n"
@@ -203,7 +198,7 @@ msgstr ""
 "  -V        Muestra la versiÃ³n actual de ImaNES y finaliza\n"
 "\n"
 
-#: src/main.c:59 src/main.c:67
+#: src/main.c:60 src/main.c:68
 #, c-format
 msgid ""
 "ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm."
@@ -212,12 +207,12 @@ msgstr ""
 "El desarrollo de ImaNES es mantenido por Rodrigo tobar <rtobar@csrg.inf."
 "utfsm.cl>\n"
 
-#: src/main.c:60 src/main.c:68
+#: src/main.c:61 src/main.c:69
 #, c-format
 msgid "Please refer to the AUTHORS file for more details\n"
 msgstr "Por favor refiÃ©rase al archivo AUTHORS para mÃ¡s detalles\n"
 
-#: src/main.c:65
+#: src/main.c:66
 #, c-format
 msgid ""
 "\n"
@@ -226,7 +221,7 @@ msgstr ""
 "\n"
 "%s versiÃ³n %s\n"
 
-#: src/main.c:66
+#: src/main.c:67
 #, c-format
 msgid ""
 "The current version of %s was compiled on %s, %s\n"
@@ -235,23 +230,23 @@ msgstr ""
 "La versiÃ³n actual de %s fue compilada el %s, %s\n"
 "\n"
 
-#: src/main.c:88
+#: src/main.c:89
 #, c-format
 msgid "Error: invalid video scale factor. Must be an integer value\n"
 msgstr ""
 "Error: Factor de escalamiento de video invÃ¡lido. Debe ser un valor entero\n"
 
-#: src/main.c:119
+#: src/main.c:120
 #, c-format
 msgid "%s: Error: Expected ROM file, none given\n"
 msgstr "%s: Error: Se esperaba un archivo ROM, no se indicÃ³ ninguno\n"
 
-#: src/main.c:173
+#: src/main.c:175
 #, c-format
 msgid "Saving SRAM... "
 msgstr "Salvando la SRAM..."
 
-#: src/main.c:176 src/sram.c:109
+#: src/main.c:178 src/sram.c:109
 #, c-format
 msgid "done!\n"
 msgstr "Â¡listo!\n"
@@ -487,6 +482,11 @@ msgstr ""
 #, c-format
 msgid "Error: malformed file (VROM not complete)\n"
 msgstr ""
+
+#: src/playback.c:43
+#, c-format
+msgid "Cannot initialize audio: %s\n"
+msgstr "No se puede iniciar el audio: %s\n"
 
 #: src/ppu.c:379
 #, c-format

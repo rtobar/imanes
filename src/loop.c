@@ -69,7 +69,7 @@ int main_loop(void *args) {
 	/* Get the initial time for the first screen drawing */
 	start_timing();
 
-	apu_pause(0);
+	playback_pause(0);
 	execute_reset();
 
 	/* This is the main loop */
@@ -80,10 +80,10 @@ int main_loop(void *args) {
 		 * We do so until the pause has been released by the user
 		 * We also check if the user wants to quit the emulation */
 		if( config.pause && run_loop ) {
-			apu_pause(1);
+			playback_pause(1);
 			gui_set_background();
 			gui_loop();
-			apu_pause(0);
+			playback_pause(0);
 		}
 		if( !run_loop )
 			return 0;

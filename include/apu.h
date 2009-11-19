@@ -1,7 +1,6 @@
 #ifndef apu_h
 #define apu_h
 
-#include <SDL/SDL.h>
 #include <stdint.h>
 
 /* Flags for the 0x4015 register */
@@ -79,16 +78,6 @@ void clock_envelopes_tlc();
  * Clocks all linear counters and sweep units
  */
 void clock_lc_sweep();
-
-/**
- * Callback function for filling the audio buffer (SDL specific)
- */
-void apu_fill_buffer(void *userdata, Uint8 *stream, int len);
-
-/**
- * Pauses/resumes the playback of audio throught the APU
- */
-void apu_pause(int pause_on);
 
 /**
  * Frees all the resources used by the APU 

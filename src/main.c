@@ -41,6 +41,7 @@
 #include "pad.h"
 #include "palette.h"
 #include "parse_file.h"
+#include "playback.h"
 #include "ppu.h"
 #include "screen.h"
 #include "sram.h"
@@ -151,6 +152,7 @@ int main(int args, char *argv[]) {
 	initialize_configuration();
 	initialize_palette();
 	initialize_instruction_set();
+	initialize_playback();
 	initialize_apu();
 	initialize_cpu();
 	initialize_ppu();
@@ -182,6 +184,7 @@ int main(int args, char *argv[]) {
 	end_ppu();
 	end_cpu();
 	end_apu();
+	end_playback();
 	free_ines_file(nes_rom);
 
 	return 0;
