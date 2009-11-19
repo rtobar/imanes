@@ -36,7 +36,7 @@ imanes_SOURCES = \
      $(top_srcdir)/include/frame_control.h \
      $(top_srcdir)/include/gui.h \
      $(top_srcdir)/include/imaconfig.h \
-     $(top_srcdir)/i18n.h \
+     $(top_srcdir)/include/i18n.h \
      $(top_srcdir)/include/instruction_set.h \
      $(top_srcdir)/include/loop.h \
      $(top_srcdir)/include/mapper.h \
