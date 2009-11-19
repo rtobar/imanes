@@ -19,8 +19,8 @@ imanes_SOURCES = \
      pad.c \
      palette.c \
      parse_file.c \
-     playback.c \
      platform.c \
+     playback.c \
      ppu.c \
      screen.c \
      screenshot.c \
@@ -46,8 +46,8 @@ imanes_SOURCES = \
      $(top_srcdir)/include/pad.h \
      $(top_srcdir)/include/palette.h \
      $(top_srcdir)/include/parse_file.h \
-     $(top_srcdir)/include/playback.h \
      $(top_srcdir)/include/platform.h \
+     $(top_srcdir)/include/playback.h \
      $(top_srcdir)/include/ppu.h \
      $(top_srcdir)/include/screen.h \
      $(top_srcdir)/include/screenshot.h \

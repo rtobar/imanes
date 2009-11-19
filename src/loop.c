@@ -32,6 +32,7 @@
 #include "instruction_set.h"
 #include "loop.h"
 #include "mapper.h"
+#include "playback.h"
 #include "ppu.h"
 #include "screen.h"
 #include "states.h"
