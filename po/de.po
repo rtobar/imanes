@@ -233,7 +233,7 @@ msgstr ""
 #: src/main.c:178 src/sram.c:109
 #, c-format
 msgid "done!\n"
-msgstr "fertig!\n"
+msgstr "Fertig!\n"
 
 #: src/mapper.c:60
 #, c-format
@@ -547,27 +547,27 @@ msgstr ""
 #: src/sram.c:103
 #, c-format
 msgid "File '%s' is not a valid SRAM dump file, SRAM not loaded.\n"
-msgstr ""
+msgstr "Datei '%s' ist keine gueltige SRAM Datei, SRAM wurde nicht geladen.\n"
 
 #: src/states.c:76
 #, c-format
 msgid "Cannot load state %d because it doesn't exist\n"
-msgstr ""
+msgstr "Zustand %d konnte nich geladen werden, weil er nicht existiert\n"
 
 #: src/states.c:91
 #, c-format
 msgid "File '%s' is not a valid state file\n"
-msgstr ""
+msgstr "Datei '%s' ist keine gueltige Zustanddatei\n"
 
 #: src/states.c:152
 #, c-format
 msgid "Loaded state %d\n"
-msgstr ""
+msgstr "Zustand %d ist geladet\n"
 
 #: src/states.c:169
 #, c-format
 msgid "Couldn't save state: cannot reach states dir\n"
-msgstr ""
+msgstr "Zustand konnte nicht gespeichert werden: \n"
 
 #: src/states.c:261
 msgid "Error while saving state to file"
@@ -576,7 +576,7 @@ msgstr ""
 #: src/states.c:272
 #, c-format
 msgid "Saved state %d\n"
-msgstr ""
+msgstr "Zustand %d wurde gespeichert\n"
 
 #: src/unrom.c:50
 #, c-format
