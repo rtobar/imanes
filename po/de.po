@@ -133,13 +133,13 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"%s: Ich bin ein NES\n"
+"%s: I'm a NES (Ich bin ein NES)\n"
 "\n"
 
 #: src/main.c:51
 #, c-format
 msgid "This program is licensed under the GPLv3 license.\n"
-msgstr ""
+msgstr "Dieses Program wurde unter die GPLv3 Lizenz gestellt.\n"
 
 #: src/main.c:52
 #, c-format
@@ -147,6 +147,8 @@ msgid ""
 "For bug reports, please refer to %s\n"
 "\n"
 msgstr ""
+"Bitte nachsehen Sie in %s, um Programmfehler zu melden.\n"
+"\n"
 
 #: src/main.c:53
 #, c-format
@@ -154,11 +156,13 @@ msgid ""
 "Usage: %s [options] <rom file>\n"
 "\n"
 msgstr ""
+"Aufruf: %s [optionen] <rom Datei>\n"
+"\n"
 
 #: src/main.c:54
 #, c-format
 msgid "Options:\n"
-msgstr ""
+msgstr "Optionen:\n"
 
 #: src/main.c:55
 #, c-format
@@ -188,6 +192,8 @@ msgid ""
 "  -V        Show the current version of ImaNES and exit\n"
 "\n"
 msgstr ""
+"  -V        Versionsinformation von ImaNES anzeigen und beenden\n"
+"\n"
 
 #: src/main.c:60 src/main.c:68
 #, c-format
@@ -195,11 +201,13 @@ msgid ""
 "ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm."
 "cl>\n"
 msgstr ""
+"Die Entwicklung von ImaNES wird von Rodrigo Tobar <rtobar@csrg.inf.utfsm.cl> "
+"instand halten.\n"
 
 #: src/main.c:61 src/main.c:69
 #, c-format
 msgid "Please refer to the AUTHORS file for more details\n"
-msgstr ""
+msgstr "Bitte nachsehen Sie in der AUTHORS Datei fuer mehr Details\n"
 
 #: src/main.c:66
 #, c-format
@@ -207,6 +215,8 @@ msgid ""
 "\n"
 "%s version %s\n"
 msgstr ""
+"\n"
+"%s Version %s\n"
 
 #: src/main.c:67
 #, c-format
@@ -346,7 +356,7 @@ msgstr ""
 #: src/pad.c:45
 #, c-format
 msgid "Pad %d. Pressed button: "
-msgstr ""
+msgstr "Gamepad %d. Gedrueckte Taste: "
 
 #: src/pad.c:168
 #, c-format
@@ -405,6 +415,8 @@ msgstr ""
 #, c-format
 msgid "Error: %s is not a valid NES ROM, incompatible header information\n"
 msgstr ""
+"Fehler: %s ist keines gueltiges NES ROM, inkompatibeler "
+"Dateianfangskennsatz\n"
 
 #: src/parse_file.c:73 src/parse_file.c:79 src/parse_file.c:91
 #: src/parse_file.c:132 src/parse_file.c:141
