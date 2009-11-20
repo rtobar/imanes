@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes git\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-19 14:33-0300\n"
+"POT-Creation-Date: 2009-11-20 10:11+0100\n"
 "PO-Revision-Date: 2009-11-18 13:00-0300\n"
 "Last-Translator: Roberto Bonvallet <rbonvall@gmail.com>\n"
 "Language-Team: German\n"
@@ -32,7 +32,7 @@ msgstr ""
 msgid "PPU: Write to PPU[%d]=$%02X PC=%04X\n"
 msgstr ""
 
-#: src/cpu.c:668 src/cpu.c:674 src/cpu.c:843
+#: src/cpu.c:668 src/cpu.c:674 src/cpu.c:837 src/cpu.c:843
 #, c-format
 msgid "CPU Address mirroring: from %04x to "
 msgstr ""
@@ -40,11 +40,6 @@ msgstr ""
 #: src/cpu.c:682
 #, c-format
 msgid "Write to %04x not allowed\n"
-msgstr ""
-
-#: src/cpu.c:837
-#, c-format
-msgid "CPU Adress mirroring: from %04x to "
 msgstr ""
 
 #: src/cpu.c:955
