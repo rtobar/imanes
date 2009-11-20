@@ -7,7 +7,9 @@ General:
  * [TO FIX] Internal state saving
  * [DONE] SRAM saving
  * [v0.2] Add audio support
- * [v0.2] Add internationalization (i18n)
+ * [DONE] Add internationalization (i18n)
+   * [v0.2] Finish spanish translation
+   * [v0.2] Finish german translation
 
 CPU:
 ====
