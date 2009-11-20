@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes git\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-20 10:11+0100\n"
+"POT-Creation-Date: 2009-11-20 11:12-0300\n"
 "PO-Revision-Date: 2009-11-18 13:00-0300\n"
 "Last-Translator: Roberto Bonvallet <rbonvall@gmail.com>\n"
 "Language-Team: German\n"
@@ -320,7 +320,7 @@ msgstr ""
 
 #: src/mmc3.c:252
 #, c-format
-msgid "MMC3: Reseting counter to 0\n"
+msgid "MMC3: Resetting counter to 0\n"
 msgstr ""
 
 #: src/mmc3.c:306
@@ -375,7 +375,7 @@ msgstr ""
 
 #: src/pad.c:219
 #, c-format
-msgid "Reseting NES\n"
+msgid "Resetting NES\n"
 msgstr ""
 
 #: src/pad.c:224

@@ -216,7 +216,7 @@ void nes_keydown(SDL_keysym keysym) {
 
 		/* Reset */
 		case SDLK_F5:
-			INFO( printf(_("Reseting NES\n")) );
+			INFO( printf(_("Resetting NES\n")) );
 			CPU->reset = 1;
 			break;
 

@@ -249,7 +249,7 @@ void mmc3_switch_banks() {
 			break;
 
 		case ResetIRQ:
-			DEBUG( printf(_("MMC3: Reseting counter to 0\n")) );
+			DEBUG( printf(_("MMC3: Resetting counter to 0\n")) );
 			irq_counter = 0;
 			zero_written = 0;
 			irq_triggered = 0;
