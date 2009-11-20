@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes 0.1\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-20 11:12-0300\n"
+"POT-Creation-Date: 2009-11-20 15:45-0300\n"
 "PO-Revision-Date: 2009-11-13 21:09+0100\n"
 "Last-Translator: Rodrigo Tobar Carrizo <rtobar@csrg.inf.utfsm.cl>\n"
 "Language-Team: Spanish\n"
@@ -416,6 +416,7 @@ msgstr ""
 #, c-format
 msgid "Error: %s is not a valid NES ROM, incompatible header information\n"
 msgstr ""
+"Error: %s no es un ROM NES válido, información de cabecera incompatible\n"
 
 #: src/parse_file.c:73 src/parse_file.c:79 src/parse_file.c:91
 #: src/parse_file.c:132 src/parse_file.c:141
@@ -436,15 +437,15 @@ msgstr ""
 #: src/parse_file.c:105
 #, c-format
 msgid "SRAM is %s\n"
-msgstr ""
+msgstr "La SRAM está %s\n"
 
 #: src/parse_file.c:105
 msgid "enabled"
-msgstr ""
+msgstr "activada"
 
 #: src/parse_file.c:105
 msgid "disabled"
-msgstr ""
+msgstr "desactivada"
 
 #: src/parse_file.c:116
 #, c-format
@@ -462,6 +463,8 @@ msgid ""
 "I'm exiting now.\n"
 "\n"
 msgstr ""
+"Me voy yendo.\n"
+"\n"
 
 #: src/parse_file.c:138
 #, c-format
@@ -471,12 +474,12 @@ msgstr ""
 #: src/parse_file.c:162
 #, c-format
 msgid "Error: malformed file (ROM not complete)\n"
-msgstr ""
+msgstr "Error: archivo malformado (ROM incompleto)\n"
 
 #: src/parse_file.c:170
 #, c-format
 msgid "Error: malformed file (VROM not complete)\n"
-msgstr ""
+msgstr "Error: archivo malformado (VROM incompleto)\n"
 
 #: src/playback.c:43
 #, c-format
@@ -504,7 +507,7 @@ msgstr ""
 #: src/screen.c:107
 #, c-format
 msgid "Error when initializing screen: %s\n"
-msgstr ""
+msgstr "Error al iniciar la pantalla: %s\n"
 
 #: src/screen.c:114
 #, c-format
@@ -514,7 +517,7 @@ msgstr "No se pudo cargar el ícono de ImaNES :(\n"
 #: src/screen.c:123
 #, c-format
 msgid "Error while setting video mode: %s\n"
-msgstr ""
+msgstr "Error al establecer el modo de video: %s\n"
 
 #: src/screenshot.c:108
 #, c-format
@@ -538,7 +541,7 @@ msgstr "Error al abrir '%s': "
 #: src/sram.c:52
 #, c-format
 msgid "Couldn't dump SRAM data to '%s': "
-msgstr ""
+msgstr "No se pudo volcar los datos de la SRAM a '%s': "
 
 #: src/sram.c:69
 #, c-format
@@ -596,4 +599,4 @@ msgstr "Estado %d guardado\n"
 #: src/unrom.c:50
 #, c-format
 msgid "Performing bank switching: Switching to bank %d of ROM\n"
-msgstr ""
+msgstr "Realizando cambio de banco: cambiando al banco %d del ROM\n"
