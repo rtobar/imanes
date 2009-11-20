@@ -834,7 +834,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 
 	/* Convert the address to handle mirroring */
 	if( 0x0800 <= address && address < 0x2000 ) {
-		DEBUG( printf(_("CPU Adress mirroring: from %04x to "), address) );
+		DEBUG( printf(_("CPU Address mirroring: from %04x to "), address) );
 		address &= 0x7FF;
 		DEBUG( printf("%04x\n",address) );
 	}

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes 0.1\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-19 17:49+0100\n"
+"POT-Creation-Date: 2009-11-20 10:11+0100\n"
 "PO-Revision-Date: 2009-11-13 21:09+0100\n"
 "Last-Translator: Rodrigo Tobar Carrizo <rtobar@csrg.inf.utfsm.cl>\n"
 "Language-Team: Spanish\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: src/cnrom.c:51
 #, c-format
 msgid "Performing switch to bank %d of VROM\n"
-msgstr ""
+msgstr "Realizando cambio al banco %d de la VROM\n"
 
 #: src/cpu.c:636
 #, c-format
@@ -30,9 +30,9 @@ msgstr "%s: Todavía sin implementar\n"
 #: src/cpu.c:663
 #, c-format
 msgid "PPU: Write to PPU[%d]=$%02X PC=%04X\n"
-msgstr "PPU: Escribir en PPU[%d]=$%02X PC=%04X\n"
+msgstr "PPU: Escritura en PPU[%d]=$%02X PC=%04X\n"
 
-#: src/cpu.c:668 src/cpu.c:674 src/cpu.c:843
+#: src/cpu.c:668 src/cpu.c:674 src/cpu.c:837 src/cpu.c:843
 #, c-format
 msgid "CPU Address mirroring: from %04x to "
 msgstr ""
@@ -41,11 +41,6 @@ msgstr ""
 #, c-format
 msgid "Write to %04x not allowed\n"
 msgstr "Escritura en %04x no permitida\n"
-
-#: src/cpu.c:837
-#, c-format
-msgid "CPU Adress mirroring: from %04x to "
-msgstr ""
 
 #: src/cpu.c:955
 #, c-format
@@ -99,12 +94,12 @@ msgstr ""
 msgid "Hey!!! You haven't written the %d addressing mode!!!\n"
 msgstr "¡Hey! ¡No has escrito el modo de direccionamiento %d!\n"
 
-#: src/loop.c:43
+#: src/loop.c:44
 #, c-format
 msgid "Ending VBlank\n"
 msgstr ""
 
-#: src/loop.c:123
+#: src/loop.c:124
 #, c-format
 msgid ""
 "\n"
@@ -115,12 +110,12 @@ msgstr ""
 "\n"
 "Instrucción no documentada: %02x\n"
 
-#: src/loop.c:124
+#: src/loop.c:125
 #, c-format
 msgid "I'm exiting now... sorry :(\n"
 msgstr "Ahora estoy saliendo... perdón :(\n"
 
-#: src/loop.c:125
+#: src/loop.c:126
 #, c-format
 msgid "Close the window when finished\n"
 msgstr "Cierra la ventana cuando termines\n"
@@ -139,7 +134,7 @@ msgstr ""
 #: src/main.c:51
 #, c-format
 msgid "This program is licensed under the GPLv3 license.\n"
-msgstr "Este programa estÃ¡ licenciado bajo la licencia GPLv3.\n"
+msgstr "Este programa está licenciado bajo la licencia GPLv3.\n"
 
 #: src/main.c:52
 #, c-format
@@ -147,7 +142,7 @@ msgid ""
 "For bug reports, please refer to %s\n"
 "\n"
 msgstr ""
-"Para reporte de fallos, por favor dirÃ­jase a %s\n"
+"Para reporte de fallos, por favor diríjase a %s\n"
 "\n"
 
 #: src/main.c:53
@@ -168,7 +163,7 @@ msgstr "Opciones:\n"
 #, c-format
 msgid "  -v        Increase verbosity. More -v, more verbose. Default: 0\n"
 msgstr ""
-"  -v        Incrementa la verbosidad. MÃ¡s -v, mÃ¡s verboso. Por defecto: 0\n"
+"  -v        Incrementa la verbosidad. Más -v, mÃ¡s verboso. Por defecto: 0\n"
 
 #: src/main.c:56
 #, c-format
@@ -181,7 +176,7 @@ msgid ""
 "  -c        Use SDL color construction. Default: no\n"
 "\n"
 msgstr ""
-"  -c        Usar contrucciÃ³n de colores de SDL. Por defecto: no\n"
+"  -c        Usar contrucción de colores de SDL. Por defecto: no\n"
 "\n"
 
 #: src/main.c:58
@@ -195,7 +190,7 @@ msgid ""
 "  -V        Show the current version of ImaNES and exit\n"
 "\n"
 msgstr ""
-"  -V        Muestra la versiÃ³n actual de ImaNES y finaliza\n"
+"  -V        Muestra la versión actual de ImaNES y finaliza\n"
 "\n"
 
 #: src/main.c:60 src/main.c:68
@@ -204,13 +199,13 @@ msgid ""
 "ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm."
 "cl>\n"
 msgstr ""
-"El desarrollo de ImaNES es mantenido por Rodrigo tobar <rtobar@csrg.inf."
+"El desarrollo de ImaNES es mantenido por Rodrigo Tobar <rtobar@csrg.inf."
 "utfsm.cl>\n"
 
 #: src/main.c:61 src/main.c:69
 #, c-format
 msgid "Please refer to the AUTHORS file for more details\n"
-msgstr "Por favor refiÃ©rase al archivo AUTHORS para mÃ¡s detalles\n"
+msgstr "Por favor refiérase al archivo AUTHORS para más detalles\n"
 
 #: src/main.c:66
 #, c-format
@@ -219,7 +214,7 @@ msgid ""
 "%s version %s\n"
 msgstr ""
 "\n"
-"%s versiÃ³n %s\n"
+"%s versión %s\n"
 
 #: src/main.c:67
 #, c-format
@@ -227,19 +222,19 @@ msgid ""
 "The current version of %s was compiled on %s, %s\n"
 "\n"
 msgstr ""
-"La versiÃ³n actual de %s fue compilada el %s, %s\n"
+"La versión actual de %s fue compilada el %s, %s\n"
 "\n"
 
 #: src/main.c:89
 #, c-format
 msgid "Error: invalid video scale factor. Must be an integer value\n"
 msgstr ""
-"Error: Factor de escalamiento de video invÃ¡lido. Debe ser un valor entero\n"
+"Error: Factor de escalamiento de video inválido. Debe ser un valor entero\n"
 
 #: src/main.c:120
 #, c-format
 msgid "%s: Error: Expected ROM file, none given\n"
-msgstr "%s: Error: Se esperaba un archivo ROM, no se indicÃ³ ninguno\n"
+msgstr "%s: Error: Se esperaba un archivo ROM, no se indicó ninguno\n"
 
 #: src/main.c:175
 #, c-format
@@ -249,7 +244,7 @@ msgstr "Salvando la SRAM..."
 #: src/main.c:178 src/sram.c:109
 #, c-format
 msgid "done!\n"
-msgstr "Â¡listo!\n"
+msgstr "¡listo!\n"
 
 #: src/mapper.c:60
 #, c-format
@@ -566,7 +561,7 @@ msgstr "SRAM deshabilitada, no se cargarÃ¡ nada\n"
 #, c-format
 msgid "File '%s' is not a valid SRAM dump file, SRAM not loaded.\n"
 msgstr ""
-"El archivo '%s' no es un archivo de SRAM vÃ¡lido, la SRAM no se cargÃ³.\n"
+"El archivo '%s' no es un archivo de SRAM válido, la SRAM no se cargó.\n"
 
 #: src/states.c:76
 #, c-format
@@ -576,7 +571,7 @@ msgstr "No se pudo cargar el estado %d porque no existe\n"
 #: src/states.c:91
 #, c-format
 msgid "File '%s' is not a valid state file\n"
-msgstr "El archivo '%s' no es un archivo de estado vÃ¡lido\n"
+msgstr "El archivo '%s' no es un archivo de estado válido\n"
 
 #: src/states.c:152
 #, c-format
