@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes 0.1\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-20 10:11+0100\n"
+"POT-Creation-Date: 2009-11-20 10:56-0300\n"
 "PO-Revision-Date: 2009-11-13 21:09+0100\n"
 "Last-Translator: Rodrigo Tobar Carrizo <rtobar@csrg.inf.utfsm.cl>\n"
 "Language-Team: Spanish\n"
@@ -176,7 +176,7 @@ msgid ""
 "  -c        Use SDL color construction. Default: no\n"
 "\n"
 msgstr ""
-"  -c        Usar contrucción de colores de SDL. Por defecto: no\n"
+"  -c        Usar construcción de colores de SDL. Por defecto: no\n"
 "\n"
 
 #: src/main.c:58
@@ -254,22 +254,22 @@ msgstr "<ningún registro>\n"
 #: src/mmc1.c:79
 #, c-format
 msgid "MMC1: reg0: Changed from %02x to %02x\n"
-msgstr ""
+msgstr "MMC1: reg0: Cambiado de %02x a %02x\n"
 
 #: src/mmc1.c:83
 #, c-format
 msgid "MMC1: reg1: Changed from %02x to %02x\n"
-msgstr ""
+msgstr "MMC1: reg1: Cambiado de %02x a %02x\n"
 
 #: src/mmc1.c:87
 #, c-format
 msgid "MMC1: reg2: Changed from %02x to %02x\n"
-msgstr ""
+msgstr "MMC1: reg2: Cambiado de %02x a %02x\n"
 
 #: src/mmc1.c:91
 #, c-format
 msgid "MMC1: reg3: Changed from %02x to %02x\n"
-msgstr ""
+msgstr "MMC1: reg3: Cambiado de %02x a %02x\n"
 
 #: src/mmc1.c:156
 #, c-format
@@ -308,104 +308,104 @@ msgstr ""
 
 #: src/mmc3.c:224
 msgid "Enabling"
-msgstr ""
+msgstr "Activando"
 
 #: src/mmc3.c:224
 msgid "Disabling"
-msgstr ""
+msgstr "Desactivando"
 
 #: src/mmc3.c:229
 #, c-format
 msgid "SRAM switching to %s mode\n"
-msgstr ""
+msgstr "Cambiando la SRAM a modo %s\n"
 
 #: src/mmc3.c:238
 #, c-format
 msgid "MMC3: Writting %02x to 0xC000\n"
-msgstr ""
+msgstr "MMC3: Escribiendo %02x en 0xC000\n"
 
 #: src/mmc3.c:252
 #, c-format
 msgid "MMC3: Reseting counter to 0\n"
-msgstr ""
+msgstr "MMC3: Reiniciando el contador en 0\n"
 
 #: src/mmc3.c:306
 #, c-format
 msgid "MMC3: Triggering IRQ caused by 0 writing to 0xC000\n"
-msgstr ""
+msgstr "MMC3: Gatillando IRQ provocado por 0 escribiendo en 0xC000\n"
 
 #: src/mmc3.c:316
 #, c-format
 msgid "MMC3: Setting irq_counter to %u\n"
-msgstr ""
+msgstr "MMC3: Poniendo irq_counter en %u\n"
 
 #: src/mmc3.c:321
 #, c-format
 msgid "MMC3: Decrementing irq_counter. New value: %u\n"
-msgstr ""
+msgstr "MMC3: Disminuyendo irq_counter. Nuevo valor: %u\n"
 
 #: src/mmc3.c:325
 #, c-format
 msgid "MMC3: Triggering IRQ\n"
-msgstr ""
+msgstr "MMC3: Gatillando IRQ\n"
 
 #: src/nrom.c:61
 #, c-format
 msgid "Copying VROM to VRAM\n"
-msgstr ""
+msgstr "Copiando la VROM a la VRAM\n"
 
 #: src/pad.c:45
 #, c-format
 msgid "Pad %d. Pressed button: "
-msgstr ""
+msgstr "Control %d. Botón apretado: "
 
 #: src/pad.c:168
 #, c-format
 msgid "Screen background %s\n"
-msgstr ""
+msgstr "Fondo de pantalla %s\n"
 
 #: src/pad.c:174
 #, c-format
 msgid "Back sprites %s\n"
-msgstr ""
+msgstr "Sprites de fondo %s\n"
 
 #: src/pad.c:180
 #, c-format
 msgid "Background %s\n"
-msgstr ""
+msgstr "Fondo %s\n"
 
 #: src/pad.c:186
 #, c-format
 msgid "Front sprites %s\n"
-msgstr ""
+msgstr "Sprites de primer plano %s\n"
 
 #: src/pad.c:219
 #, c-format
 msgid "Reseting NES\n"
-msgstr ""
+msgstr "Reiniciando NES\n"
 
 #: src/pad.c:224
 #, c-format
 msgid "Show frames per second %s\n"
-msgstr ""
+msgstr "Mostrar frames por segundo %s\n"
 
 #: src/pad.c:231
 #, c-format
 msgid "Instructions never executed:\n"
-msgstr ""
+msgstr "Instrucciones sin ejecutar:\n"
 
 #: src/pad.c:238
 #, c-format
 msgid "%s emulation\n"
-msgstr ""
+msgstr "%s emulación\n"
 
 #: src/pad.c:238
 msgid "Resuming"
-msgstr ""
+msgstr "Reanudando"
 
 #: src/pad.c:238
 msgid "Pausing"
-msgstr ""
+msgstr "Suspendiendo"
 
 #: src/palette.c:175
 #, c-format
