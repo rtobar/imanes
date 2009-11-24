@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes git\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-20 11:12-0300\n"
+"POT-Creation-Date: 2009-11-24 11:38-0300\n"
 "PO-Revision-Date: 2009-11-18 13:00-0300\n"
 "Last-Translator: Roberto Bonvallet <rbonvall@gmail.com>\n"
 "Language-Team: German\n"
@@ -410,8 +410,7 @@ msgstr ""
 #, c-format
 msgid "Error: %s is not a valid NES ROM, incompatible header information\n"
 msgstr ""
-"Fehler: %s ist keines gültiges NES ROM, inkompatibeler "
-"Dateianfangskennsatz\n"
+"Fehler: %s ist keines gültiges NES ROM, inkompatibeler Dateianfangskennsatz\n"
 
 #: src/parse_file.c:73 src/parse_file.c:79 src/parse_file.c:91
 #: src/parse_file.c:132 src/parse_file.c:141
@@ -432,15 +431,15 @@ msgstr ""
 #: src/parse_file.c:105
 #, c-format
 msgid "SRAM is %s\n"
-msgstr ""
+msgstr "SRAM wird %s\n"
 
 #: src/parse_file.c:105
 msgid "enabled"
-msgstr ""
+msgstr "angeschaltet"
 
 #: src/parse_file.c:105
 msgid "disabled"
-msgstr ""
+msgstr "abgeschaltet"
 
 #: src/parse_file.c:116
 #, c-format
@@ -539,7 +538,7 @@ msgstr ""
 #: src/sram.c:69
 #, c-format
 msgid "Loading SRAM... "
-msgstr ""
+msgstr "SRAM wird geladen... "
 
 #: src/sram.c:73
 #, c-format
@@ -569,7 +568,7 @@ msgstr "Datei '%s' ist keine gültige Zustanddatei\n"
 #: src/states.c:152
 #, c-format
 msgid "Loaded state %d\n"
-msgstr "Zustand %d ist geladet\n"
+msgstr "Zustand %d ist geladen\n"
 
 #: src/states.c:169
 #, c-format
