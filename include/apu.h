@@ -86,11 +86,28 @@ void end_apu();
 
 
 /* Normalized output of DAC for
- * square channel 1 + square channel 2 */
+ * square channel 1 + square channel 2
+ * This is implemented as a lookup table. The index for this table
+ * will be composed by:
+ *
+ * square1 + square2
+ *
+ * Each square DAC input is 4 bits long
+ */
 float normal_square_dac_outputs[32];
 
 /* Normalized output of the DAC for the triangle channel,
- * the noise channel and the delta modulation channel */
-float normal_tnd_dmc_outputs[208];
+ * the noise channel and the delta modulation channel
+ *
+ * This is implemented as a lookup table. The index for this table
+ * will be composed by:
+ *
+ * 3*triangle + 2*noise + dmc
+ *
+ * Triangle's DAC input is 4 bits long
+ * Noise's DAC input is 4 bits long
+ * DMC DAC's input is 7 bits long
+ */
+float normal_tnd_dmc_outputs[204];
 
 #endif /* apu_h */
