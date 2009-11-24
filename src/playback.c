@@ -49,7 +49,7 @@ void initialize_playback() {
 
 void playback_fill_sound_buffer(void *userdata, Uint8 *stream, int len) {
 
-	printf("Entering to the callback function :)\n");
+	/* printf("Entering to the callback function :)\n"); */
 }
 
 void playback_pause(int pause_on) {

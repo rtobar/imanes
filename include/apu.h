@@ -84,4 +84,13 @@ void clock_lc_sweep();
  */
 void end_apu();
 
+
+/* Normalized output of DAC for
+ * square channel 1 + square channel 2 */
+float normal_square_dac_outputs[32];
+
+/* Normalized output of the DAC for the triangle channel,
+ * the noise channel and the delta modulation channel */
+float normal_tnd_dmc_outputs[208];
+
 #endif /* apu_h */
