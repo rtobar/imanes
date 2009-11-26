@@ -293,7 +293,7 @@ void dump_apu() {
 	return;
 }
 
-void clock_apu_sequencer() {
+void clock_frame_sequencer() {
 
 	/* Reset the clock timeout depending on the sequencer mode */
 	APU->frame_seq.clock_timeout += ( (APU->commons & STEP_MODE5) ?
@@ -385,6 +385,23 @@ void clock_envelopes_tlc() {
 
 void clock_lc_sweep() {
 
+}
+
+void clock_triangle_timer() {
+	APU->triangle.clock_timeout += 1000;
+}
+
+void clock_square_timer(int square_channel) {
+	APU->square1.clock_timeout += 1000;
+	APU->square2.clock_timeout += 1000;
+}
+
+void clock_noise_timer() {
+	APU->noise.clock_timeout += 1000;
+}
+
+void clock_dmc_timer() {
+	APU->dmc.clock_timeout += 1000;
 }
 
 void end_apu() {

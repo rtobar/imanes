@@ -18,6 +18,11 @@
 #define PPUCYCLES_STEP4  (27919) /* 27919.375 */
 #define PPUCYCLES_STEP5  (22336) /* 22335.5 */
 
+/**
+ * The emulation of the APU is mostly based on the apu_ref.txt document,
+ * available at http://nesdev.parodius.com/apu_ref.txt
+ */
+
 /* Frame Sequencer structure */
 typedef struct _frame_seq {
 
@@ -26,6 +31,67 @@ typedef struct _frame_seq {
 	int8_t int_flag;    /* Internal interrupt flag */
 
 } nes_frame_seq;
+
+/* Triangle channel */
+typedef struct _triangle_channel {
+
+	/* Timer stuff */
+	int clock_timeout;
+	unsigned int period;
+
+	/* Linear Counter stuff */
+
+	/* Lenght Counter stuff */
+
+	/* The sequencer of the triangle channel doesn't need
+	 * a representation here, since it always outputs the
+	 * same sequence of numbers. This is emulated in the
+	 * actual implementation of the channel's behavior
+	 */
+
+} nes_triangle_channel;
+
+typedef struct _square_channel {
+
+	/* Timer stuff */
+	int clock_timeout;
+	unsigned int period;
+
+	/* Sweep Unit stuff */
+
+	/* Sequencer stuff (needed?) */
+
+	/* Lenght Counter stuff */
+
+} nes_square_channel;
+
+typedef struct _noise_channel {
+
+	/* Timer stuff */
+	int clock_timeout;
+	unsigned int period;
+
+	/* Random (needed?) */
+
+	/* Lenght Counter stuff */
+
+} nes_noise_channel;
+
+typedef struct _delta_modulation_channel {
+
+	/* Timer stuff */
+	int clock_timeout;
+	unsigned int period;
+
+	/* DMA Reader stuff (needed?) */
+
+	/* Buffer stuff */
+
+	/* Output stuff (needed?) */
+
+	/* Counter stuff */
+
+} nes_delta_modulation_channel;
 
 /* APU final structure */
 typedef struct _apu {
@@ -37,6 +103,18 @@ typedef struct _apu {
 	/* Frame sequencer */
 	nes_frame_seq frame_seq;
 
+	/* Triangle channel */
+	nes_triangle_channel triangle;
+
+	/* Square channels */
+	nes_square_channel square1;
+	nes_square_channel square2;
+
+	/* Noise channel */
+	nes_noise_channel noise;
+
+	/* DMC */
+	nes_delta_modulation_channel dmc;
 } nes_apu;
 
 extern nes_apu *APU;
@@ -65,8 +143,28 @@ void dump_apu();
  *
  * This method is called from the main loop of the emulation
  */
-void clock_apu_sequencer();
+void clock_frame_sequencer();
 
+/**
+ * Clocks the timer unit of the triangle channel.
+ */
+void clock_triangle_timer();
+
+/**
+ * Clocks the timer unit of a square channel.
+ * @param square_channel The number of the square channel (1 or 2)
+ */
+void clock_square_timer(int square_channel);
+
+/**
+ * Clocks the timer unit of the noise channel.
+ */
+void clock_noise_timer();
+
+/**
+ * Clocks the timer unit of the DMC channel.
+ */
+void clock_dmc_timer();
 
 /**
  * Clocks all the evelope units
