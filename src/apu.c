@@ -28,6 +28,18 @@
 
 nes_apu *APU;
 
+/** The output that comes out from the sequencer
+ *  on the triangle channel
+ *
+ *  This variable is local since it is accessed only in this module
+ */
+static uint8_t triangle_sequencer_output[32] = {
+	0xF, 0xE, 0xD, 0xC, 0xB, 0xA, 0x9, 0x8,
+	0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x0,
+	0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7,
+	0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF
+};
+
 float normal_square_dac_outputs[32] = {
 	0.0,
 	0.011609139523,
@@ -270,6 +282,25 @@ float normal_tnd_dac_outputs[204] = {
 	0.746466051108
 };
 
+uint8_t length_counter_reload_values[32] = {
+	0x0A, 0xFE,
+	0x14, 0x02,
+	0x28, 0x04,
+	0x50, 0x06,
+	0xA0, 0x08,
+	0x3C, 0x0A,
+	0x0E, 0x0C,
+	0x1A, 0x0E,
+	0x0C, 0x10,
+	0x18, 0x12,
+	0x30, 0x14,
+	0x60, 0x16,
+	0xC0, 0x18,
+	0x48, 0x1A,
+	0x10, 0x1C,
+	0x20, 0x1E
+};
+
 void initialize_apu() {
 
 	APU = (nes_apu *)malloc(sizeof(nes_apu));
@@ -381,14 +412,43 @@ void clock_frame_sequencer() {
 
 void clock_envelopes_tlc() {
 
+	/* Clock triangle linear counter*/
+	if( APU->triangle.linear_halt )
+		APU->triangle.linear_counter = APU->triangle.linear_reload;
+	else if( APU->triangle.linear_counter )
+		APU->triangle.linear_counter--;
+
+	if ( !APU->triangle.linear_control )
+		APU->triangle.linear_halt = 0;
 }
 
 void clock_lc_sweep() {
 
+	/* Clock the triangle lenght counter */
+	if( !APU->triangle.length_halt && APU->triangle.length_counter )
+		APU->triangle.length_counter--;
+
 }
 
 void clock_triangle_timer() {
-	APU->triangle.clock_timeout += 1000;
+
+	uint8_t dac_output;
+	uint8_t index;
+
+	/* Reset the timeout counter */
+	APU->triangle.clock_timeout += APU->triangle.period;
+
+	/* Check if the linear counter allows us to pass through... */
+	if( !APU->triangle.linear_counter )
+		return;
+
+	/* Check if the length counter allows us to pass through... */
+	if( !APU->triangle.length_counter )
+		return;
+
+	/* Clock the sequencer! :) */
+	index = APU->triangle.sequencer_step++ & 0x1F;
+	dac_output = triangle_sequencer_output[index];
 }
 
 void clock_square_timer(int square_channel) {

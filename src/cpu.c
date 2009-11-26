@@ -768,6 +768,29 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			}
 			break;
 
+		/* Triangle channel linear counter, control */
+		case 0x4008:
+			APU->triangle.linear_control = (value&0x80) >> 15;
+			APU->triangle.linear_reload = value&0x7F;
+			break;
+
+		/* Triangle channel period 8 lower bits */
+		case 0x400A:
+			APU->triangle.period &= 0x0700;
+			APU->triangle.period |= value;
+			break;
+
+		/* Triangle channel period 3 higher bits, length counter index */
+		case 0x400B:
+			APU->triangle.period &= 0x00FF;
+			APU->triangle.period |= (value & 0x7) << 8;
+
+			i = (value & 0xF8) >> 3;
+			APU->triangle.length_counter = length_counter_reload_values[i];
+
+			APU->triangle.linear_halt = 1;
+			break;
+
 		/* Sprite DMA */
 		case 0x4014:
 			address = value*0x100;

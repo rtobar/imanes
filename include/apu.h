@@ -36,18 +36,21 @@ typedef struct _frame_seq {
 typedef struct _triangle_channel {
 
 	/* Timer stuff */
-	int clock_timeout;
-	unsigned int period;
+	int16_t clock_timeout;
+	uint16_t period;
 
 	/* Linear Counter stuff */
+	uint8_t linear_counter;
+	uint8_t linear_reload;
+	uint8_t linear_halt;
+	uint8_t linear_control;
 
 	/* Lenght Counter stuff */
+	uint8_t length_counter;
+	uint8_t length_halt;
 
-	/* The sequencer of the triangle channel doesn't need
-	 * a representation here, since it always outputs the
-	 * same sequence of numbers. This is emulated in the
-	 * actual implementation of the channel's behavior
-	 */
+	/* Sequencer stuff */
+	uint8_t sequencer_step;
 
 } nes_triangle_channel;
 
@@ -207,5 +210,15 @@ float normal_square_dac_outputs[32];
  * DMC DAC's input is 7 bits long
  */
 float normal_tnd_dmc_outputs[204];
+
+/**
+ * Look-up table for the Lenght Counters.
+ * The index corresponds to the 5-bit value written
+ * into the register of the associated Lenght counter,
+ * and should be calculated as follows:
+ *
+ * (bits 7-3) >> 3
+ */
+uint8_t length_counter_reload_values[32];
 
 #endif /* apu_h */
