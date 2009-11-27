@@ -331,8 +331,6 @@ void clock_frame_sequencer() {
 	                                PPUCYCLES_STEP5 : PPUCYCLES_STEP4);
 
 
-	INFO( dump_apu() );
-
 	/* At any time, if the interrupt flag is set
     * and the IRQ disable is clear, CPU's IRQ is asserted */
 	if( APU->frame_seq.int_flag && !(APU->commons & DISABLE_FRAME_IRQ) ) {
