@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes 0.1\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-20 15:45-0300\n"
+"POT-Creation-Date: 2009-11-29 15:54+0100\n"
 "PO-Revision-Date: 2009-11-13 21:09+0100\n"
 "Last-Translator: Rodrigo Tobar Carrizo <rtobar@csrg.inf.utfsm.cl>\n"
 "Language-Team: Spanish\n"
@@ -32,22 +32,22 @@ msgstr "%s: Todavía sin implementar\n"
 msgid "PPU: Write to PPU[%d]=$%02X PC=%04X\n"
 msgstr "PPU: Escritura en PPU[%d]=$%02X PC=%04X\n"
 
-#: src/cpu.c:668 src/cpu.c:674 src/cpu.c:837 src/cpu.c:843
+#: src/cpu.c:668 src/cpu.c:674 src/cpu.c:866 src/cpu.c:872
 #, c-format
 msgid "CPU Address mirroring: from %04x to "
-msgstr ""
+msgstr "Mirroring de dirección de CPU desde %04x a "
 
 #: src/cpu.c:682
 #, c-format
 msgid "Write to %04x not allowed\n"
 msgstr "Escritura en %04x no permitida\n"
 
-#: src/cpu.c:955
+#: src/cpu.c:984
 #, c-format
 msgid "Returning %02x from %04x\n"
 msgstr "Retornando %02x desde %04x\n"
 
-#: src/cpu.c:980
+#: src/cpu.c:1009
 #, c-format
 msgid "Executing NMI!\n"
 msgstr "¡Ejecutando NMI!\n"
@@ -97,7 +97,7 @@ msgstr "¡Hey! ¡No has escrito el modo de direccionamiento %d!\n"
 #: src/loop.c:44
 #, c-format
 msgid "Ending VBlank\n"
-msgstr ""
+msgstr "Finalizando VBlank\n"
 
 #: src/loop.c:124
 #, c-format
@@ -274,37 +274,38 @@ msgstr "MMC1: reg3: Cambiado de %02x a %02x\n"
 #: src/mmc1.c:156
 #, c-format
 msgid "MMC1: Switching 8 Kb VROM bank %d. Offset is "
-msgstr ""
+msgstr "MMC1: Cambiando el banco VROM %d de 8 Kb. El corrimiento es "
 
 #: src/mmc1.c:163
 #, c-format
 msgid "MMC1: Switching 4 Kb VROM banks %d/%d. Offsets are "
-msgstr ""
+msgstr "MMC1: Cambiando los bancos VROM %d/%d de 4 Kb. Los corrimientos son "
 
 #: src/mmc1.c:202
 #, c-format
 msgid "MMC1: Switching 32 Kb ROM bank %d and offset %04x to 0x8000\n"
 msgstr ""
+"MMC1: Cambiando el banco VROM %d de 32 Kb y corrimiento %04x a 0x8000\n"
 
 #: src/mmc1.c:209
 #, c-format
 msgid "MMC1: Switching 16 Kb ROM bank %d and offset %04x to %04x\n"
-msgstr ""
+msgstr "MMC1: Cambiando el banco VROM %d de 16 Kb y corrimiento %04x a %04x\n"
 
 #: src/mmc3.c:166
 #, c-format
 msgid "MMC3: Reg0:%02x, Swapping {-2} bank to %04x\n"
-msgstr ""
+msgstr "MMC3: Reg0:%02x, cambiando el banco {-2} a %04x\n"
 
 #: src/mmc3.c:185 src/mmc3.c:192
 #, c-format
 msgid "MMC3: Switching VROM bank %d to %04x\n"
-msgstr ""
+msgstr "MMC3: Cambiando el banco VROM %d a %04x\n"
 
 #: src/mmc3.c:207
 #, c-format
 msgid "MMC3: Switching ROM bank %02x into %04x\n"
-msgstr ""
+msgstr "MMC3: Cambiando el banco ROM %02x a %04x\n"
 
 #: src/mmc3.c:224
 msgid "Enabling"
@@ -410,7 +411,7 @@ msgstr "Suspendiendo"
 #: src/palette.c:175
 #, c-format
 msgid "No | Picture       | Sprites\n"
-msgstr ""
+msgstr "Num| Dibujo        | Sprites\n"
 
 #: src/parse_file.c:66
 #, c-format
@@ -428,11 +429,12 @@ msgstr "Error: %s no es un ROM NES válido\n"
 #, c-format
 msgid "File contains %hu 16kb ROM banks and %hu 8kb VROM banks\n"
 msgstr ""
+"El archivo contiene %hu bancos ROM de 16 Kb y %hu bancos VROM de 8 Kb\n"
 
 #: src/parse_file.c:102
 #, c-format
 msgid "Mirroring type: %d\n"
-msgstr ""
+msgstr "Tipo de mirroring: %d\n"
 
 #: src/parse_file.c:105
 #, c-format
@@ -450,12 +452,13 @@ msgstr "desactivada"
 #: src/parse_file.c:116
 #, c-format
 msgid "ROM mapper is '%s'\n"
-msgstr ""
+msgstr "El mapper del ROm es '%s'\n"
 
 #: src/parse_file.c:121
 #, c-format
 msgid "Sorry, but we currently support cartridges using the mapper %d\n"
 msgstr ""
+"Disculpe, pero actualmente no soportamos cartuchos que usen el mapper %d\n"
 
 #: src/parse_file.c:122
 #, c-format
@@ -469,7 +472,7 @@ msgstr ""
 #: src/parse_file.c:138
 #, c-format
 msgid "Trainer present in ROM file\n"
-msgstr ""
+msgstr "Trainer presente en el archivo ROM\n"
 
 #: src/parse_file.c:162
 #, c-format
@@ -489,7 +492,7 @@ msgstr "No se puede iniciar el audio: %s\n"
 #: src/ppu.c:379
 #, c-format
 msgid "Set Hit flag at scanline %d\n"
-msgstr ""
+msgstr "Hit flag seteada durante la línea de escaneo %d\n"
 
 #: src/ppu.c:395 src/ppu.c:402 src/ppu.c:420 src/ppu.c:425 src/ppu.c:430
 #: src/ppu.c:438 src/ppu.c:446 src/ppu.c:454 src/ppu.c:459 src/ppu.c:464
@@ -497,12 +500,12 @@ msgstr ""
 #: src/ppu.c:531 src/ppu.c:539 src/ppu.c:547 src/ppu.c:552 src/ppu.c:557
 #, c-format
 msgid "PPU Address mirroring: from %04x to "
-msgstr ""
+msgstr "Mirroring de dirección PPU: desde %04x a "
 
 #: src/ppu.c:409 src/ppu.c:502
 #, c-format
 msgid "Palette mirroring: from %04x to "
-msgstr ""
+msgstr "Mirroring de paleta: desde %04x a "
 
 #: src/screen.c:107
 #, c-format
