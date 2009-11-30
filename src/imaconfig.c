@@ -41,6 +41,13 @@ void initialize_configuration() {
 	config.show_screen_bg = 1;
 	config.show_fps = 1;
 
+	/* APU channels */
+	config.apu_triangle = 1;
+	config.apu_square1 = 1;
+	config.apu_square2 = 1;
+	config.apu_noise = 1;
+	config.apu_dmc = 1;
+
 	/* Start on non-pause and at 60 fps */
 	config.pause = 0;
 	config.run_fast = 0;

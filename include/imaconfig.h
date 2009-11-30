@@ -4,18 +4,30 @@
 #include <stdint.h>
 
 typedef struct _config {
-	uint8_t show_front_spr;      /* Should we display front sprites? */
-	uint8_t show_back_spr;       /* Should we display back sprites? */
-	uint8_t show_bg;             /* Should we display the background */
-	uint8_t show_screen_bg;      /* Background color behind everything */
-	uint8_t show_fps;            /* Show frames per second information */
-	uint8_t pause;               /* Pause emulation */
+
+	/* PPU layers */
+	uint8_t show_front_spr;      /* Toogle show front sprites */
+	uint8_t show_back_spr;       /* Toogle show back sprites */
+	uint8_t show_bg;             /* Toogle show background */
+	uint8_t show_screen_bg;      /* Toogle show background color */
+
+	/* Emulation status */
+	uint8_t show_fps;            /* Toogle show frames per second */
+	uint8_t pause;               /* Toogle pause emulation */
+
+	/* APU channels */
+	uint8_t apu_triangle;        /* Toogle Triangle channel */
+	uint8_t apu_square1;         /* Toogle 1st square channel */
+	uint8_t apu_square2;         /* Toogle 2nd square channel */
+	uint8_t apu_noise;           /* Toogle noise channel */
+	uint8_t apu_dmc;             /* Toogle delta modulation channel */
 
 	/* State-related */
 	uint8_t current_state;       /* State to be loaded/saved */
 	uint8_t save_state;          /* Flag to save our current state */
 	uint8_t load_state;          /* Flag to load a state */
 
+	/* Others */
 	int video_scale;             /* Video scale factor */
 	int verbosity;               /* How verbose imanes should be */
 	int run_fast;                /* Run as fast as possible */

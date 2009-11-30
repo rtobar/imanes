@@ -780,9 +780,9 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 		/* Triangle channel period 8 lower bits */
 		case 0x400A:
-			INFO( printf("Writing in 0x400A\n") );
 			APU->triangle.period &= 0x0700;
 			APU->triangle.period |= value;
+			INFO( printf("APU triangle channel's period set to %d\n", APU->triangle.period) );
 			break;
 
 		/* Triangle channel period 3 higher bits, length counter index */
