@@ -313,6 +313,17 @@ void initialize_apu() {
 	APU->frame_seq.clock_timeout = PPUCYCLES_STEP4;
 	APU->frame_seq.int_flag = 0;
 
+	/* Triangle channel initialization */
+	APU->triangle.clock_timeout = 0;
+	APU->triangle.period = 0;
+	APU->triangle.linear_counter = 0;
+	APU->triangle.linear_reload = 0;
+	APU->triangle.linear_halt = 0;
+	APU->triangle.linear_control = 0;
+	APU->triangle.length_counter = 0;
+	APU->triangle.length_halt = 0;
+	APU->triangle.sequencer_step = 0;
+
 }
 
 void dump_apu() {
