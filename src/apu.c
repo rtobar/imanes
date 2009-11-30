@@ -315,7 +315,7 @@ void initialize_apu() {
 
 	/* Triangle channel initialization */
 	APU->triangle.clock_timeout = 0;
-	APU->triangle.period = 0;
+	APU->triangle.period = 0x07FF;
 	APU->triangle.linear_counter = 0;
 	APU->triangle.linear_reload = 0;
 	APU->triangle.linear_halt = 0;
@@ -458,6 +458,7 @@ void clock_triangle_timer() {
 	/* Clock the sequencer! :) */
 	index = APU->triangle.sequencer_step++ & 0x1F;
 	dac_output = triangle_sequencer_output[index];
+
 }
 
 void clock_square_timer(int square_channel) {

@@ -54,6 +54,7 @@ int run_loop;
 int main_loop(void *args) {
 
 	uint8_t opcode;
+	int added_cycles;
 	int standard_lines;
 	int vblank_ended = 0;
 	int a12_raised = 0;
@@ -149,8 +150,10 @@ int main_loop(void *args) {
 
 		/* Update cycles count */
 		ADD_CPU_CYCLES(inst.cycles);
-		PPU->scanline_timeout -= (int)(CLK->ppu_cycles - ppu_cycles);
-		APU->frame_seq.clock_timeout -= (int)(CLK->ppu_cycles - ppu_cycles);
+		added_cycles = (int)(CLK->ppu_cycles - ppu_cycles);
+		PPU->scanline_timeout -= added_cycles;
+		APU->frame_seq.clock_timeout -= added_cycles;
+		APU->triangle.clock_timeout -= added_cycles;
 		ppu_cycles = CLK->ppu_cycles;
 
 		/* Check if we need to clock each of the
