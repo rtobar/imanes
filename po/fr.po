@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: imanes git\n"
 "Report-Msgid-Bugs-To: https://csrg.inf.utfsm.cl/flyspray/index.php?"
 "project=10\n"
-"POT-Creation-Date: 2009-11-29 15:54+0100\n"
+"POT-Creation-Date: 2009-12-01 11:58-0300\n"
 "PO-Revision-Date: 2009-11-24 11:44-0300\n"
 "Last-Translator: Roberto Bonvallet <rbonvall@gmail.com>\n"
 "Language-Team: French\n"
@@ -67,22 +67,22 @@ msgstr "Ne peut pas actualiser le moniteur :(\n"
 msgid "I'm exiting now\n"
 msgstr "Je sors maintenant\n"
 
-#: src/imaconfig.c:75
+#: src/imaconfig.c:82
 #, c-format
 msgid "Couldn't find user's configuration\n"
 msgstr "Ne peut pas trouver la configuration d'utilisateur\n"
 
-#: src/imaconfig.c:95
+#: src/imaconfig.c:102
 #, c-format
 msgid "Directory '%s' not found, creating it...\n"
 msgstr "Dossier '%s' pas trouvé, ... \n"
 
-#: src/imaconfig.c:99
+#: src/imaconfig.c:106
 #, c-format
 msgid "Error while creating directory '%s': "
 msgstr ""
 
-#: src/imaconfig.c:121
+#: src/imaconfig.c:128
 #, c-format
 msgid "Couldn't find user's home directory. Will not load user configuration\n"
 msgstr ""
@@ -97,7 +97,7 @@ msgstr "Hé ! Vous n'avez pas écrit le mode d'adressage %d !\n"
 msgid "Ending VBlank\n"
 msgstr ""
 
-#: src/loop.c:124
+#: src/loop.c:125
 #, c-format
 msgid ""
 "\n"
@@ -105,12 +105,12 @@ msgid ""
 "Undocumented instruction: %02x\n"
 msgstr ""
 
-#: src/loop.c:125
+#: src/loop.c:126
 #, c-format
 msgid "I'm exiting now... sorry :(\n"
 msgstr "Je quitte maintenant... désolé :(\n"
 
-#: src/loop.c:126
+#: src/loop.c:127
 #, c-format
 msgid "Close the window when finished\n"
 msgstr "Fermez la fenêtre quand vous aurez fini\n"
@@ -129,7 +129,7 @@ msgstr ""
 #: src/main.c:51
 #, c-format
 msgid "This program is licensed under the GPLv3 license.\n"
-msgstr ""
+msgstr "Cet logiciel est licencié sous la licence GPLv3.\n"
 
 #: src/main.c:52
 #, c-format
@@ -137,6 +137,8 @@ msgid ""
 "For bug reports, please refer to %s\n"
 "\n"
 msgstr ""
+"Pour signaler des bogues, consultez %s s'il vous plaît\n"
+"\n"
 
 #: src/main.c:53
 #, c-format
@@ -187,6 +189,8 @@ msgid ""
 "ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm."
 "cl>\n"
 msgstr ""
+"Le développement d'ImaNES est maintenu par Rodrigo Tobar <rtobar@csrg.inf."
+"utfsm.cl>\n"
 
 #: src/main.c:61 src/main.c:69
 #, c-format
@@ -230,7 +234,7 @@ msgstr "ça y est!\n"
 #: src/mapper.c:60
 #, c-format
 msgid "<no registers>\n"
-msgstr ""
+msgstr "<pas de registres>\n"
 
 #: src/mmc1.c:79
 #, c-format
@@ -490,7 +494,7 @@ msgstr ""
 #: src/screen.c:114
 #, c-format
 msgid "Could not load ImaNES icon :(\n"
-msgstr ""
+msgstr "L'icône d'ImaNES ne peut pas être chargée :(\n"
 
 #: src/screen.c:123
 #, c-format
