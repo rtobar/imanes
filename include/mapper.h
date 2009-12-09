@@ -47,6 +47,6 @@ void dump_mapper();
 extern nes_mapper mapper_list[];
 
 /* Global current mapper variable */
-nes_mapper *mapper;
+extern nes_mapper *mapper;
 
 #endif /* mapper_h */
