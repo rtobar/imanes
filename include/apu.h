@@ -18,6 +18,14 @@
 #define PPUCYCLES_STEP4  (27919) /* 27919.375 */
 #define PPUCYCLES_STEP5  (22336) /* 22335.5 */
 
+typedef enum _nes_apu_channel {
+	Square1,
+	Square2,
+	Triangle,
+	DMC,
+	Noise
+} nes_apu_channel;
+
 /**
  * The emulation of the APU is mostly based on the apu_ref.txt document,
  * available at http://nesdev.parodius.com/apu_ref.txt
@@ -195,7 +203,7 @@ void end_apu();
  *
  * Each square DAC input is 4 bits long
  */
-float normal_square_dac_outputs[32];
+extern float normal_square_dac_outputs[32];
 
 /* Normalized output of the DAC for the triangle channel,
  * the noise channel and the delta modulation channel
@@ -209,7 +217,7 @@ float normal_square_dac_outputs[32];
  * Noise's DAC input is 4 bits long
  * DMC DAC's input is 7 bits long
  */
-float normal_tnd_dmc_outputs[204];
+extern float normal_tnd_dac_outputs[204];
 
 /**
  * Look-up table for the Lenght Counters.
