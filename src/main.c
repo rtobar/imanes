@@ -70,7 +70,7 @@ void print_version() {
 	printf("\n");
 }
 
-void parse_options(int args, char *argv[]) {
+int parse_options(int args, char *argv[]) {
 
 	int opt;
 
@@ -87,8 +87,7 @@ void parse_options(int args, char *argv[]) {
 				config.video_scale = atoi(optarg);
 				if( config.video_scale == 0 ) {
 					fprintf(stderr,_("Error: invalid video scale factor. Must be an integer value\n"));
-					usage(stderr, argv);
-					exit(EXIT_FAILURE);
+					return -1;
 				}
 				break;
 
@@ -100,28 +99,24 @@ void parse_options(int args, char *argv[]) {
 			case 'h':
 			case 'H':
 				usage(stdout,argv);
-				exit(EXIT_SUCCESS);
-				break;
+				return 0;
 
 			case 'V':
 				print_version();
-				exit(EXIT_SUCCESS);
-				break;
+				return 0;
 
 			default:
-				usage(stderr,argv);
-				exit(EXIT_FAILURE);
-				break;
+				return -1;
 		}
 
 	}
 
 	if( optind >= args ) {
 		fprintf(stderr,_("%s: Error: Expected ROM file, none given\n"), argv[0]);
-		usage(stderr,argv);
-		exit(EXIT_FAILURE);
+		return -1;
 	}
 
+	return 1;
 }
 
 int main(int args, char *argv[]) {
@@ -144,7 +139,15 @@ int main(int args, char *argv[]) {
 	textdomain(PACKAGE);
 
 	/* Parse command line options */
-	parse_options(args, argv);
+	switch ( parse_options(args, argv) ) {
+		case -1:
+			usage(stderr,argv);
+			exit(EXIT_FAILURE);
+		case 0:
+			exit(EXIT_SUCCESS);
+		default:
+			break;
+	}
 
 	load_user_configuration();
 
