@@ -24,11 +24,11 @@
 #include "i18n.h"
 #include "playback.h"
 
-uint8_t **sdl_audio_buffer;
+uint8_t *sdl_audio_buffer;
 static SDL_AudioSpec audio_spec;
 static int audio_initialized;
 Uint8 square_dac_outputs[32];
-Uint8 tnd_dac_outputs[32];
+Uint8 tnd_dac_outputs[204];
 
 void initialize_playback() {
 
@@ -55,10 +55,7 @@ void initialize_playback() {
 	}
 
 	/* sdl_audio_buffer = (uint8_t *)malloc(audio_spec.size*2); */
-	sdl_audio_buffer = (uint8_t **)malloc(5*sizeof(uint8_t *));
-	for(i=0;i!=5;i++)
-		sdl_audio_buffer[i] = (uint8_t *)malloc(CYCLES_PER_SCANLINE*262*60/3);
-
+	sdl_audio_buffer = (uint8_t *)malloc(CYCLES_PER_SCANLINE*262*60/3);
 	if( sdl_audio_buffer == NULL ) {
 		fprintf(stderr,_("Cannot initialize audio: cannot allocate memory for audio buffer\n"));
 		return;
@@ -79,8 +76,15 @@ void initialize_playback() {
 
 void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
+	int i;
+
 	/* Fill with silence at the start */
 	memset(stream, audio_spec.silence, len);
+
+	for(i=0;i!=len;i++) {
+		stream[i] = (Uint8)sdl_audio_buffer[i];
+		sdl_audio_buffer[i] = 0;
+	}
 
 }
 
@@ -89,15 +93,15 @@ void playback_fill_sound_buffer(uint8_t sample, nes_apu_channel channel) {
 	int index = CLK->nmi_pcycles/3;
 
 	if( channel == Square1 )
-		sdl_audio_buffer[index][0] = (Uint8)sample;
+		sdl_audio_buffer[index] = square_dac_outputs[sample];
 	if( channel == Square2 )
-		sdl_audio_buffer[index][1] = sample;
+		sdl_audio_buffer[index] = square_dac_outputs[sample];
 	if( channel == Triangle )
-		sdl_audio_buffer[index][2] = sample;
+		sdl_audio_buffer[index] = tnd_dac_outputs[3*sample];
 	if( channel == DMC )
-		sdl_audio_buffer[index][3] = sample;
+		sdl_audio_buffer[index] = tnd_dac_outputs[2*sample];
 	if( channel == Noise )
-		sdl_audio_buffer[index][4] = sample;
+		sdl_audio_buffer[index] = tnd_dac_outputs[sample];
 
 }
 

@@ -90,6 +90,16 @@ int main_loop(void *args) {
 		if( !run_loop )
 			return 0;
 
+		/* If we need to reset, call the reset routine */
+		if( CPU->reset )
+			execute_reset();
+
+		/* A12 rising edge occurs at PPU cycle #260 on the scanline */
+		if( !a12_raised && PPU->scanline_timeout <= 76 && (int)PPU->lines < NES_SCREEN_HEIGHT ) {
+			mapper->update();
+			a12_raised = 1;
+		}
+
 		/* If we want to save our current state or load a new one,
 		 * now is the time to do it! */
 		if( config.save_state == 1 ) {
@@ -100,16 +110,6 @@ int main_loop(void *args) {
 			load_state(config.current_state);
 			config.load_state = 0;
 			ppu_cycles = CLK->ppu_cycles;
-		}
-
-		/* If we need to reset, call the reset routine */
-		if( CPU->reset )
-			execute_reset();
-
-		/* A12 rising edge occurs at PPU cycle #260 on the scanline */
-		if( !a12_raised && PPU->scanline_timeout <= 76 && (int)PPU->lines < NES_SCREEN_HEIGHT ) {
-			mapper->update();
-			a12_raised = 1;
 		}
 
 		/* Read opcode and full instruction :) */
@@ -169,6 +169,7 @@ int main_loop(void *args) {
 		if( APU->triangle.clock_timeout <= 0 )
 			clock_triangle_timer();
 
+/*
 		if( APU->noise.clock_timeout <= 0 )
 			clock_noise_timer();
 
@@ -180,6 +181,7 @@ int main_loop(void *args) {
 
 		if( APU->dmc.clock_timeout <= 0 )
 			clock_dmc_timer();
+*/
 
 
 		/* A line has ended its scanning, draw it */

@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include "apu.h"
+#include "clock.h"
 #include "cpu.h"
 #include "debug.h"
 #include "i18n.h"
@@ -333,6 +334,19 @@ void dump_apu() {
 	printf("0x4017:%02x  ", APU->commons);
 	printf("FS: %d/%d\n", APU->frame_seq.step, APU->frame_seq.int_flag);
 
+	/* Triangle channel registers */
+	printf("Triangle channel:\n");
+	printf(" Period:  %u\n", APU->triangle.period);
+	printf(" Timeout: %d\n", APU->triangle.clock_timeout);
+	printf(" Linear Counter:\n");
+	printf("   Current counter: %u\n", APU->triangle.linear_counter);
+	printf("   Reload value:    %u\n", APU->triangle.linear_reload);
+	printf("   Counter halt:    %u\n", APU->triangle.linear_halt);
+	printf("   Counter control: %u\n", APU->triangle.linear_control);
+	printf(" Length Counter: %u\n", APU->triangle.length_counter);
+	printf(" Length Halt:    %u\n", APU->triangle.length_halt);
+	printf(" Sequencer step: %u\n", APU->triangle.sequencer_step);
+
 	return;
 }
 
@@ -446,7 +460,7 @@ void clock_triangle_timer() {
 	uint8_t index;
 
 	/* Reset the timeout counter */
-	APU->triangle.clock_timeout += APU->triangle.period;
+	APU->triangle.clock_timeout += APU->triangle.period*3;
 
 	/* Check if the linear counter allows us to pass through... */
 	if( !APU->triangle.linear_counter )

@@ -128,7 +128,7 @@ void save_screenshot() {
 
 	if( fd == -1 ) {
 		tmp = (char *)malloc(23 + strlen(ss_file));
-		imanes_sprintf(tmp, strlen(ss_file)+23, "Error while opening '%s'", ss_file);
+		imanes_sprintf(tmp, strlen(ss_file)+23, _("Error while opening '%s'"), ss_file);
 		perror(tmp);
 		free(tmp);
 		free(ss_file);
