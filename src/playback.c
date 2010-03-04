@@ -48,6 +48,9 @@ void initialize_playback() {
 	desired.callback = playback_fill_sound_card;
 	desired.userdata = (void *)NULL;
 
+	setenv("PULSE_PROP_application.name", "ImaNES", 1);
+	setenv("PULSE_PROP_media.role", "game", 1);
+
 	/* Inform if we cannot initialize the audio subsystem */
 	if( SDL_OpenAudio(&desired, &audio_spec) == -1 ) {
 		fprintf(stderr,_("Cannot initialize audio: %s\n"), SDL_GetError());
