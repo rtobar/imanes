@@ -630,6 +630,18 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case SAX:
 			write_cpu_ram(oper.address, CPU->A & CPU->X );
+			update_flags(oper.address, N_FLAG | Z_FLAG);
+			break;
+
+		case SBX:
+			CPU->X = CPU->A & CPU->X;
+
+			if( CPU->X >= oper.value)
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+			CPU->X -= oper.value;
+			update_flags(CPU->X, N_FLAG | Z_FLAG);
 			break;
 
 		case SLO:

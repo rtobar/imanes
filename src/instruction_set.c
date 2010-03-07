@@ -317,9 +317,6 @@ void initialize_instruction_set() {
 	/* ARR instrunction */
 	SET_INSTRUCTION_ADDR_DATA( ARR, IMMEDIATE, 0x6B, 2, 2, NORMAL);
 
-	/* AXS instruction */
-	SET_INSTRUCTION_ADDR_DATA( AXS, IMMEDIATE, 0xCB, 2, 2, NORMAL);
-
 	/* DCP instruction */
 	SET_INSTRUCTION_ADDR_DATA( DCP, ZEROPAGE,  0xC7, 2, 5, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( DCP, ZERO_INDX, 0xD7, 2, 6, NORMAL);
@@ -395,6 +392,9 @@ void initialize_instruction_set() {
 	SET_INSTRUCTION_ADDR_DATA( SAX, ZERO_INDY, 0x97, 2, 4, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( SAX, ABSOLUTE,  0x8F, 3, 4, NORMAL);
 	SET_INSTRUCTION_ADDR_DATA( SAX, IND_INDIR, 0x83, 2, 6, NORMAL);
+
+	/* SBX instruction */
+	SET_INSTRUCTION_ADDR_DATA( SBX, IMMEDIATE, 0xCB, 2, 2, NORMAL);
 
 	/* SHX instruction (it seems not to be present in the 6502) */
 	SET_INSTRUCTION_ADDR_DATA( SHX, ABS_INDY,  0x9E, 3, 5, NORMAL);
