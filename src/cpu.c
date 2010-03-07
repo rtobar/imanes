@@ -90,6 +90,30 @@ void dump_stack() {
 	return;
 }
 
+void dump_ram(uint16_t address, unsigned int lenght) {
+
+	unsigned int i;
+	unsigned short j;
+	uint8_t tmp[16];
+
+	for(i=0; i!=lenght; i++) {
+		printf("%04X: ", address + 0x10*i);
+		for(j=0; j!=16; j++) {
+			tmp[j] = read_cpu_ram(address + 0x10*i + j);
+			printf("%02X ", tmp[j]);
+		}
+		printf("| ");
+		for(j=0; j!=16; j++) {
+			/* Not-nice ASCII characters get a dot */
+			if( tmp[j] < 32 || tmp[j] > 126 )
+				tmp[j] = '.';
+			printf("%c", tmp[j]);
+		}
+		printf("\n");
+	}
+
+}
+
 void init_cpu_ram(ines_file *file) {
 	mapper->reset();
 }

@@ -62,6 +62,12 @@ void dump_cpu();
 void dump_stack();
 
 /**
+ * Dumps the current contents of a given RAM address,
+ * until lenght bytes are dumped.
+ */
+void dump_ram(uint16_t address, unsigned int lenght);
+
+/**
  * Given an operand, and an instruction, it executes it into the CPU
  */
 void execute_instruction(instruction inst, operand oper); 
