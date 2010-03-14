@@ -38,6 +38,7 @@ void save_sram(char *save_file) {
 	if( !CPU->sram_enabled )
 		return;
 
+	INFO( printf(_("Saving SRAM... ")) );
 	IMANES_OPEN(fd,save_file, IMANES_OPEN_WRITE);
 
 	if( fd == -1 ) {
@@ -54,6 +55,7 @@ void save_sram(char *save_file) {
 	}
 
 	IMANES_CLOSE(fd);
+	INFO( printf(_("done!\n")) );
 
 	return;
 }

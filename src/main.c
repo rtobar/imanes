@@ -175,10 +175,9 @@ int main(int args, char *argv[]) {
 	/* Main execution loop */
 	main_loop();
 
-	INFO( printf(_("Saving SRAM... ")) );
+	/* After finishing the emulation, save the SRAM if necessary */
 	save_sram(save_file);
 	free(save_file);
-	INFO( printf(_("done!\n")) );
 
 	/* Free all the used resources */
 	mapper->end_mapper();
