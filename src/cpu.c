@@ -814,7 +814,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			APU->triangle.linear_reload = value&0x7F;
 
 			printf("Write to 0x4008 is %02X\n", value);
-			dump_apu();
+			//dump_apu();
 			break;
 
 		/* Triangle channel period 8 lower bits */
@@ -823,7 +823,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			APU->triangle.period |= value;
 			APU->triangle.period++;
 			printf("Write to 0x400A is %02X\n", value);
-			dump_apu();
+			//dump_apu();
 			break;
 
 		/* Triangle channel period 3 higher bits, length counter index */
@@ -835,7 +835,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			i = (value & 0xF8) >> 3;
 			APU->triangle.length_counter = length_counter_reload_values[i];
 			printf("Write to 0x400B is %02X\n", value);
-			dump_apu();
+			//dump_apu();
 			APU->triangle.linear_halt = 1;
 			break;
 
@@ -847,6 +847,11 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			ADD_CPU_CYCLES(512);
 			break;
 
+		/* APU Lenght Control */
+		case 0x4015:
+			APU->length_ctr = value & 0x1F;
+			break;
+
 		/* 1st and 2nd joysticks strobe */
 		case 0x4016:
 			if( value == 0x01 )
@@ -856,11 +861,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 				pads[0].reads = 0;
 				pads[1].reads = 0;
 			}
-			break;
-
-		/* APU Lenght Control */
-		case 0x4015:
-			APU->length_ctr = value & 0x1F;
 			break;
 
 		/* APU common */
