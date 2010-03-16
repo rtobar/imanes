@@ -541,6 +541,41 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		/** Illegal opcodes **/
+		case ANC:
+			CPU->A &= oper.value;
+			if( (int8_t)CPU->A < 0 )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+			update_flags(CPU->A, N_FLAG | Z_FLAG );
+			break;
+
+		case ALR:
+			CPU->A &= oper.value;
+			if( CPU->A & 0x01 )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+			CPU->A >>= 1;
+			update_flags(CPU->A, N_FLAG | Z_FLAG );
+			break;
+
+		case ARR:
+			CPU->A &= oper.value;
+			tmp = CPU->A & 0x01;
+			CPU->A >>= 1;
+			CPU->A |= (tmp << 7);
+			if( CPU->A & 0x20 )
+				CPU->SR |= C_FLAG;
+			else
+				CPU->SR &= ~C_FLAG;
+			if( ((CPU->A&0x20)>>1) != (CPU->A&0x10) )
+				CPU->SR |= V_FLAG;
+			else
+				CPU->SR &= ~V_FLAG;
+			update_flags(CPU->A, N_FLAG | Z_FLAG );
+			break;
+
 		case DCP:
 			tmp = read_cpu_ram(oper.address) - 1;
 			write_cpu_ram(oper.address, tmp);
@@ -642,6 +677,16 @@ void execute_instruction(instruction inst, operand oper) {
 				CPU->SR &= ~C_FLAG;
 			CPU->X -= oper.value;
 			update_flags(CPU->X, N_FLAG | Z_FLAG);
+			break;
+
+		case SHX:
+			tmp = CPU->X & (((oper.address & 0xFF00) >> 8) + 1);
+			write_cpu_ram(oper.address, tmp);
+			break;
+
+		case SHY:
+			tmp = CPU->Y & (((oper.address & 0xFF00) >> 8) + 1);
+			write_cpu_ram(oper.address, tmp);
 			break;
 
 		case SLO:
@@ -814,7 +859,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			APU->triangle.linear_reload = value&0x7F;
 
 			printf("Write to 0x4008 is %02X\n", value);
-			//dump_apu();
 			break;
 
 		/* Triangle channel period 8 lower bits */
@@ -823,7 +867,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			APU->triangle.period |= value;
 			APU->triangle.period++;
 			printf("Write to 0x400A is %02X\n", value);
-			//dump_apu();
 			break;
 
 		/* Triangle channel period 3 higher bits, length counter index */
@@ -835,7 +878,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			i = (value & 0xF8) >> 3;
 			APU->triangle.length_counter = length_counter_reload_values[i];
 			printf("Write to 0x400B is %02X\n", value);
-			//dump_apu();
 			APU->triangle.linear_halt = 1;
 			break;
 
