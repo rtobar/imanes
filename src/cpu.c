@@ -562,14 +562,13 @@ void execute_instruction(instruction inst, operand oper) {
 
 		case ARR:
 			CPU->A &= oper.value;
-			tmp = CPU->A & 0x01;
 			CPU->A >>= 1;
-			CPU->A |= (tmp << 7);
-			if( CPU->A & 0x20 )
+			CPU->A |= (CPU->SR & C_FLAG) << 7;
+			if( CPU->A & 0x40 )
 				CPU->SR |= C_FLAG;
 			else
 				CPU->SR &= ~C_FLAG;
-			if( ((CPU->A&0x20)>>1) != (CPU->A&0x10) )
+			if( ((CPU->A&0x40)>>1) != (CPU->A&0x20) )
 				CPU->SR |= V_FLAG;
 			else
 				CPU->SR &= ~V_FLAG;
