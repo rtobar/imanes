@@ -82,7 +82,7 @@ void ASL_func(instruction inst, operand oper){
 		update_flags(oper.value, N_FLAG | Z_FLAG);
 		write_cpu_ram(oper.address, oper.value);
 	}
-	if( tmp )	
+	if( tmp )
 		CPU->SR |= C_FLAG;
 	else
 		CPU->SR &= ~C_FLAG;
@@ -633,80 +633,80 @@ void default_func(instruction inst, operand oper){
 }
 
 void (*ptr_to_inst[INSTRUCTIONS_NUMBER])(instruction inst, operand oper) = {
-&ADC_func, 
-&AND_func, 
-&ASL_func, 
-&BCC_func, 
-&BCS_func, 
-&BEQ_func, 
-&BIT_func, 
-&BMI_func, 
-&BNE_func, 
-&BPL_func, 
-&BRK_func, 
-&BVC_func, 
-&BVS_func, 
-&CLC_func, 
-&CLD_func, 
-&CLI_func, 
-&CLV_func, 
-&CMP_func, 
-&CPX_func, 
-&CPY_func, 
-&DEC_func, 
-&DEX_func, 
-&DEY_func, 
-&EOR_func, 
-&INC_func, 
-&INX_func, 
-&INY_func, 
-&JMP_func, 
-&JSR_func, 
-&LDA_func, 
-&LDX_func, 
-&LDY_func, 
-&LSR_func, 
-&NOP_func, 
-&ORA_func, 
-&PHA_func, 
-&PHP_func, 
-&PLA_func, 
-&PLP_func, 
-&ROL_func, 
-&ROR_func, 
-&RTI_func, 
-&RTS_func, 
-&SBC_func, 
-&SEC_func, 
-&SED_func, 
-&SEI_func, 
-&STA_func, 
-&STX_func, 
-&STY_func, 
-&TAX_func, 
-&TAY_func, 
-&TSX_func, 
-&TXA_func, 
-&TXS_func, 
-&TYA_func, 
-&default_func, 
-&ANC_func, 
-&ALR_func, 
-&ARR_func, 
-&DCP_func, 
-&ISC_func, 
-&default_func, 
-&LAX_func, 
-&RLA_func, 
-&RRA_func, 
-&SAX_func, 
-&SBX_func, 
-&SHX_func, 
-&SHY_func, 
-&SLO_func, 
-&SRE_func, 
-&default_func, 
-&default_func 
+&ADC_func,
+&AND_func,
+&ASL_func,
+&BCC_func,
+&BCS_func,
+&BEQ_func,
+&BIT_func,
+&BMI_func,
+&BNE_func,
+&BPL_func,
+&BRK_func,
+&BVC_func,
+&BVS_func,
+&CLC_func,
+&CLD_func,
+&CLI_func,
+&CLV_func,
+&CMP_func,
+&CPX_func,
+&CPY_func,
+&DEC_func,
+&DEX_func,
+&DEY_func,
+&EOR_func,
+&INC_func,
+&INX_func,
+&INY_func,
+&JMP_func,
+&JSR_func,
+&LDA_func,
+&LDX_func,
+&LDY_func,
+&LSR_func,
+&NOP_func,
+&ORA_func,
+&PHA_func,
+&PHP_func,
+&PLA_func,
+&PLP_func,
+&ROL_func,
+&ROR_func,
+&RTI_func,
+&RTS_func,
+&SBC_func,
+&SEC_func,
+&SED_func,
+&SEI_func,
+&STA_func,
+&STX_func,
+&STY_func,
+&TAX_func,
+&TAY_func,
+&TSX_func,
+&TXA_func,
+&TXS_func,
+&TYA_func,
+&default_func,
+&ANC_func,
+&ALR_func,
+&ARR_func,
+&DCP_func,
+&ISC_func,
+&default_func,
+&LAX_func,
+&RLA_func,
+&RRA_func,
+&SAX_func,
+&SBX_func,
+&SHX_func,
+&SHY_func,
+&SLO_func,
+&SRE_func,
+&default_func,
+&default_func
 };
 
 nes_cpu *CPU;
@@ -895,7 +895,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 				if( (PPU->vram_addr & 0x1000) &&
 				    !prev_a12_state )
 					mapper->update();
-					
+
 				/* Save the A12 line status (needed by MMC3) */
 				prev_a12_state  = PPU->vram_addr & 0x1000;
 				prev_a12_cycles = CLK->ppu_cycles;
@@ -911,12 +911,12 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 					PPU->vram_addr += 32;
 				else
 					PPU->vram_addr++;
-				
+
 				/* Check rising edge of A12 on PPU bus (needed by MMC3) */
 				if( (PPU->vram_addr & 0x1000) &&
 				    !prev_a12_state )
 					mapper->update();
-					
+
 				/* Save the A12 line status (needed by MMC3) */
 				prev_a12_state  = PPU->vram_addr & 0x1000;
 				prev_a12_cycles = CLK->ppu_cycles;
@@ -1035,7 +1035,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 	/* PPU Control Register 1 */
 	if( address == 0x2000 )
 		ret_val = PPU->CR1;
-	
+
 	/* PPU Control Register 1 */
 	else if( address == 0x2001 )
 		ret_val = PPU->CR2;
@@ -1079,7 +1079,7 @@ uint8_t read_cpu_ram(uint16_t address) {
 		if( (PPU->vram_addr & 0x1000) &&
 			!prev_a12_state )
 			mapper->update();
-			
+
 		/* Save the A12 line status (needed by MMC3) */
 		prev_a12_state  = PPU->vram_addr & 0x1000;
 		prev_a12_cycles = CLK->ppu_cycles;
