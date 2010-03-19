@@ -663,8 +663,9 @@ void execute_instruction(instruction inst, operand oper) {
 			break;
 
 		case SAX:
-			write_cpu_ram(oper.address, CPU->A & CPU->X );
-			update_flags(oper.address, N_FLAG | Z_FLAG);
+			tmp = CPU->A & CPU->X;
+			write_cpu_ram(oper.address, tmp);
+			update_flags(tmp, N_FLAG | Z_FLAG);
 			break;
 
 		case SBX:
