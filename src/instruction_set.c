@@ -441,174 +441,121 @@ void initialize_instruction_set() {
 	return;
 }
 
-operand get_operand_immediate(instruction inst, uint16_t inst_address) {
-
-	operand oper = { 0xDEAD, 0xBE};
-
-	oper.value = CPU->RAM[inst_address+1];
-	DEBUG( printf(" #$%02x", oper.value) );
-
-	return oper;
+void get_operand_immediate(instruction inst, uint16_t inst_address, operand *oper) {
+	oper->value = CPU->RAM[inst_address+1];
+	DEBUG( printf(" #$%02x", oper->value) );
 }
 
-operand get_operand_absolute(instruction inst, uint16_t inst_address) {
-
-	operand oper = { 0xDEAD, 0xBE};
-
-	oper.address = CPU->RAM[inst_address+1] | (CPU->RAM[inst_address + 2]  << 8);
-	DEBUG( printf(" $%04x", oper.address) );
-
-	return oper;
+void get_operand_absolute(instruction inst, uint16_t inst_address, operand *oper) {
+	oper->address = CPU->RAM[inst_address+1] | (CPU->RAM[inst_address + 2]  << 8);
+	DEBUG( printf(" $%04x", oper->address) );
 }
 
-operand get_operand_zeropage(instruction inst, uint16_t inst_address) {
-
-	operand oper = { 0xDEAD, 0xBE};
-
-	oper.address = CPU->RAM[inst_address+1];
-	DEBUG( printf(" $%02x", oper.address) );
-
-	return oper;
+void get_operand_zeropage(instruction inst, uint16_t inst_address, operand *oper) {
+	oper->address = CPU->RAM[inst_address+1];
+	DEBUG( printf(" $%02x", oper->address) );
 }
 
-operand get_operand_implied(instruction inst, uint16_t inst_address) {
-	operand oper = { 0xDEAD, 0xBE};
-	return oper;
+void get_operand_implied(instruction inst, uint16_t inst_address, operand *oper) {
 }
 
-operand get_operand_indirect(instruction inst, uint16_t inst_address) {
+void get_operand_indirect(instruction inst, uint16_t inst_address, operand *oper) {
 
 	uint16_t address;
-	operand oper = { 0xDEAD, 0xBE};
 
 	address = CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8);
 	DEBUG( printf(" ($%04x)", address) );
-	oper.address =  read_cpu_ram(address);
+	oper->address =  read_cpu_ram(address);
 
 	/* If address is $xxFF, the next read wraps page */
 	if( address%0x100 == 0xFF )
 		address -= 0x100;
-	oper.address |= (read_cpu_ram(address+1) << 8);
-
-	return oper;
+	oper->address |= (read_cpu_ram(address+1) << 8);
 }
 
-operand get_operand_abs_indx(instruction inst, uint16_t inst_address) {
+void get_operand_abs_indx(instruction inst, uint16_t inst_address, operand *oper) {
 
 	uint16_t address;
-	operand oper = { 0xDEAD, 0xBE};
 
 	address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) );
 	DEBUG( printf(" $%04x,X", address) );
-	oper.address = address + CPU->X;
-	if( ((address&0x100) != (oper.address&0x100)) &&
+	oper->address = address + CPU->X;
+	if( ((address&0x100) != (oper->address&0x100)) &&
 	    inst.cycle_change == CYCLE_PAGE )
 		ADD_CPU_CYCLES(1);
-
-	return oper;
 }
 
-operand get_operand_abs_indy(instruction inst, uint16_t inst_address) {
+void get_operand_abs_indy(instruction inst, uint16_t inst_address, operand *oper) {
 
 	uint16_t address;
-	operand oper = { 0xDEAD, 0xBE};
 
 	address = ( CPU->RAM[inst_address+1] | (CPU->RAM[inst_address+2] << 8) );
 	DEBUG( printf(" $%04x,Y", address) );
-	oper.address = address + CPU->Y;
-	if( ((address&0x100) != (oper.address&0x100)) &&
+	oper->address = address + CPU->Y;
+	if( ((address&0x100) != (oper->address&0x100)) &&
 	    inst.cycle_change == CYCLE_PAGE )
 		ADD_CPU_CYCLES(1);
-
-	return oper;
 }
 
-operand get_operand_ind_indir(instruction inst, uint16_t inst_address) {
+void get_operand_ind_indir(instruction inst, uint16_t inst_address, operand *oper) {
 
 	uint16_t address;
-	operand oper = { 0xDEAD, 0xBE};
 
 	address = CPU->RAM[inst_address+1] + CPU->X;
 	DEBUG( printf(" ($%02x,X)", address - CPU->X) );
 	if( address > 0xFF )
 		address -= 0x100;
-	oper.address = read_cpu_ram(address);
+	oper->address = read_cpu_ram(address);
 	if( address == 0xFF )
 		address -= 0x100;
-	oper.address |= read_cpu_ram(address+1) << 8;
-
-	return oper;
+	oper->address |= read_cpu_ram(address+1) << 8;
 }
 
-operand get_operand_indir_ind(instruction inst, uint16_t inst_address) {
+void get_operand_indir_ind(instruction inst, uint16_t inst_address, operand *oper) {
 
 	uint16_t address;
-	operand oper = { 0xDEAD, 0xBE};
 
 	address = CPU->RAM[inst_address+1];
 	DEBUG( printf(" ($%02x),Y", address) );
-	oper.address = read_cpu_ram(address);
+	oper->address = read_cpu_ram(address);
 	if( address == 0xFF )
 		address -= 0x100;
-	oper.address |= read_cpu_ram(address+1) << 8;
-	if( ((oper.address&0x100) != ((oper.address+CPU->Y)&0x100)) &&
+	oper->address |= read_cpu_ram(address+1) << 8;
+	if( ((oper->address&0x100) != ((oper->address+CPU->Y)&0x100)) &&
 	    inst.cycle_change == CYCLE_PAGE )
 		ADD_CPU_CYCLES(1);
-	oper.address += CPU->Y;
-
-	return oper;
+	oper->address += CPU->Y;
 }
 
-operand get_operand_relative(instruction inst, uint16_t inst_address) {
-
-	operand oper = { 0xDEAD, 0xBE};
-
-	oper.value = CPU->RAM[inst_address+1];
-	DEBUG( printf(" $%02x", oper.value) );
-
-	return oper;
+void get_operand_relative(instruction inst, uint16_t inst_address, operand *oper) {
+	oper->value = CPU->RAM[inst_address+1];
+	DEBUG( printf(" $%02x", oper->value) );
 }
 
-operand get_operand_accum(instruction inst, uint16_t inst_address) {
-
-	operand oper = { 0xDEAD, 0xBE};
-
+void get_operand_accum(instruction inst, uint16_t inst_address, operand *oper) {
 	DEBUG( printf(" A") );
-
-	return oper;
 }
 
-operand get_operand_zero_indx(instruction inst, uint16_t inst_address) {
-
-	operand oper = { 0xDEAD, 0xBE};
-
-	oper.address = CPU->RAM[inst_address+1] + CPU->X;
-	DEBUG( printf(" $%02x,X", oper.address - CPU->X) );
-	if( oper.address >= 0x0100 )
-		oper.address -= 0x100;
-
-	return oper;
+void get_operand_zero_indx(instruction inst, uint16_t inst_address, operand *oper) {
+	oper->address = CPU->RAM[inst_address+1] + CPU->X;
+	DEBUG( printf(" $%02x,X", oper->address - CPU->X) );
+	if( oper->address >= 0x0100 )
+		oper->address -= 0x100;
 }
 
-operand get_operand_zero_indy(instruction inst, uint16_t inst_address) {
+void get_operand_zero_indy(instruction inst, uint16_t inst_address, operand *oper) {
 
-	operand oper = { 0xDEAD, 0xBE};
-
-	oper.address = CPU->RAM[inst_address+1] + CPU->Y;
-	DEBUG( printf(" $%02x,Y", oper.address - CPU->Y) );
-	if( oper.address >= 0x0100 )
-		oper.address -= 0x100;
-
-	return oper;
+	oper->address = CPU->RAM[inst_address+1] + CPU->Y;
+	DEBUG( printf(" $%02x,Y", oper->address - CPU->Y) );
+	if( oper->address >= 0x0100 )
+		oper->address -= 0x100;
 }
 
-operand get_operand_default(instruction inst, uint16_t inst_address) {
-	operand oper = { 0xDEAD, 0xBE};
+void get_operand_default(instruction inst, uint16_t inst_address, operand *oper) {
 	fprintf(stderr,_("Hey!!! You haven't written the %d addressing mode!!!\n"), inst.addr_mode);
-	return oper;
 }
 
-operand (*get_operand_functions[])(instruction inst, uint16_t inst_address) = {
+void (*get_operand_functions[])(instruction inst, uint16_t inst_address, operand *) = {
 	&get_operand_immediate,
 	&get_operand_absolute,
 	&get_operand_zeropage,
@@ -632,7 +579,7 @@ operand get_operand(instruction inst, uint16_t inst_address) {
 
 	DEBUG( inst_lowercase(inst.name, lower_name) );
 	DEBUG( printf("%s", lower_name) );
-	oper = get_operand_functions[inst.addr_mode](inst, inst_address);
+	get_operand_functions[inst.addr_mode](inst, inst_address, &oper);
 	DEBUG( printf("\n") );
 
 	return oper;
