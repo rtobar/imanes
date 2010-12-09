@@ -167,6 +167,6 @@ void initialize_instruction_set();
  * When reading an instruction, the operand that should be used depends
  * on the addressing mode. This function does this job
  */
-operand get_operand(instruction inst, uint16_t inst_address);
+void get_operand(instruction *inst, uint16_t inst_address, operand *oper);
 
 #endif /* instruction_set_h */
