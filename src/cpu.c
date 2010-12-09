@@ -40,10 +40,10 @@ static int prev_a12_cycles = 0;
 uint8_t  tmp;
 uint16_t tmp16;
 
-void ADC_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	tmp16 = CPU->A + oper.value + (CPU->SR & C_FLAG);
+void ADC_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	tmp16 = CPU->A + oper->value + (CPU->SR & C_FLAG);
 
 	/* If result is over 0xFF, then the carry is 1 */
 	if( tmp16 > 0xFF )
@@ -53,7 +53,7 @@ void ADC_func(instruction inst, operand oper){
 
 	/* Set overflow flag if needed */
 	if( ( ((CPU->A^tmp16)      & 0x80) != 0 ) &&
-			( ((CPU->A^oper.value) & 0x80) == 0 ) )
+	    ( ((CPU->A^oper->value) & 0x80) == 0 ) )
 		CPU->SR |= V_FLAG;
 	else
 		CPU->SR &= ~V_FLAG;
@@ -62,25 +62,25 @@ void ADC_func(instruction inst, operand oper){
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void AND_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	CPU->A &= oper.value;
+void AND_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	CPU->A &= oper->value;
 	update_flags(CPU->A, N_FLAG | Z_FLAG );
 }
 
-void ASL_func(instruction inst, operand oper){
-	if( inst.addr_mode == ADDR_ACCUM ) {
+void ASL_func(instruction *inst, operand *oper){
+	if( inst->addr_mode == ADDR_ACCUM ) {
 		tmp = CPU->A & 0x80;
 		CPU->A <<= 1;
 		update_flags(CPU->A, N_FLAG | Z_FLAG);
 	}
 	else {
-		oper.value = read_cpu_ram(oper.address);
-		tmp = oper.value & 0x80;
-		oper.value <<= 1;
-		update_flags(oper.value, N_FLAG | Z_FLAG);
-		write_cpu_ram(oper.address, oper.value);
+		oper->value = read_cpu_ram(oper->address);
+		tmp = oper->value & 0x80;
+		oper->value <<= 1;
+		update_flags(oper->value, N_FLAG | Z_FLAG);
+		write_cpu_ram(oper->address, oper->value);
 	}
 	if( tmp )
 		CPU->SR |= C_FLAG;
@@ -88,206 +88,206 @@ void ASL_func(instruction inst, operand oper){
 		CPU->SR &= ~C_FLAG;
 }
 
-void BCC_func(instruction inst, operand oper){
+void BCC_func(instruction *inst, operand *oper){
 	if( ~CPU->SR & C_FLAG ) {
-		add_cycles(CYCLE_BRANCH, oper.value);
-		CPU->PC += (int8_t)oper.value;
+		add_cycles(CYCLE_BRANCH, oper->value);
+		CPU->PC += (int8_t)oper->value;
 	}
 }
 
-void BCS_func(instruction inst, operand oper){
+void BCS_func(instruction *inst, operand *oper){
 	if( CPU->SR & C_FLAG ) {
-		add_cycles(CYCLE_BRANCH, oper.value);
-		CPU->PC +=(int8_t)oper.value;
+		add_cycles(CYCLE_BRANCH, oper->value);
+		CPU->PC +=(int8_t)oper->value;
 	}
 }
 
-void BEQ_func(instruction inst, operand oper){
+void BEQ_func(instruction *inst, operand *oper){
 	if( CPU->SR & Z_FLAG ) {
-		add_cycles(CYCLE_BRANCH, oper.value);
-		CPU->PC += (int8_t)oper.value;
+		add_cycles(CYCLE_BRANCH, oper->value);
+		CPU->PC += (int8_t)oper->value;
 	}
 }
 
-void BIT_func(instruction inst, operand oper){
-	oper.value = read_cpu_ram(oper.address);
-	if( (oper.value >> 6)  & 0x01 )
+void BIT_func(instruction *inst, operand *oper){
+	oper->value = read_cpu_ram(oper->address);
+	if( (oper->value >> 6)  & 0x01 )
 		CPU->SR |= V_FLAG;
 	else
 		CPU->SR &= ~V_FLAG;
-	update_flags(oper.value, N_FLAG);
-	update_flags(oper.value & CPU->A, Z_FLAG);
+	update_flags(oper->value, N_FLAG);
+	update_flags(oper->value & CPU->A, Z_FLAG);
 }
 
-void BMI_func(instruction inst, operand oper){
+void BMI_func(instruction *inst, operand *oper){
 	if( CPU->SR & N_FLAG ) {
-		add_cycles(CYCLE_BRANCH, oper.value);
-		CPU->PC += (int8_t)oper.value;
+		add_cycles(CYCLE_BRANCH, oper->value);
+		CPU->PC += (int8_t)oper->value;
 	}
 }
 
-void BNE_func(instruction inst, operand oper){
+void BNE_func(instruction *inst, operand *oper){
 	if( ~CPU->SR & Z_FLAG ) {
-		add_cycles(CYCLE_BRANCH, oper.value);
-		CPU->PC += (int8_t)oper.value;
+		add_cycles(CYCLE_BRANCH, oper->value);
+		CPU->PC += (int8_t)oper->value;
 	}
 }
 
-void BPL_func(instruction inst, operand oper){
+void BPL_func(instruction *inst, operand *oper){
 	if( ~CPU->SR & N_FLAG ) {
-		add_cycles(CYCLE_BRANCH, oper.value);
-		CPU->PC += (int8_t)oper.value;
+		add_cycles(CYCLE_BRANCH, oper->value);
+		CPU->PC += (int8_t)oper->value;
 	}
 }
 
-void BRK_func(instruction inst, operand oper){
+void BRK_func(instruction *inst, operand *oper){
 	CPU->SR |= B_FLAG;
 	execute_irq();
-	CPU->PC -= inst.size;
+	CPU->PC -= inst->size;
 }
 
-void BVC_func(instruction inst, operand oper){
+void BVC_func(instruction *inst, operand *oper){
 	if( ~CPU->SR & V_FLAG ) {
-		add_cycles(CYCLE_BRANCH, oper.value);
-		CPU->PC += (int8_t)oper.value;
+		add_cycles(CYCLE_BRANCH, oper->value);
+		CPU->PC += (int8_t)oper->value;
 	}
 }
 
-void BVS_func(instruction inst, operand oper){
+void BVS_func(instruction *inst, operand *oper){
 	if( CPU->SR & V_FLAG ) {
-		add_cycles(CYCLE_BRANCH, oper.value);
-		CPU->PC += (int8_t)oper.value;
+		add_cycles(CYCLE_BRANCH, oper->value);
+		CPU->PC += (int8_t)oper->value;
 	}
 }
 
-void CLC_func(instruction inst, operand oper){
+void CLC_func(instruction *inst, operand *oper){
 	CPU->SR &= ~C_FLAG;
 }
 
-void CLD_func(instruction inst, operand oper){
+void CLD_func(instruction *inst, operand *oper){
 	CPU->SR &= ~D_FLAG;
 }
 
-void CLI_func(instruction inst, operand oper){
+void CLI_func(instruction *inst, operand *oper){
 	CPU->SR &= ~I_FLAG;
 }
 
-void CLV_func(instruction inst, operand oper){
+void CLV_func(instruction *inst, operand *oper){
 	CPU->SR &= ~V_FLAG;
 }
 
-void CMP_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	if( CPU->A >= oper.value)
+void CMP_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	if( CPU->A >= oper->value)
 		CPU->SR |= C_FLAG;
 	else
 		CPU->SR &= ~C_FLAG;
-	update_flags(CPU->A - oper.value, N_FLAG | Z_FLAG);
+	update_flags(CPU->A - oper->value, N_FLAG | Z_FLAG);
 }
 
-void CPX_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	if( CPU->X >= oper.value)
+void CPX_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	if( CPU->X >= oper->value)
 		CPU->SR |= C_FLAG;
 	else
 		CPU->SR &= ~C_FLAG;
-	update_flags(CPU->X - oper.value, N_FLAG | Z_FLAG);
+	update_flags(CPU->X - oper->value, N_FLAG | Z_FLAG);
 }
 
-void CPY_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	if( CPU->Y >= oper.value)
+void CPY_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	if( CPU->Y >= oper->value)
 		CPU->SR |= C_FLAG;
 	else
 		CPU->SR &= ~C_FLAG;
-	update_flags(CPU->Y - oper.value, N_FLAG | Z_FLAG);
+	update_flags(CPU->Y - oper->value, N_FLAG | Z_FLAG);
 }
 
-void DEC_func(instruction inst, operand oper){
-	tmp = read_cpu_ram(oper.address) - 1;
-	write_cpu_ram(oper.address, tmp);
+void DEC_func(instruction *inst, operand *oper){
+	tmp = read_cpu_ram(oper->address) - 1;
+	write_cpu_ram(oper->address, tmp);
 	update_flags( tmp , N_FLAG | Z_FLAG);
 }
 
-void DEX_func(instruction inst, operand oper){
+void DEX_func(instruction *inst, operand *oper){
 	CPU->X--;
 	update_flags(CPU->X, N_FLAG | Z_FLAG);
 }
 
-void DEY_func(instruction inst, operand oper){
+void DEY_func(instruction *inst, operand *oper){
 	CPU->Y--;
 	update_flags(CPU->Y, N_FLAG | Z_FLAG);
 }
 
-void EOR_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	CPU->A ^= oper.value;
+void EOR_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	CPU->A ^= oper->value;
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void INC_func(instruction inst, operand oper){
-	tmp = read_cpu_ram(oper.address) + 1;
-	write_cpu_ram( oper.address, tmp);
+void INC_func(instruction *inst, operand *oper){
+	tmp = read_cpu_ram(oper->address) + 1;
+	write_cpu_ram( oper->address, tmp);
 	update_flags(tmp, N_FLAG | Z_FLAG);
 }
 
-void INX_func(instruction inst, operand oper){
+void INX_func(instruction *inst, operand *oper){
 	CPU->X++;
 	update_flags(CPU->X, N_FLAG | Z_FLAG);
 }
 
-void INY_func(instruction inst, operand oper){
+void INY_func(instruction *inst, operand *oper){
 	CPU->Y++;
 	update_flags(CPU->Y, N_FLAG | Z_FLAG);
 }
 
-void JMP_func(instruction inst, operand oper){
-	CPU->PC = oper.address - inst.size;
+void JMP_func(instruction *inst, operand *oper){
+	CPU->PC = oper->address - inst->size;
 }
 
-void JSR_func(instruction inst, operand oper){
+void JSR_func(instruction *inst, operand *oper){
 	stack_push( (CPU->PC+2) >> 8 );
 	stack_push( (CPU->PC+2) & 0xFF );
-	CPU->PC = oper.address - inst.size;
+	CPU->PC = oper->address - inst->size;
 }
 
-void LDA_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	CPU->A = oper.value;
+void LDA_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	CPU->A = oper->value;
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void LDX_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	CPU->X = oper.value;
+void LDX_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	CPU->X = oper->value;
 	update_flags(CPU->X, N_FLAG | Z_FLAG);
 }
 
-void LDY_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	CPU->Y = oper.value;
+void LDY_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	CPU->Y = oper->value;
 	update_flags(CPU->Y, N_FLAG | Z_FLAG);
 }
 
-void LSR_func(instruction inst, operand oper){
-	if( inst.addr_mode == ADDR_ACCUM ) {
+void LSR_func(instruction *inst, operand *oper){
+	if( inst->addr_mode == ADDR_ACCUM ) {
 		tmp = CPU->A & 0x1;
 		CPU->A >>= 1;
 		update_flags(CPU->A, Z_FLAG | N_FLAG);
 	}
 	else {
-		oper.value = read_cpu_ram(oper.address);
-		tmp = oper.value & 0x1;
-		oper.value >>= 1;
-		write_cpu_ram( oper.address, oper.value );
-		update_flags( oper.value , Z_FLAG | N_FLAG);
+		oper->value = read_cpu_ram(oper->address);
+		tmp = oper->value & 0x1;
+		oper->value >>= 1;
+		write_cpu_ram( oper->address, oper->value );
+		update_flags( oper->value , Z_FLAG | N_FLAG);
 	}
 	if( tmp )
 		CPU->SR |= C_FLAG;
@@ -295,48 +295,48 @@ void LSR_func(instruction inst, operand oper){
 		CPU->SR &= ~C_FLAG;
 }
 
-void NOP_func(instruction inst, operand oper){
+void NOP_func(instruction *inst, operand *oper){
 }
 
-void ORA_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	CPU->A |= oper.value;
+void ORA_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	CPU->A |= oper->value;
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void PHA_func(instruction inst, operand oper){
+void PHA_func(instruction *inst, operand *oper){
 	stack_push( CPU->A );
 }
 
-void PHP_func(instruction inst, operand oper){
+void PHP_func(instruction *inst, operand *oper){
 	CPU->SR |= B_FLAG;
 	stack_push( CPU->SR );
 }
 
-void PLA_func(instruction inst, operand oper){
+void PLA_func(instruction *inst, operand *oper){
 	CPU->A = stack_pull();
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void PLP_func(instruction inst, operand oper){
+void PLP_func(instruction *inst, operand *oper){
 	CPU->SR = stack_pull();
 	CPU->SR |= R_FLAG; /* R_FLAG should be _always_ set */
 }
 
-void ROL_func(instruction inst, operand oper){
-	if( inst.addr_mode == ADDR_ACCUM ) {
+void ROL_func(instruction *inst, operand *oper){
+	if( inst->addr_mode == ADDR_ACCUM ) {
 		tmp = CPU->A & 0x80;
 		CPU->A <<= 1;
 		CPU->A |= (CPU->SR & C_FLAG);
 		update_flags( CPU->A, N_FLAG | Z_FLAG);
 	} else {
-		oper.value = read_cpu_ram(oper.address);
-		tmp = oper.value & 0x80;
-		oper.value <<= 1;
-		oper.value |= (CPU->SR & C_FLAG);
-		write_cpu_ram(oper.address, oper.value);
-		update_flags( oper.value , N_FLAG | Z_FLAG);
+		oper->value = read_cpu_ram(oper->address);
+		tmp = oper->value & 0x80;
+		oper->value <<= 1;
+		oper->value |= (CPU->SR & C_FLAG);
+		write_cpu_ram(oper->address, oper->value);
+		update_flags( oper->value , N_FLAG | Z_FLAG);
 	}
 	if( tmp )
 		CPU->SR |= C_FLAG;
@@ -344,19 +344,19 @@ void ROL_func(instruction inst, operand oper){
 		CPU->SR &= ~C_FLAG;
 }
 
-void ROR_func(instruction inst, operand oper){
-	if( inst.addr_mode == ADDR_ACCUM ) {
+void ROR_func(instruction *inst, operand *oper){
+	if( inst->addr_mode == ADDR_ACCUM ) {
 		tmp = CPU->A & 0x1;
 		CPU->A >>= 1;
 		CPU->A |= (CPU->SR & C_FLAG) << 7;
 		update_flags( CPU->A, N_FLAG | Z_FLAG);
 	} else {
-		oper.value = read_cpu_ram(oper.address);
-		tmp = oper.value & 0x1;
-		oper.value >>= 1;
-		oper.value |= ((CPU->SR & C_FLAG) << 7);
-		write_cpu_ram(oper.address, oper.value);
-		update_flags( oper.value , N_FLAG | Z_FLAG);
+		oper->value = read_cpu_ram(oper->address);
+		tmp = oper->value & 0x1;
+		oper->value >>= 1;
+		oper->value |= ((CPU->SR & C_FLAG) << 7);
+		write_cpu_ram(oper->address, oper->value);
+		update_flags( oper->value , N_FLAG | Z_FLAG);
 	}
 	if( tmp )
 		CPU->SR |= C_FLAG;
@@ -364,25 +364,25 @@ void ROR_func(instruction inst, operand oper){
 		CPU->SR &= ~C_FLAG;
 }
 
-void RTI_func(instruction inst, operand oper){
+void RTI_func(instruction *inst, operand *oper){
 	CPU->SR =  stack_pull();
 	CPU->SR |= R_FLAG; /* R_FLAG should be _always_ set */
 	CPU->PC =  stack_pull();
 	CPU->PC |= stack_pull() << 8;
-	CPU->PC -= inst.size;
+	CPU->PC -= inst->size;
 }
 
-void RTS_func(instruction inst, operand oper){
+void RTS_func(instruction *inst, operand *oper){
 	CPU->PC =  stack_pull();
 	CPU->PC |= stack_pull() << 8;
 	CPU->PC++;
-	CPU->PC -= inst.size;
+	CPU->PC -= inst->size;
 }
 
-void SBC_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	tmp16 = CPU->A - oper.value - (1 - (CPU->SR & C_FLAG));
+void SBC_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	tmp16 = CPU->A - oper->value - (1 - (CPU->SR & C_FLAG));
 
 	/* If result is over 0xFF, then the carry is 1 */
 	if( tmp16 > 0xFF )
@@ -392,7 +392,7 @@ void SBC_func(instruction inst, operand oper){
 
 	/* Set overflow flag if needed */
 	if( ( ((CPU->A^tmp16)      & 0x80) != 0 ) &&
-			( ((CPU->A^oper.value) & 0x80) != 0 ) )
+			( ((CPU->A^oper->value) & 0x80) != 0 ) )
 		CPU->SR |= V_FLAG;
 	else
 		CPU->SR &= ~V_FLAG;
@@ -402,62 +402,62 @@ void SBC_func(instruction inst, operand oper){
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void SEC_func(instruction inst, operand oper){
+void SEC_func(instruction *inst, operand *oper){
 	CPU->SR |= C_FLAG;
 }
 
-void SED_func(instruction inst, operand oper){
+void SED_func(instruction *inst, operand *oper){
 	CPU->SR |= D_FLAG;
 }
 
-void SEI_func(instruction inst, operand oper){
+void SEI_func(instruction *inst, operand *oper){
 	CPU->SR |= I_FLAG;
 }
 
-void STA_func(instruction inst, operand oper){
-	write_cpu_ram(oper.address, CPU->A);
+void STA_func(instruction *inst, operand *oper){
+	write_cpu_ram(oper->address, CPU->A);
 }
 
-void STX_func(instruction inst, operand oper){
-	write_cpu_ram(oper.address, CPU->X);
+void STX_func(instruction *inst, operand *oper){
+	write_cpu_ram(oper->address, CPU->X);
 }
 
-void STY_func(instruction inst, operand oper){
-	write_cpu_ram(oper.address, CPU->Y);
+void STY_func(instruction *inst, operand *oper){
+	write_cpu_ram(oper->address, CPU->Y);
 }
 
-void TAX_func(instruction inst, operand oper){
+void TAX_func(instruction *inst, operand *oper){
 	CPU->X = CPU->A;
 	update_flags(CPU->X, N_FLAG | Z_FLAG);
 }
 
-void TAY_func(instruction inst, operand oper){
+void TAY_func(instruction *inst, operand *oper){
 	CPU->Y = CPU->A;
 	update_flags(CPU->Y, N_FLAG | Z_FLAG);
 }
 
-void TSX_func(instruction inst, operand oper){
+void TSX_func(instruction *inst, operand *oper){
 	CPU->X = CPU->SP;
 	update_flags(CPU->X, N_FLAG | Z_FLAG);
 }
 
-void TXA_func(instruction inst, operand oper){
+void TXA_func(instruction *inst, operand *oper){
 	CPU->A = CPU->X;
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void TXS_func(instruction inst, operand oper){
+void TXS_func(instruction *inst, operand *oper){
 	CPU->SP = CPU->X;
 }
 
-void TYA_func(instruction inst, operand oper){
+void TYA_func(instruction *inst, operand *oper){
 	CPU->A = CPU->Y;
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
 /** Illegal opcodes **/
-void ANC_func(instruction inst, operand oper){
-	CPU->A &= oper.value;
+void ANC_func(instruction *inst, operand *oper){
+	CPU->A &= oper->value;
 	if( (int8_t)CPU->A < 0 )
 		CPU->SR |= C_FLAG;
 	else
@@ -465,8 +465,8 @@ void ANC_func(instruction inst, operand oper){
 	update_flags(CPU->A, N_FLAG | Z_FLAG );
 }
 
-void ALR_func(instruction inst, operand oper){
-	CPU->A &= oper.value;
+void ALR_func(instruction *inst, operand *oper){
+	CPU->A &= oper->value;
 	if( CPU->A & 0x01 )
 		CPU->SR |= C_FLAG;
 	else
@@ -475,8 +475,8 @@ void ALR_func(instruction inst, operand oper){
 	update_flags(CPU->A, N_FLAG | Z_FLAG );
 }
 
-void ARR_func(instruction inst, operand oper){
-	CPU->A &= oper.value;
+void ARR_func(instruction *inst, operand *oper){
+	CPU->A &= oper->value;
 	CPU->A >>= 1;
 	CPU->A |= (CPU->SR & C_FLAG) << 7;
 	if( CPU->A & 0x40 )
@@ -490,9 +490,9 @@ void ARR_func(instruction inst, operand oper){
 	update_flags(CPU->A, N_FLAG | Z_FLAG );
 }
 
-void DCP_func(instruction inst, operand oper){
-	tmp = read_cpu_ram(oper.address) - 1;
-	write_cpu_ram(oper.address, tmp);
+void DCP_func(instruction *inst, operand *oper){
+	tmp = read_cpu_ram(oper->address) - 1;
+	write_cpu_ram(oper->address, tmp);
 	if( CPU->A >= tmp)
 		CPU->SR |= C_FLAG;
 	else
@@ -500,9 +500,9 @@ void DCP_func(instruction inst, operand oper){
 	update_flags(CPU->A - tmp, N_FLAG | Z_FLAG);
 }
 
-void ISC_func(instruction inst, operand oper){
-	tmp = read_cpu_ram(oper.address) + 1;
-	write_cpu_ram(oper.address, tmp);
+void ISC_func(instruction *inst, operand *oper){
+	tmp = read_cpu_ram(oper->address) + 1;
+	write_cpu_ram(oper->address, tmp);
 
 	tmp16 = CPU->A - tmp - (1 - (CPU->SR & C_FLAG));
 
@@ -523,42 +523,42 @@ void ISC_func(instruction inst, operand oper){
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void LAX_func(instruction inst, operand oper){
-	if( inst.addr_mode != ADDR_IMMEDIATE )
-		oper.value = read_cpu_ram(oper.address);
-	CPU->A = oper.value;
-	CPU->X = oper.value;
+void LAX_func(instruction *inst, operand *oper){
+	if( inst->addr_mode != ADDR_IMMEDIATE )
+		oper->value = read_cpu_ram(oper->address);
+	CPU->A = oper->value;
+	CPU->X = oper->value;
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void RLA_func(instruction inst, operand oper){
-	oper.value = read_cpu_ram(oper.address);
-	tmp = oper.value & 0x80;
-	oper.value <<= 1;
-	oper.value |= (CPU->SR & C_FLAG);
-	write_cpu_ram(oper.address, oper.value);
+void RLA_func(instruction *inst, operand *oper){
+	oper->value = read_cpu_ram(oper->address);
+	tmp = oper->value & 0x80;
+	oper->value <<= 1;
+	oper->value |= (CPU->SR & C_FLAG);
+	write_cpu_ram(oper->address, oper->value);
 	if( tmp )
 		CPU->SR |= C_FLAG;
 	else
 		CPU->SR &= ~C_FLAG;
-	CPU->A &= oper.value;
+	CPU->A &= oper->value;
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void RRA_func(instruction inst, operand oper){
+void RRA_func(instruction *inst, operand *oper){
 	/* Right shift */
-	oper.value = read_cpu_ram(oper.address);
-	tmp = oper.value & 0x1;
-	oper.value >>= 1;
-	oper.value |= ((CPU->SR & C_FLAG) << 7);
-	write_cpu_ram(oper.address, oper.value);
+	oper->value = read_cpu_ram(oper->address);
+	tmp = oper->value & 0x1;
+	oper->value >>= 1;
+	oper->value |= ((CPU->SR & C_FLAG) << 7);
+	write_cpu_ram(oper->address, oper->value);
 	if( tmp )
 		CPU->SR |= C_FLAG;
 	else
 		CPU->SR &= ~C_FLAG;
 
 	/* ADC */
-	tmp16 = CPU->A + oper.value + (CPU->SR & C_FLAG);
+	tmp16 = CPU->A + oper->value + (CPU->SR & C_FLAG);
 
 	/* If result is over 0xFF, then the carry is 1 */
 	if( tmp16 > 0xFF )
@@ -568,7 +568,7 @@ void RRA_func(instruction inst, operand oper){
 
 	/* Set overflow flag if needed */
 	if( ( ((CPU->A^tmp16)      & 0x80) != 0 ) &&
-			( ((CPU->A^oper.value) & 0x80) == 0 ) )
+			( ((CPU->A^oper->value) & 0x80) == 0 ) )
 		CPU->SR |= V_FLAG;
 	else
 		CPU->SR &= ~V_FLAG;
@@ -577,136 +577,136 @@ void RRA_func(instruction inst, operand oper){
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void SAX_func(instruction inst, operand oper){
+void SAX_func(instruction *inst, operand *oper){
 	tmp = CPU->A & CPU->X;
-	write_cpu_ram(oper.address, tmp);
+	write_cpu_ram(oper->address, tmp);
 	update_flags(tmp, N_FLAG | Z_FLAG);
 }
 
-void SBX_func(instruction inst, operand oper){
+void SBX_func(instruction *inst, operand *oper){
 	CPU->X = CPU->A & CPU->X;
 
-	if( CPU->X >= oper.value)
+	if( CPU->X >= oper->value)
 		CPU->SR |= C_FLAG;
 	else
 		CPU->SR &= ~C_FLAG;
-	CPU->X -= oper.value;
+	CPU->X -= oper->value;
 	update_flags(CPU->X, N_FLAG | Z_FLAG);
 }
 
-void SHX_func(instruction inst, operand oper){
-	tmp = CPU->X & (((oper.address & 0xFF00) >> 8) + 1);
-	write_cpu_ram(oper.address, tmp);
+void SHX_func(instruction *inst, operand *oper){
+	tmp = CPU->X & (((oper->address & 0xFF00) >> 8) + 1);
+	write_cpu_ram(oper->address, tmp);
 }
 
-void SHY_func(instruction inst, operand oper){
-	tmp = CPU->Y & (((oper.address & 0xFF00) >> 8) + 1);
-	write_cpu_ram(oper.address, tmp);
+void SHY_func(instruction *inst, operand *oper){
+	tmp = CPU->Y & (((oper->address & 0xFF00) >> 8) + 1);
+	write_cpu_ram(oper->address, tmp);
 }
 
-void SLO_func(instruction inst, operand oper){
-	oper.value = read_cpu_ram(oper.address);
-	if( oper.value & 0x80 )
+void SLO_func(instruction *inst, operand *oper){
+	oper->value = read_cpu_ram(oper->address);
+	if( oper->value & 0x80 )
 		CPU->SR |= C_FLAG;
 	else
 		CPU->SR &= ~C_FLAG;
-	oper.value <<= 1;
-	write_cpu_ram(oper.address, oper.value);
-	CPU->A |= oper.value;
+	oper->value <<= 1;
+	write_cpu_ram(oper->address, oper->value);
+	CPU->A |= oper->value;
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void SRE_func(instruction inst, operand oper){
-	oper.value = read_cpu_ram(oper.address);
-	if( oper.value & 0x01 )
+void SRE_func(instruction *inst, operand *oper){
+	oper->value = read_cpu_ram(oper->address);
+	if( oper->value & 0x01 )
 		CPU->SR |= C_FLAG;
 	else
 		CPU->SR &= ~C_FLAG;
-	oper.value >>= 1;
-	write_cpu_ram(oper.address, oper.value);
-	CPU->A ^= oper.value;
+	oper->value >>= 1;
+	write_cpu_ram(oper->address, oper->value);
+	CPU->A ^= oper->value;
 	update_flags(CPU->A, N_FLAG | Z_FLAG);
 }
 
-void default_func(instruction inst, operand oper){
-	fprintf(stderr,_("%s: Still unimplemented\n"), inst.name);
+void default_func(instruction *inst, operand *oper){
+	fprintf(stderr,_("%s: Still unimplemented\n"), inst->name);
 }
 
-void (*ptr_to_inst[INSTRUCTIONS_NUMBER])(instruction inst, operand oper) = {
-&ADC_func,
-&AND_func,
-&ASL_func,
-&BCC_func,
-&BCS_func,
-&BEQ_func,
-&BIT_func,
-&BMI_func,
-&BNE_func,
-&BPL_func,
-&BRK_func,
-&BVC_func,
-&BVS_func,
-&CLC_func,
-&CLD_func,
-&CLI_func,
-&CLV_func,
-&CMP_func,
-&CPX_func,
-&CPY_func,
-&DEC_func,
-&DEX_func,
-&DEY_func,
-&EOR_func,
-&INC_func,
-&INX_func,
-&INY_func,
-&JMP_func,
-&JSR_func,
-&LDA_func,
-&LDX_func,
-&LDY_func,
-&LSR_func,
-&NOP_func,
-&ORA_func,
-&PHA_func,
-&PHP_func,
-&PLA_func,
-&PLP_func,
-&ROL_func,
-&ROR_func,
-&RTI_func,
-&RTS_func,
-&SBC_func,
-&SEC_func,
-&SED_func,
-&SEI_func,
-&STA_func,
-&STX_func,
-&STY_func,
-&TAX_func,
-&TAY_func,
-&TSX_func,
-&TXA_func,
-&TXS_func,
-&TYA_func,
-&default_func,
-&ANC_func,
-&ALR_func,
-&ARR_func,
-&DCP_func,
-&ISC_func,
-&default_func,
-&LAX_func,
-&RLA_func,
-&RRA_func,
-&SAX_func,
-&SBX_func,
-&SHX_func,
-&SHY_func,
-&SLO_func,
-&SRE_func,
-&default_func,
-&default_func
+void (*ptr_to_inst[INSTRUCTIONS_NUMBER])(instruction *, operand *) = {
+	&ADC_func,
+	&AND_func,
+	&ASL_func,
+	&BCC_func,
+	&BCS_func,
+	&BEQ_func,
+	&BIT_func,
+	&BMI_func,
+	&BNE_func,
+	&BPL_func,
+	&BRK_func,
+	&BVC_func,
+	&BVS_func,
+	&CLC_func,
+	&CLD_func,
+	&CLI_func,
+	&CLV_func,
+	&CMP_func,
+	&CPX_func,
+	&CPY_func,
+	&DEC_func,
+	&DEX_func,
+	&DEY_func,
+	&EOR_func,
+	&INC_func,
+	&INX_func,
+	&INY_func,
+	&JMP_func,
+	&JSR_func,
+	&LDA_func,
+	&LDX_func,
+	&LDY_func,
+	&LSR_func,
+	&NOP_func,
+	&ORA_func,
+	&PHA_func,
+	&PHP_func,
+	&PLA_func,
+	&PLP_func,
+	&ROL_func,
+	&ROR_func,
+	&RTI_func,
+	&RTS_func,
+	&SBC_func,
+	&SEC_func,
+	&SED_func,
+	&SEI_func,
+	&STA_func,
+	&STX_func,
+	&STY_func,
+	&TAX_func,
+	&TAY_func,
+	&TSX_func,
+	&TXA_func,
+	&TXS_func,
+	&TYA_func,
+	&default_func,
+	&ANC_func,
+	&ALR_func,
+	&ARR_func,
+	&DCP_func,
+	&ISC_func,
+	&default_func,
+	&LAX_func,
+	&RLA_func,
+	&RRA_func,
+	&SAX_func,
+	&SBX_func,
+	&SHX_func,
+	&SHY_func,
+	&SLO_func,
+	&SRE_func,
+	&default_func,
+	&default_func
 };
 
 nes_cpu *CPU;
@@ -790,8 +790,8 @@ void init_cpu_ram(ines_file *file) {
 	mapper->reset();
 }
 
-void execute_instruction(instruction inst, operand oper) {
-	(*ptr_to_inst[inst.instr_id])(inst, oper);
+void execute_instruction(instruction *inst, operand *oper) {
+	(*ptr_to_inst[inst->instr_id])(inst, oper);
 }
 
 void update_flags(int8_t value, uint8_t flags) {

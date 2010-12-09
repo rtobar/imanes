@@ -143,7 +143,7 @@ int main_loop(void *args) {
 			PPU->SR |= VBLANK_FLAG;
 
 		/* Execute the given instruction */
-		execute_instruction(inst,operand);
+		execute_instruction(&inst, &operand);
 
 		XTREME( dump_cpu() );
 		CPU->PC += inst.size;
