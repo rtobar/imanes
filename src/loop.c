@@ -129,7 +129,7 @@ int main_loop(void *args) {
 		}
 
 		/* Select operand depending on the addressing node */
-		get_operand(&inst, CPU->PC, &operand);
+		get_operand(&inst, &operand);
 
 		/* Clear the VBLANK flag if the execution of the instruction
 		 * passes the instant when the VBLANK flag is cleared */
