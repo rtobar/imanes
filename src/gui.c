@@ -77,6 +77,7 @@ void gui_loop() {
 
 	SDL_Event event;
 
+	config.run_fast = 0;
 	SDL_ShowCursor(SDL_ENABLE);
 	start_timing();
 
