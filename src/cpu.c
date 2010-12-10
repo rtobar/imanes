@@ -925,7 +925,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 		/* Triangle channel linear counter, control */
 		case 0x4008:
-			INFO( printf("Writing in 0x4008\n") );
 			i  = (value&0x80) >> 7;
 			APU->triangle.linear_control = i;
 			APU->triangle.length_halt = i;
@@ -945,7 +944,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 		/* Triangle channel period 3 higher bits, length counter index */
 		case 0x400B:
-			INFO( printf("Writing in 0x400B\n") );
 			APU->triangle.period &= 0x00FF;
 			APU->triangle.period |= (value & 0x7) << 8;
 
