@@ -54,7 +54,8 @@ void usage(FILE *file, char *argv[]) {
 	fprintf(file,_("Options:\n"));
 	fprintf(file,_("  -v        Increase verbosity. More -v, more verbose. Default: 0\n"));
 	fprintf(file,_("  -s <n>    Video scaling factor. Default: 1\n"));
-	fprintf(file,_("  -c        Use SDL color construction. Default: no\n\n"));
+	fprintf(file,_("  -c        Use SDL color construction. Default: no\n"));
+	fprintf(file,_("  -m        Mute sound. Default: no\n\n"));
 	fprintf(file,_("  -h,-?     Show this help and exit\n"));
 	fprintf(file,_("  -V        Show the current version of ImaNES and exit\n\n"));
 	fprintf(file,_("ImaNES development is maintained by Rodrigo Tobar <rtobar@csrg.inf.utfsm.cl>\n"));
@@ -76,9 +77,11 @@ int parse_options(int args, char *argv[]) {
 
 	config.verbosity = 0;
 
-	while( (opt = getopt(args, argv, "cvhHVs:?")) != -1 ) {
+	while( (opt = getopt(args, argv, "mcvhHVs:?")) != -1 ) {
 
 		switch(opt) {
+			case 'm':
+				config.sound_mute = 1;
 			case 'v':
 				config.verbosity++;
 				break;
@@ -139,6 +142,7 @@ int main(int args, char *argv[]) {
 	textdomain(PACKAGE);
 
 	/* Parse command line options */
+	initialize_configuration();
 	switch ( parse_options(args, argv) ) {
 		case -1:
 			usage(stderr,argv);
@@ -152,7 +156,6 @@ int main(int args, char *argv[]) {
 	load_user_configuration();
 
 	/* Initialize static data */
-	initialize_configuration();
 	initialize_palette();
 	initialize_instruction_set();
 	initialize_playback();

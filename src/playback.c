@@ -22,11 +22,11 @@
 #include "clock.h"
 #include "cpu.h"
 #include "i18n.h"
+#include "imaconfig.h"
 #include "playback.h"
 
 uint8_t *sdl_audio_buffer;
 static SDL_AudioSpec audio_spec;
-static int audio_initialized;
 Uint8 square_dac_outputs[32];
 Uint8 tnd_dac_outputs[204];
 
@@ -36,7 +36,8 @@ void initialize_playback() {
 	int max_vol;
 	SDL_AudioSpec desired;
 
-	audio_initialized = 0;
+	if( config.sound_mute )
+		return;
 
 	/* Initialize the SDL Audio subsytem */
 	desired.freq     = 22050;
@@ -63,8 +64,6 @@ void initialize_playback() {
 		fprintf(stderr,_("Cannot initialize audio: cannot allocate memory for audio buffer\n"));
 		return;
 	}
-
-	audio_initialized = 1;
 
 	/* Calculate our own final DAC outputs from the normalized
 	 * We do this to avoid floating point calculations during ImaNES */
@@ -95,6 +94,9 @@ void playback_fill_sound_buffer(uint8_t sample, nes_apu_channel channel) {
 
 	int index = CLK->nmi_pcycles/3;
 
+	if( config.sound_mute )
+		return;
+
 	if( channel == Square1 )
 		sdl_audio_buffer[index] = square_dac_outputs[sample];
 	if( channel == Square2 )
@@ -109,9 +111,13 @@ void playback_fill_sound_buffer(uint8_t sample, nes_apu_channel channel) {
 }
 
 void playback_pause(int pause_on) {
+	if( config.sound_mute )
+		return;
 	SDL_PauseAudio(pause_on);
 }
 
 void end_playback() {
+	if( config.sound_mute )
+		return;
 	playback_pause(1);
 }

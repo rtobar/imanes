@@ -32,6 +32,7 @@ typedef struct _config {
 	int verbosity;               /* How verbose imanes should be */
 	int run_fast;                /* Run as fast as possible */
 	int use_sdl_colors;          /* Let SDL convert RGB values */
+	int sound_mute;              /* Do not output any sound */
 
 	int take_screenshot;         /* Should we take a screenshot? */
 

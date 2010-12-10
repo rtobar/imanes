@@ -114,7 +114,6 @@ void init_screen() {
 		fprintf(stderr,_("Could not load ImaNES icon :(\n"));
 	else
 		SDL_WM_SetIcon(icon, mask);
-	SDL_WM_SetCaption(window_title,NULL);
 
 
 	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*config.video_scale, NES_NTSC_HEIGHT*config.video_scale, NES_SCREEN_BPP, 0);

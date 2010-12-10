@@ -47,6 +47,7 @@ void initialize_configuration() {
 	config.apu_square2 = 1;
 	config.apu_noise = 1;
 	config.apu_dmc = 1;
+	config.sound_mute = 0;
 
 	/* Start on non-pause and at 60 fps */
 	config.pause = 0;
