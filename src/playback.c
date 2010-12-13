@@ -90,12 +90,13 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
 }
 
+/*
+   if(config.mute) not here, but where the call is invoked, to
+   avoid unnecesary arguments copy during runtime
+*/
 void playback_fill_sound_buffer(uint8_t sample, nes_apu_channel channel) {
 
 	int index = CLK->nmi_pcycles/3;
-
-	if( config.sound_mute )
-		return;
 
 	if( channel == Square1 )
 		sdl_audio_buffer[index] = square_dac_outputs[sample];

@@ -26,6 +26,7 @@
 #include "cpu.h"
 #include "debug.h"
 #include "i18n.h"
+#include "imaconfig.h"
 #include "playback.h"
 
 nes_apu *APU;
@@ -474,7 +475,8 @@ void clock_triangle_timer() {
 	index = APU->triangle.sequencer_step++ & 0x1F;
 	dac_output = triangle_sequencer_output[index];
 
-	playback_fill_sound_buffer(dac_output, Triangle);
+	if( !config.sound_mute )
+		playback_fill_sound_buffer(dac_output, Triangle);
 }
 
 void clock_square_timer(int square_channel) {
