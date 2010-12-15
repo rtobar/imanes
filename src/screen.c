@@ -116,7 +116,7 @@ void init_screen() {
 		SDL_WM_SetIcon(icon, mask);
 
 
-	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*config.video_scale, NES_NTSC_HEIGHT*config.video_scale, NES_SCREEN_BPP, 0);
+	nes_screen = SDL_SetVideoMode(NES_SCREEN_WIDTH*config.video_scale, NES_NTSC_HEIGHT*config.video_scale, NES_SCREEN_BPP, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
 	if( nes_screen == NULL ) {
 		fprintf(stderr,_("Error while setting video mode: %s\n"), SDL_GetError());
