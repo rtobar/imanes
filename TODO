@@ -19,8 +19,17 @@ CPU:
  * [DONE] Handle the mirroring by means of this separate method
  * [DONE] Fix the ADC/SBC instructions (recognize the C flag change)
  * [DONE] Check ASL
- * [ALMOST] Add illegal opcodes
+ * [DONE] Add illegal opcodes
  * [DOING] Improve CPU/PPU timing
+
+APU:
+====
+
+ * [    ] Emulate noise channel
+ * [    ] Emulate DMC channel
+ * [    ] Correct output of audio samples via SDL (use a queue + pull mechanism?)
+ * [    ] Check that the current triangle channel is well implemented
+ * [    ] Check that the current square channel is well implemented
 
 PPU:
 ====
@@ -37,13 +46,15 @@ PPU:
  * [    ] Proper hit flag timing
  * [DONE] Add support for 8x16 sprites
  * [DONE] Fix the back and front sprites drawing
+ * [    ] Re-check the sprite drawing, it seems to fail in some cases, have to
+   check the drawing limits of the NES again
 
 Pads:
 =====
 
  * [DONE] Add initial support for user input through keyboard
  * [DONE] Support second pad
- * [v0.2] Configurable keys
+ * [v0.3] Configurable keys
 
 Mappers:
 ========
