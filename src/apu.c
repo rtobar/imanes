@@ -308,7 +308,6 @@ void initialize_apu() {
 
 	APU = (nes_apu *)malloc(sizeof(nes_apu));
 
-	APU->length_ctr = 0;
 	APU->commons = 0;
 
 	/* Frame sequencer initialization */
@@ -327,11 +326,13 @@ void initialize_apu() {
 	APU->triangle.length_halt = 0;
 	APU->triangle.sequencer_step = 0;
 
+	/* Square channels initialization */
+	APU->square1.channel = Square1;
+	APU->square2.channel = Square2;
 }
 
 void dump_apu() {
 
-	printf("0x4015:%02x  ", APU->length_ctr);
 	printf("0x4017:%02x  ", APU->commons);
 	printf("FS: %d/%d\n", APU->frame_seq.step, APU->frame_seq.int_flag);
 
@@ -435,6 +436,34 @@ void clock_frame_sequencer() {
 
 }
 
+void clock_envelope(nes_square_channel *s) {
+
+	uint8_t volume;
+
+	if( s->envelope_written ) {
+		s->envelope_counter = 15;
+		s->envelope_timeout = s->envelope_period;
+	}
+	else
+		s->envelope_timeout--;
+	s->envelope_written = 0;
+
+	if( !s->envelope_timeout ) {
+		if( s->envelope_loop && !s->envelope_counter )
+			s->envelope_counter = 15;
+		else
+			if( s->envelope_counter )
+				s->envelope_counter--;
+	}
+
+	if( s->envelope_disabled )
+		volume = s->envelope_period-1;
+	else
+		volume = s->envelope_counter;
+
+	playback_fill_sound_buffer(volume, s->channel);
+}
+
 void clock_envelopes_tlc() {
 
 	/* Clock triangle linear counter*/
@@ -445,13 +474,59 @@ void clock_envelopes_tlc() {
 
 	if ( !APU->triangle.linear_control )
 		APU->triangle.linear_halt = 0;
+
+	/* Clock square channels envelope */
+	clock_envelope(&APU->square1);
+	clock_envelope(&APU->square2);
+
+	/* TODO: Clock noise envelope */
+}
+
+void clock_sweep(nes_square_channel *s) {
+
+	uint16_t new_period;
+
+	/* Calculate the new period */
+	new_period = s->period >> s->sweep_shift;
+	if( s->sweep_negate )
+		new_period = (!new_period) & 0x7FF;
+	if( s->channel == Square2 )
+		new_period++;
+	new_period = s->period + new_period;
+
+	/* Possibily update the channel's period */
+	if( s->period < 8 || new_period > 0x7FF ) {
+		if( !config.sound_mute )
+			playback_fill_sound_buffer(0, Square1);
+	}
+	else {
+		if( !s->sweep_enable && s->sweep_shift )
+			if( !s->sweep_timeout ) {
+				s->period = new_period;
+				s->sweep_timeout = s->sweep_period;
+			}
+	}
+
 }
 
 void clock_lc_sweep() {
 
-	/* Clock the triangle lenght counter */
+
+	/* Clock the length counters for triangle and square channels */
 	if( !APU->triangle.length_halt && APU->triangle.length_counter )
 		APU->triangle.length_counter--;
+
+	if( !APU->square1.length_halt && APU->square1.length_counter )
+		APU->square1.length_counter--;
+
+	if( !APU->square2.length_halt && APU->square2.length_counter )
+		APU->square2.length_counter--;
+
+	/* TODO: clock noise channel's length counter */
+
+	/* Clock sweep unit on square channels */
+	clock_sweep(&APU->square1);
+	clock_sweep(&APU->square2);
 
 }
 

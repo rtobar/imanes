@@ -923,6 +923,46 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			}
 			break;
 
+		/* 1st Square channel duty, envelope */
+		case 0x4000:
+			APU->square1.duty_cycle = (value&0xC0) >> 6;
+
+			i = (value&0x20) >> 5;
+			APU->square1.envelope_loop = i;
+			APU->square1.length_halt = i;
+
+			APU->square1.envelope_disabled = (value&0x10) >> 4;
+			APU->square1.envelope_period = (value&0x0F) + 1;
+			APU->square1.envelope_written = 1;
+			break;
+
+		/* 1st Square channel sweep unit */
+		case 0x4001:
+			APU->square1.sweep_enable = (value&0x80) >> 7;
+			APU->square1.sweep_reload = ((value&0x70) >> 4) + 1;
+			APU->square1.sweep_negate = (value&0x08) >> 3;
+			APU->square1.sweep_shift = value&0x03;
+			break;
+
+		/* 1st Square channel period 8 lower bits */
+		case 0x4002:
+			APU->square1.period &= 0x0700;
+			APU->square1.period |= value;
+			APU->square1.period++;
+			break;
+
+		/* 1st Square channel period 3 higher bits, length counter index */
+		case 0x4003:
+			APU->square1.period &= 0x00FF;
+			APU->square1.period |= (value & 0x7) << 8;
+
+			i = (value & 0xF8) >> 3;
+			if( APU->square1.length_enabled )
+				APU->square1.length_counter = length_counter_reload_values[i];
+			break;
+
+		/* TODO: Copy 1st square channel to 2nd addresses */
+
 		/* Triangle channel linear counter, control */
 		case 0x4008:
 			i  = (value&0x80) >> 7;
@@ -931,7 +971,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 			APU->triangle.linear_reload = value&0x7F;
 
-			printf("Write to 0x4008 is %02X\n", value);
 			break;
 
 		/* Triangle channel period 8 lower bits */
@@ -939,7 +978,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			APU->triangle.period &= 0x0700;
 			APU->triangle.period |= value;
 			APU->triangle.period++;
-			printf("Write to 0x400A is %02X\n", value);
 			break;
 
 		/* Triangle channel period 3 higher bits, length counter index */
@@ -948,8 +986,8 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			APU->triangle.period |= (value & 0x7) << 8;
 
 			i = (value & 0xF8) >> 3;
-			APU->triangle.length_counter = length_counter_reload_values[i];
-			printf("Write to 0x400B is %02X\n", value);
+			if( APU->triangle.length_enabled )
+				APU->triangle.length_counter = length_counter_reload_values[i];
 			APU->triangle.linear_halt = 1;
 			break;
 
@@ -963,7 +1001,17 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 		/* APU Lenght Control */
 		case 0x4015:
-			APU->length_ctr = value & 0x1F;
+			/* TODO: DMC IRQ flag clear, DMC start/stop */
+
+			APU->square1.length_enabled = value&0x01;
+			APU->square2.length_enabled = (value&0x02) >> 1;
+			APU->triangle.length_enabled = (value&0x04) >> 2;
+
+			APU->square1.length_counter = 0;
+			APU->square2.length_counter = 0;
+			APU->triangle.length_counter = 0;
+
+			/* TODO: noise length flag */
 			break;
 
 		/* 1st and 2nd joysticks strobe */

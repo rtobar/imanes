@@ -54,8 +54,9 @@ typedef struct _triangle_channel {
 	uint8_t linear_control;
 
 	/* Lenght Counter stuff */
-	uint8_t length_counter;
+	uint8_t length_enabled;
 	uint8_t length_halt;
+	uint8_t length_counter;
 
 	/* Sequencer stuff */
 	uint8_t sequencer_step;
@@ -64,23 +65,41 @@ typedef struct _triangle_channel {
 
 typedef struct _square_channel {
 
+	nes_apu_channel channel;
+	uint8_t duty_cycle;
+
 	/* Timer stuff */
-	int clock_timeout;
-	unsigned int period;
+	int16_t clock_timeout;
+	uint16_t period;
 
 	/* Sweep Unit stuff */
+	uint8_t sweep_enable;
+	uint8_t sweep_negate;
+	uint8_t sweep_reload;
+	uint8_t sweep_period;
+	uint8_t sweep_timeout;
+	uint8_t sweep_shift;
 
-	/* Sequencer stuff (needed?) */
+	/* Envelope stuff */
+	uint8_t envelope_disabled;
+	uint8_t envelope_loop;
+	uint8_t envelope_written;
+	uint8_t envelope_counter;
+	uint8_t envelope_period;
+	uint8_t envelope_timeout;
 
 	/* Lenght Counter stuff */
+	uint8_t length_enabled;
+	uint8_t length_halt;
+	uint8_t length_counter;
 
 } nes_square_channel;
 
 typedef struct _noise_channel {
 
 	/* Timer stuff */
-	int clock_timeout;
-	unsigned int period;
+	int16_t clock_timeout;
+	uint16_t period;
 
 	/* Random (needed?) */
 
@@ -91,8 +110,8 @@ typedef struct _noise_channel {
 typedef struct _delta_modulation_channel {
 
 	/* Timer stuff */
-	int clock_timeout;
-	unsigned int period;
+	int16_t clock_timeout;
+	uint16_t period;
 
 	/* DMA Reader stuff (needed?) */
 
@@ -108,7 +127,6 @@ typedef struct _delta_modulation_channel {
 typedef struct _apu {
 
 	/* Registers */
-	uint8_t length_ctr; /* 0x4015 */
 	uint8_t commons;    /* 0x4017 */
 
 	/* Frame sequencer */
