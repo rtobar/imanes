@@ -418,25 +418,25 @@ void clock_frame_sequencer() {
 
 		switch(APU->frame_seq.step) {
 
-			case 1:
+			case 0:
 				clock_lc_sweep();
+				clock_envelopes_tlc();
+				break;
+
+			case 1:
 				clock_envelopes_tlc();
 				break;
 
 			case 2:
-				clock_envelopes_tlc();
-				break;
-
-			case 3:
 				clock_lc_sweep();
 				clock_envelopes_tlc();
 				break;
 
-			case 4:
+			case 3:
 				clock_envelopes_tlc();
 				break;
 
-			case 5:
+			case 4:
 				/* Doesn't do anything? */
 				break;
 		}
@@ -446,22 +446,23 @@ void clock_frame_sequencer() {
 
 		switch(APU->frame_seq.step) {
 
+			case 0:
+				clock_envelopes_tlc();
+				break;
+
 			case 1:
+				clock_lc_sweep();
 				clock_envelopes_tlc();
 				break;
 
 			case 2:
-				clock_lc_sweep();
 				clock_envelopes_tlc();
 				break;
 
 			case 3:
-				clock_envelopes_tlc();
-				break;
-
-			case 4:
 				clock_lc_sweep();
 				clock_envelopes_tlc();
+				APU->frame_seq.int_flag = 1;
 				break;
 
 		}
@@ -547,7 +548,6 @@ void clock_sweep(nes_square_channel *s) {
 }
 
 void clock_lc_sweep() {
-
 
 	/* Clock the length counters for triangle and square channels */
 	if( !APU->triangle.length_halt && APU->triangle.length_counter )

@@ -1044,12 +1044,17 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			/* TODO: DMC IRQ flag clear, DMC start/stop */
 
 			APU->square1.length_enabled = value&0x01;
-			APU->square2.length_enabled = (value&0x02) >> 1;
-			APU->triangle.length_enabled = (value&0x04) >> 2;
+			if( !APU->square1.length_enabled )
+				APU->square1.length_counter = 0;
 
-			APU->square1.length_counter = 0;
-			APU->square2.length_counter = 0;
-			APU->triangle.length_counter = 0;
+			APU->square2.length_enabled = (value&0x02) >> 1;
+			if( !APU->square2.length_enabled )
+				APU->square2.length_counter = 0;
+
+			APU->triangle.length_enabled = (value&0x04) >> 2;
+			if( !APU->triangle.length_enabled )
+				APU->triangle.length_counter = 0;
+
 
 			/* TODO: noise length flag */
 			break;
@@ -1069,14 +1074,15 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		case 0x4017:
 			APU->commons = value & 0xC0;
 
-			/* Reset the frame sequencer */
+			/* Reset the frame sequencer and divider */
+			APU->frame_seq.step = 0;
 			if( APU->commons & STEP_MODE5 )
 				APU->frame_seq.clock_timeout = PPUCYCLES_STEP5;
 			else
 				APU->frame_seq.clock_timeout = PPUCYCLES_STEP4;
 
-			APU->frame_seq.step = 0;
-			clock_frame_sequencer();
+			if( APU->commons & STEP_MODE5 )
+				clock_frame_sequencer();
 			break;
 
 		/* Normal RAM memory area */
@@ -1173,8 +1179,13 @@ uint8_t read_cpu_ram(uint16_t address) {
 
 	/* APU Status Register */
 	else if( address == 0x4015 ) {
-		/* TODO: Fill with missing info (lenght counter status, etc) */
-		ret_val |= ( (APU->frame_seq.int_flag & 0x1) << 6 );
+
+		/* TODO: IRQ from DMC */
+		ret_val |= ((APU->frame_seq.int_flag & 0x1) << 6);
+		/* TODO: DMC sample bytes remaining > 0 << 3 */
+		ret_val |= ((APU->triangle.length_counter > 0 ? 1 : 0) << 2);
+		ret_val |= ((APU->square2.length_counter > 0 ? 1 : 0) << 1);
+		ret_val |= ((APU->square1.length_counter > 0 ? 1 : 0));
 
 		/* Finally, clear the FS interrupt flag */
 		APU->frame_seq.int_flag = 0;
