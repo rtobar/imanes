@@ -959,9 +959,49 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			i = (value & 0xF8) >> 3;
 			if( APU->square1.length_enabled )
 				APU->square1.length_counter = length_counter_reload_values[i];
+
+			APU->square1.sequencer_step = 0;
 			break;
 
-		/* TODO: Copy 1st square channel to 2nd addresses */
+		/* 2nd Square channel duty, envelope */
+		case 0x4004:
+			APU->square2.duty_cycle = (value&0xC0) >> 6;
+
+			i = (value&0x20) >> 5;
+			APU->square2.envelope_loop = i;
+			APU->square2.length_halt = i;
+
+			APU->square2.envelope_disabled = (value&0x10) >> 4;
+			APU->square2.envelope_period = (value&0x0F) + 1;
+			APU->square2.envelope_written = 1;
+			break;
+
+		/* 2nd Square channel sweep unit */
+		case 0x4005:
+			APU->square2.sweep_enable = (value&0x80) >> 7;
+			APU->square2.sweep_reload = ((value&0x70) >> 4) + 1;
+			APU->square2.sweep_negate = (value&0x08) >> 3;
+			APU->square2.sweep_shift = value&0x03;
+			break;
+
+		/* 2nd Square channel period 8 lower bits */
+		case 0x4006:
+			APU->square2.period &= 0x0700;
+			APU->square2.period |= value;
+			APU->square2.period++;
+			break;
+
+		/* 2nd Square channel period 3 higher bits, length counter index */
+		case 0x4007:
+			APU->square2.period &= 0x00FF;
+			APU->square2.period |= (value & 0x7) << 8;
+
+			i = (value & 0xF8) >> 3;
+			if( APU->square2.length_enabled )
+				APU->square2.length_counter = length_counter_reload_values[i];
+
+			APU->square2.sequencer_step = 0;
+			break;
 
 		/* Triangle channel linear counter, control */
 		case 0x4008:

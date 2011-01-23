@@ -328,7 +328,52 @@ void initialize_apu() {
 
 	/* Square channels initialization */
 	APU->square1.channel = Square1;
+	APU->square1.clock_timeout = 0;
+	APU->square1.period = 0x07FF;
+
+	APU->square1.sweep_enable = 0;
+	APU->square1.sweep_negate = 0;
+	APU->square1.sweep_reload = 0;
+	APU->square1.sweep_period = 0x07;
+	APU->square1.sweep_timeout = 0;
+	APU->square1.sweep_shift = 0;
+
+	APU->square1.envelope_disabled = 1;
+	APU->square1.envelope_loop = 0;
+	APU->square1.envelope_written = 0;
+	APU->square1.envelope_counter = 0;
+	APU->square1.envelope_period = 0x10;
+	APU->square1.envelope_timeout = 0;
+
+	APU->square1.length_counter = 0;
+	APU->square1.length_halt = 0;
+
+	APU->square1.duty_cycle = 0;
+	APU->square1.sequencer_step = 0;
+
 	APU->square2.channel = Square2;
+	APU->square2.clock_timeout = 0;
+	APU->square2.period = 0x07FF;
+
+	APU->square2.sweep_enable = 0;
+	APU->square2.sweep_negate = 0;
+	APU->square2.sweep_reload = 0;
+	APU->square2.sweep_period = 0x07;
+	APU->square2.sweep_timeout = 0;
+	APU->square2.sweep_shift = 0;
+
+	APU->square2.envelope_disabled = 1;
+	APU->square2.envelope_loop = 0;
+	APU->square2.envelope_written = 0;
+	APU->square2.envelope_counter = 0;
+	APU->square2.envelope_period = 0x10;
+	APU->square2.envelope_timeout = 0;
+
+	APU->square2.length_counter = 0;
+	APU->square2.length_halt = 0;
+
+	APU->square2.duty_cycle = 0;
+	APU->square2.sequencer_step = 0;
 }
 
 void dump_apu() {
@@ -438,8 +483,6 @@ void clock_frame_sequencer() {
 
 void clock_envelope(nes_square_channel *s) {
 
-	uint8_t volume;
-
 	if( s->envelope_written ) {
 		s->envelope_counter = 15;
 		s->envelope_timeout = s->envelope_period;
@@ -456,12 +499,6 @@ void clock_envelope(nes_square_channel *s) {
 				s->envelope_counter--;
 	}
 
-	if( s->envelope_disabled )
-		volume = s->envelope_period-1;
-	else
-		volume = s->envelope_counter;
-
-	playback_fill_sound_buffer(volume, s->channel);
 }
 
 void clock_envelopes_tlc() {
@@ -554,9 +591,49 @@ void clock_triangle_timer() {
 		playback_fill_sound_buffer(dac_output, Triangle);
 }
 
-void clock_square_timer(int square_channel) {
-	APU->square1.clock_timeout += 1000;
-	APU->square2.clock_timeout += 1000;
+void clock_square_timer(nes_square_channel *s) {
+
+	uint8_t volume;
+
+	/* Reset the timeout counter */
+	s->clock_timeout += s->period;
+
+	/* Clock the sequencer.
+	 *
+	 * The sequencer works depending on the current
+	 * duty cycle, like this:
+	 *
+	 *   d   waveform sequence
+	 *   ---------------------
+	 *        _       1
+	 *   0   - ------ 0 (12.5%)
+	 *
+	 *        __      1
+	 *   1   -  ----- 0 (25%)
+	 *
+	 *        ____    1
+	 *   2   -    --- 0 (50%)
+	 *
+	 *       _  _____ 1
+	 *   3    --      0 (25% negated)
+	 */
+	s->sequencer_step++;
+	if( (s->duty_cycle == 0 && s->sequencer_step == 1) ||
+	    (s->duty_cycle == 1 && (s->sequencer_step == 1 || s->sequencer_step == 2)) ||
+	    (s->duty_cycle == 2 && (s->sequencer_step >= 1 && s->sequencer_step <=4)) ||
+	    (s->duty_cycle == 3 && (s->sequencer_step != 1 && s->sequencer_step != 2)) ) {
+
+		if( s->envelope_disabled )
+			volume = s->envelope_period-1;
+		else
+			volume = s->envelope_counter;
+
+		playback_fill_sound_buffer(volume, s->channel);
+	}
+	else {
+		playback_fill_sound_buffer(0, s->channel);
+	}
+
 }
 
 void clock_noise_timer() {

@@ -154,6 +154,8 @@ int main_loop(void *args) {
 		PPU->scanline_timeout -= added_cycles;
 		APU->frame_seq.clock_timeout -= added_cycles;
 		APU->triangle.clock_timeout -= added_cycles;
+		APU->square1.clock_timeout -= added_cycles;
+		APU->square2.clock_timeout -= added_cycles;
 		ppu_cycles = CLK->ppu_cycles;
 
 		/* Check if we need to clock each of the
@@ -169,15 +171,16 @@ int main_loop(void *args) {
 		if( APU->triangle.clock_timeout <= 0 )
 			clock_triangle_timer();
 
+		if( APU->square1.clock_timeout <= 0 )
+			clock_square_timer(&APU->square1);
+
+		if( APU->square2.clock_timeout <= 0 )
+			clock_square_timer(&APU->square2);
+
 /*
 		if( APU->noise.clock_timeout <= 0 )
 			clock_noise_timer();
 
-		if( APU->square1.clock_timeout <= 0 )
-			clock_square_timer(1);
-
-		if( APU->square2.clock_timeout <= 0 )
-			clock_square_timer(2);
 
 		if( APU->dmc.clock_timeout <= 0 )
 			clock_dmc_timer();

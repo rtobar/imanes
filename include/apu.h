@@ -66,7 +66,6 @@ typedef struct _triangle_channel {
 typedef struct _square_channel {
 
 	nes_apu_channel channel;
-	uint8_t duty_cycle;
 
 	/* Timer stuff */
 	int16_t clock_timeout;
@@ -92,6 +91,10 @@ typedef struct _square_channel {
 	uint8_t length_enabled;
 	uint8_t length_halt;
 	uint8_t length_counter;
+
+	/* Sequencer stuff */
+	uint8_t duty_cycle;
+	uint8_t sequencer_step;
 
 } nes_square_channel;
 
@@ -181,9 +184,9 @@ void clock_triangle_timer();
 
 /**
  * Clocks the timer unit of a square channel.
- * @param square_channel The number of the square channel (1 or 2)
+ * @param s A pointer to the square channel to use
  */
-void clock_square_timer(int square_channel);
+void clock_square_timer(nes_square_channel *s);
 
 /**
  * Clocks the timer unit of the noise channel.
