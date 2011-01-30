@@ -928,37 +928,37 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			APU->square1.duty_cycle = (value&0xC0) >> 6;
 
 			i = (value&0x20) >> 5;
-			APU->square1.envelope_loop = i;
-			APU->square1.length_halt = i;
+			APU->square1.envelope.loop = i;
+			APU->square1.lc.halt = i;
 
-			APU->square1.envelope_disabled = (value&0x10) >> 4;
-			APU->square1.envelope_period = (value&0x0F) + 1;
-			APU->square1.envelope_written = 1;
+			APU->square1.envelope.disabled = (value&0x10) >> 4;
+			APU->square1.envelope.period = (value&0x0F) + 1;
+			APU->square1.envelope.written = 1;
 			break;
 
 		/* 1st Square channel sweep unit */
 		case 0x4001:
-			APU->square1.sweep_enable = (value&0x80) >> 7;
-			APU->square1.sweep_reload = ((value&0x70) >> 4) + 1;
-			APU->square1.sweep_negate = (value&0x08) >> 3;
-			APU->square1.sweep_shift = value&0x03;
+			APU->square1.sweep.enable = (value&0x80) >> 7;
+			APU->square1.sweep.reload = ((value&0x70) >> 4) + 1;
+			APU->square1.sweep.negate = (value&0x08) >> 3;
+			APU->square1.sweep.shift = value&0x03;
 			break;
 
 		/* 1st Square channel period 8 lower bits */
 		case 0x4002:
-			APU->square1.period &= 0x0700;
-			APU->square1.period |= value;
-			APU->square1.period++;
+			APU->square1.timer.period &= 0x0700;
+			APU->square1.timer.period |= value;
+			APU->square1.timer.period++;
 			break;
 
 		/* 1st Square channel period 3 higher bits, length counter index */
 		case 0x4003:
-			APU->square1.period &= 0x00FF;
-			APU->square1.period |= (value & 0x7) << 8;
+			APU->square1.timer.period &= 0x00FF;
+			APU->square1.timer.period |= (value & 0x7) << 8;
 
 			i = (value & 0xF8) >> 3;
-			if( APU->square1.length_enabled )
-				APU->square1.length_counter = length_counter_reload_values[i];
+			if( APU->square1.lc.enabled )
+				APU->square1.lc.counter = length_counter_reload_values[i];
 
 			APU->square1.sequencer_step = 0;
 			break;
@@ -968,37 +968,37 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			APU->square2.duty_cycle = (value&0xC0) >> 6;
 
 			i = (value&0x20) >> 5;
-			APU->square2.envelope_loop = i;
-			APU->square2.length_halt = i;
+			APU->square2.envelope.loop = i;
+			APU->square2.lc.halt = i;
 
-			APU->square2.envelope_disabled = (value&0x10) >> 4;
-			APU->square2.envelope_period = (value&0x0F) + 1;
-			APU->square2.envelope_written = 1;
+			APU->square2.envelope.disabled = (value&0x10) >> 4;
+			APU->square2.envelope.period = (value&0x0F) + 1;
+			APU->square2.envelope.written = 1;
 			break;
 
 		/* 2nd Square channel sweep unit */
 		case 0x4005:
-			APU->square2.sweep_enable = (value&0x80) >> 7;
-			APU->square2.sweep_reload = ((value&0x70) >> 4) + 1;
-			APU->square2.sweep_negate = (value&0x08) >> 3;
-			APU->square2.sweep_shift = value&0x03;
+			APU->square2.sweep.enable = (value&0x80) >> 7;
+			APU->square2.sweep.reload = ((value&0x70) >> 4) + 1;
+			APU->square2.sweep.negate = (value&0x08) >> 3;
+			APU->square2.sweep.shift = value&0x03;
 			break;
 
 		/* 2nd Square channel period 8 lower bits */
 		case 0x4006:
-			APU->square2.period &= 0x0700;
-			APU->square2.period |= value;
-			APU->square2.period++;
+			APU->square2.timer.period &= 0x0700;
+			APU->square2.timer.period |= value;
+			APU->square2.timer.period++;
 			break;
 
 		/* 2nd Square channel period 3 higher bits, length counter index */
 		case 0x4007:
-			APU->square2.period &= 0x00FF;
-			APU->square2.period |= (value & 0x7) << 8;
+			APU->square2.timer.period &= 0x00FF;
+			APU->square2.timer.period |= (value & 0x7) << 8;
 
 			i = (value & 0xF8) >> 3;
-			if( APU->square2.length_enabled )
-				APU->square2.length_counter = length_counter_reload_values[i];
+			if( APU->square2.lc.enabled )
+				APU->square2.lc.counter = length_counter_reload_values[i];
 
 			APU->square2.sequencer_step = 0;
 			break;
@@ -1006,53 +1006,53 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* Triangle channel linear counter, control */
 		case 0x4008:
 			i  = (value&0x80) >> 7;
-			APU->triangle.linear_control = i;
-			APU->triangle.length_halt = i;
+			APU->triangle.linear.control = i;
+			APU->triangle.lc.halt = i;
 
-			APU->triangle.linear_reload = value&0x7F;
+			APU->triangle.linear.reload = value&0x7F;
 
 			break;
 
 		/* Triangle channel period 8 lower bits */
 		case 0x400A:
-			APU->triangle.period &= 0x0700;
-			APU->triangle.period |= value;
-			APU->triangle.period++;
+			APU->triangle.timer.period &= 0x0700;
+			APU->triangle.timer.period |= value;
+			APU->triangle.timer.period++;
 			break;
 
 		/* Triangle channel period 3 higher bits, length counter index */
 		case 0x400B:
-			APU->triangle.period &= 0x00FF;
-			APU->triangle.period |= (value & 0x7) << 8;
+			APU->triangle.timer.period &= 0x00FF;
+			APU->triangle.timer.period |= (value & 0x7) << 8;
 
 			i = (value & 0xF8) >> 3;
-			if( APU->triangle.length_enabled )
-				APU->triangle.length_counter = length_counter_reload_values[i];
-			APU->triangle.linear_halt = 1;
+			if( APU->triangle.lc.enabled )
+				APU->triangle.lc.counter = length_counter_reload_values[i];
+			APU->triangle.linear.halt = 1;
 			break;
 
 		/* Noise channel envelope */
 		case 0x400C:
 			i = (value&0x20) >> 5;
-			APU->noise.envelope_loop = i;
-			APU->noise.length_halt = i;
+			APU->noise.envelope.loop = i;
+			APU->noise.lc.halt = i;
 
-			APU->noise.envelope_disabled = (value&0x10) >> 4;
-			APU->noise.envelope_period = (value&0x0F) + 1;
-			APU->noise.envelope_written = 1;
+			APU->noise.envelope.disabled = (value&0x10) >> 4;
+			APU->noise.envelope.period = (value&0x0F) + 1;
+			APU->noise.envelope.written = 1;
 			break;
 
 		/* Noise channel random mode, timer period index */
 		case 0x400E:
 			APU->noise.random_mode = (value&0x80) >> 7;
-			APU->noise.period = noise_timer_periods[ value&0x0F ];
+			APU->noise.timer.period = noise_timer_periods[ value&0x0F ];
 			break;
 
 		/* Noise channel length counter */
 		case 0x400F:
 			i = (value & 0xF8) >> 3;
-			if( APU->noise.length_enabled )
-				APU->noise.length_counter = length_counter_reload_values[i];
+			if( APU->noise.lc.enabled )
+				APU->noise.lc.counter = length_counter_reload_values[i];
 			break;
 
 		/* Sprite DMA */
@@ -1065,21 +1065,21 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 		/* APU Lenght Control */
 		case 0x4015:
-			APU->square1.length_enabled = value&0x01;
-			if( !APU->square1.length_enabled )
-				APU->square1.length_counter = 0;
+			APU->square1.lc.enabled = value&0x01;
+			if( !APU->square1.lc.enabled )
+				APU->square1.lc.counter = 0;
 
-			APU->square2.length_enabled = (value&0x02) >> 1;
-			if( !APU->square2.length_enabled )
-				APU->square2.length_counter = 0;
+			APU->square2.lc.enabled = (value&0x02) >> 1;
+			if( !APU->square2.lc.enabled )
+				APU->square2.lc.counter = 0;
 
-			APU->triangle.length_enabled = (value&0x04) >> 2;
-			if( !APU->triangle.length_enabled )
-				APU->triangle.length_counter = 0;
+			APU->triangle.lc.enabled = (value&0x04) >> 2;
+			if( !APU->triangle.lc.enabled )
+				APU->triangle.lc.counter = 0;
 
-			APU->noise.length_enabled = (value&0x08) >> 3;
-			if( !APU->noise.length_enabled )
-				APU->noise.length_counter = 0;
+			APU->noise.lc.enabled = (value&0x08) >> 3;
+			if( !APU->noise.lc.enabled )
+				APU->noise.lc.counter = 0;
 
 			/* TODO: DMC IRQ flag clear, DMC start/stop */
 
@@ -1206,10 +1206,10 @@ uint8_t read_cpu_ram(uint16_t address) {
 	/* APU Status Register */
 	else if( address == 0x4015 ) {
 
-		ret_val |= ((APU->square1.length_counter > 0 ? 1 : 0));
-		ret_val |= ((APU->square2.length_counter > 0 ? 1 : 0) << 1);
-		ret_val |= ((APU->triangle.length_counter > 0 ? 1 : 0) << 2);
-		ret_val |= ((APU->noise.length_counter > 0 ? 1 : 0) << 3);
+		ret_val |= ((APU->square1.lc.counter > 0 ? 1 : 0));
+		ret_val |= ((APU->square2.lc.counter > 0 ? 1 : 0) << 1);
+		ret_val |= ((APU->triangle.lc.counter > 0 ? 1 : 0) << 2);
+		ret_val |= ((APU->noise.lc.counter > 0 ? 1 : 0) << 3);
 		/* TODO: DMC sample bytes remaining > 0 << 4 */
 		ret_val |= ((APU->frame_seq.int_flag & 0x1) << 6);
 		/* TODO: IRQ from DMC << 7 */

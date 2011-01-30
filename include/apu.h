@@ -1,3 +1,10 @@
+/**
+ * Note from the developer:
+ *
+ * The emulation of the APU is mostly based on the apu_ref.txt document,
+ * available at http://nesdev.parodius.com/apu_ref.txt
+ */
+
 #ifndef apu_h
 #define apu_h
 
@@ -26,12 +33,63 @@ typedef enum _nes_apu_channel {
 	Noise
 } nes_apu_channel;
 
-/**
- * The emulation of the APU is mostly based on the apu_ref.txt document,
- * available at http://nesdev.parodius.com/apu_ref.txt
+
+/*
+ * Common structures
+ *
+ * These are circuits that are common to some channels, and that
+ * work with the same logic. Therefore, it's useful to have them
+ * defined as units that then are assembled into the channels.
  */
 
-/* Frame Sequencer structure */
+/* Timer */
+typedef struct _timer {
+	int16_t  timeout;
+	uint16_t period;
+} apu_timer;
+
+/* Lenght counter */
+typedef struct _length_counter {
+	uint8_t enabled;
+	uint8_t halt;
+	uint8_t counter;
+} apu_length_counter;
+
+/* Envelope unit */
+typedef struct _envelope {
+	uint8_t disabled;
+	uint8_t loop;
+	uint8_t written;
+	uint8_t counter;
+	uint8_t period;
+	uint8_t timeout;
+} apu_envelope;
+
+/* Linear counter */
+typedef struct _linear_counter {
+	uint8_t counter;
+	uint8_t reload;
+	uint8_t halt;
+	uint8_t control;
+} apu_linear_counter;
+
+/* Sweep unit */
+typedef struct _sweep {
+	uint8_t enable;
+	uint8_t negate;
+	uint8_t reload;
+	uint8_t period;
+	uint8_t timeout;
+	uint8_t shift;
+} apu_sweep;
+
+/*
+ * High-level APU devices
+ *
+ * These are the channels of the APU, plus the central frame sequencer
+ */
+
+/* Frame Sequencer */
 typedef struct _frame_seq {
 
 	int clock_timeout;  /* PPU cycles until the next sequencer clock */
@@ -40,57 +98,39 @@ typedef struct _frame_seq {
 
 } nes_frame_seq;
 
-/* Triangle channel */
+/*
+ * Triangle channel.
+ *
+ * The triangle channel contains a 32-step sequencer,
+ * a length counter, a linear counter
+ */
 typedef struct _triangle_channel {
 
-	/* Timer stuff */
-	int16_t clock_timeout;
-	uint16_t period;
-
-	/* Linear Counter stuff */
-	uint8_t linear_counter;
-	uint8_t linear_reload;
-	uint8_t linear_halt;
-	uint8_t linear_control;
-
-	/* Lenght Counter stuff */
-	uint8_t length_enabled;
-	uint8_t length_halt;
-	uint8_t length_counter;
+	apu_timer          timer;
+	apu_length_counter lc;
+	apu_linear_counter linear;
 
 	/* Sequencer stuff */
 	uint8_t sequencer_step;
 
 } nes_triangle_channel;
 
+/*
+ * Square channel
+ *
+ * There are two squares channel (1 and 2, duh!). Although there are subtle minor
+ * differences between their behavior, they work almost exactly the same way.
+ * Each square channel contains an envelope generator, a sweep unit, a timer,
+ * an 8-step sequencer, and a length counter.
+ */
 typedef struct _square_channel {
 
-	nes_apu_channel channel;
+	nes_apu_channel    channel; /* To differentiate between the two */
 
-	/* Timer stuff */
-	int16_t clock_timeout;
-	uint16_t period;
-
-	/* Sweep Unit stuff */
-	uint8_t sweep_enable;
-	uint8_t sweep_negate;
-	uint8_t sweep_reload;
-	uint8_t sweep_period;
-	uint8_t sweep_timeout;
-	uint8_t sweep_shift;
-
-	/* Envelope stuff */
-	uint8_t envelope_disabled;
-	uint8_t envelope_loop;
-	uint8_t envelope_written;
-	uint8_t envelope_counter;
-	uint8_t envelope_period;
-	uint8_t envelope_timeout;
-
-	/* Lenght Counter stuff */
-	uint8_t length_enabled;
-	uint8_t length_halt;
-	uint8_t length_counter;
+	apu_timer          timer;
+	apu_length_counter lc;
+	apu_envelope       envelope;
+	apu_sweep          sweep;
 
 	/* Sequencer stuff */
 	uint8_t duty_cycle;
@@ -98,51 +138,40 @@ typedef struct _square_channel {
 
 } nes_square_channel;
 
+/*
+ * Noise channel
+ *
+ * The noise channel contains a length counter, an envelope generator, a timer,
+ * and a 15-bits right shift register with feedback.
+ */
 typedef struct _noise_channel {
 
-	/* Timer stuff */
-	int16_t clock_timeout;
-	uint16_t period;
+	apu_timer          timer;
+	apu_length_counter lc;
+	apu_envelope       envelope;
 
-	/* Lenght Counter stuff */
-	uint8_t length_enabled;
-	uint8_t length_halt;
-	uint8_t length_counter;
-
-	/* Envelope stuff */
-	uint8_t envelope_disabled;
-	uint8_t envelope_loop;
-	uint8_t envelope_written;
-	uint8_t envelope_counter;
-	uint8_t envelope_period;
-	uint8_t envelope_timeout;
-
-	/* Random (needed?) */
+	/* Random stuff */
 	uint8_t random_mode;
 
 } nes_noise_channel;
 
 typedef struct _delta_modulation_channel {
 
-	/* Timer stuff */
-	int16_t clock_timeout;
-	uint16_t period;
-
-	/* DMA Reader stuff (needed?) */
-
-	/* Buffer stuff */
-
-	/* Output stuff (needed?) */
-
-	/* Counter stuff */
+	apu_timer timer;
 
 } nes_delta_modulation_channel;
 
-/* APU final structure */
+/*
+ * The APU
+ *
+ * The APU contains: a triangle channel, two square channels, a noise channel and
+ * a delta modulation channel. Apart from these, there is a central frame sequencer
+ * in charge of clocking some internal parts of the channels.
+ */
 typedef struct _apu {
 
 	/* Registers */
-	uint8_t commons;    /* 0x4017 */
+	uint8_t commons;
 
 	/* Frame sequencer */
 	nes_frame_seq frame_seq;
@@ -162,11 +191,6 @@ typedef struct _apu {
 } nes_apu;
 
 extern nes_apu *APU;
-
-/**
- * Lookup tables used to get the final normalized output
- * from the DACs.
- */
 
 
 /**
