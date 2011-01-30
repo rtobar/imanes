@@ -455,7 +455,6 @@ void clock_frame_sequencer() {
 	/* At any time, if the interrupt flag is set
     * and the IRQ disable is clear, CPU's IRQ is asserted */
 	if( APU->frame_seq.int_flag && !(APU->commons & DISABLE_FRAME_IRQ) ) {
-		printf("Triggering IRQ from APU\n");
 		CPU->SR &= ~B_FLAG;
 		execute_irq();
 	}
