@@ -647,11 +647,9 @@ void clock_square_timer(nes_square_channel *s) {
 	uint8_t volume;
 
 	/* Reset the timeout counter */
-	s->timer.timeout += s->timer.period;
+	s->timer.timeout += s->timer.period*2; /* Timer output is divided by 2 */
 
-	/* Clock the sequencer.
-	 *
-	 */
+	/* Clock the sequencer */
 	s->sequencer_step++;
 	if( square_sequencer_output[s->duty_cycle][s->sequencer_step] ) {
 		if( s->envelope.disabled )
@@ -667,13 +665,16 @@ void clock_square_timer(nes_square_channel *s) {
 
 void clock_noise_timer() {
 
-	/* Reset the timeout counter */
+	/* Reset the timer */
 	APU->noise.timer.timeout += APU->noise.timer.period;
 
 }
 
 void clock_dmc_timer() {
-	APU->dmc.timer.timeout += 1000;
+
+	/* Reset the timer */
+	APU->dmc.timer.timeout += APU->dmc.timer.period;
+
 }
 
 void end_apu() {

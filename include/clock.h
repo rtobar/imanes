@@ -4,11 +4,11 @@
 /**
  * NES clock definition. It counts the number of cycles that have
  * elapsed since the start of the machine. The cycles are counted
- * in PPU cycles and CPU cycles.
+ * in PPU cycles.
  * As an addition, a count of the cycles elapsed since the last
- * NMI (in CPU and PPY cycles) is maintained
+ * NMI (in PPU cycles) is maintained
  *
- * The C representation of these counts is big enough to count
+ * The C representation of these numbers is big enough to count
  * the cycles continuously without overflowing for about
  * ~50.000 years, so we don't have to take this case into account :)
  */

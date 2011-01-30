@@ -151,17 +151,19 @@ int main_loop(void *args) {
 		/* Update cycles count */
 		ADD_CPU_CYCLES(inst.cycles);
 		added_cycles = (int)(CLK->ppu_cycles - ppu_cycles);
+		ppu_cycles = CLK->ppu_cycles;
 		PPU->scanline_timeout -= added_cycles;
+
+		/* Decrement APU timers */
 		APU->frame_seq.clock_timeout -= added_cycles;
 		APU->triangle.timer.timeout -= added_cycles;
 		APU->square1.timer.timeout -= added_cycles;
 		APU->square2.timer.timeout -= added_cycles;
 		APU->noise.timer.timeout -= added_cycles;
-		ppu_cycles = CLK->ppu_cycles;
+		APU->dmc.timer.timeout -= added_cycles;
 
 		/* Check if we need to clock each of the
-		 * APU timers: frame sequencer, square 1/2,
-		 * triangle, DMC.
+		 * APU timers.
 		 *
 		 * In particular, the frame sequencer may clock
 		 * other internal units of the APU.
@@ -185,7 +187,6 @@ int main_loop(void *args) {
 		if( APU->dmc.clock_timeout <= 0 )
 			clock_dmc_timer();
 */
-
 
 		/* A line has ended its scanning, draw it */
 		if( PPU->scanline_timeout <= 0 ) {
