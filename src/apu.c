@@ -43,6 +43,32 @@ static uint8_t triangle_sequencer_output[32] = {
 	0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF
 };
 
+/* Square channel sequencer outputs.
+ *
+ * The sequencer works depending on the current
+ * duty cycle, like this:
+ *
+ *   d   waveform sequence
+ *   ---------------------
+ *        _       1
+ *   0   - ------ 0 (12.5%)
+ *
+ *        __      1
+ *   1   -  ----- 0 (25%)
+ *
+ *        ____    1
+ *   2   -    --- 0 (50%)
+ *
+ *       _  _____ 1
+ *   3    --      0 (25% negated)
+ */
+static uint8_t square_sequencer_output[4][8] = {
+	{0, 1, 0, 0, 0, 0, 0, 0},
+	{0, 1, 1, 0, 0, 0, 0, 0},
+	{0, 1, 1, 1, 1, 0, 0, 0},
+	{1, 0, 0, 1, 1, 1, 1, 1}
+};
+
 float normal_square_dac_outputs[32] = {
 	0.0,
 	0.011609139523,
@@ -625,39 +651,17 @@ void clock_square_timer(nes_square_channel *s) {
 
 	/* Clock the sequencer.
 	 *
-	 * The sequencer works depending on the current
-	 * duty cycle, like this:
-	 *
-	 *   d   waveform sequence
-	 *   ---------------------
-	 *        _       1
-	 *   0   - ------ 0 (12.5%)
-	 *
-	 *        __      1
-	 *   1   -  ----- 0 (25%)
-	 *
-	 *        ____    1
-	 *   2   -    --- 0 (50%)
-	 *
-	 *       _  _____ 1
-	 *   3    --      0 (25% negated)
 	 */
 	s->sequencer_step++;
-	if( (s->duty_cycle == 0 && s->sequencer_step == 1) ||
-	    (s->duty_cycle == 1 && (s->sequencer_step == 1 || s->sequencer_step == 2)) ||
-	    (s->duty_cycle == 2 && (s->sequencer_step >= 1 && s->sequencer_step <=4)) ||
-	    (s->duty_cycle == 3 && (s->sequencer_step != 1 && s->sequencer_step != 2)) ) {
-
+	if( square_sequencer_output[s->duty_cycle][s->sequencer_step] ) {
 		if( s->envelope.disabled )
 			volume = s->envelope.period-1;
 		else
 			volume = s->envelope.counter;
-
 		playback_fill_sound_buffer(volume, s->channel);
 	}
-	else {
+	else
 		playback_fill_sound_buffer(0, s->channel);
-	}
 
 }
 
