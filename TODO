@@ -6,7 +6,7 @@ General:
  * [DONE] Screenshot support
  * [TO FIX] Internal state saving
  * [DONE] SRAM saving
- * [v0.2] Add audio support
+ * [DOING] Add audio support
  * [DONE] Add internationalization (i18n)
    * [v0.2] Finish spanish translation
    * [v0.2] Finish german translation
@@ -20,7 +20,7 @@ CPU:
  * [DONE] Fix the ADC/SBC instructions (recognize the C flag change)
  * [DONE] Check ASL
  * [DONE] Add illegal opcodes
- * [DOING] Improve CPU/PPU timing
+ * [    ] Improve CPU/PPU timing
 
 APU:
 ====

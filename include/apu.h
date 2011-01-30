@@ -104,9 +104,21 @@ typedef struct _noise_channel {
 	int16_t clock_timeout;
 	uint16_t period;
 
-	/* Random (needed?) */
-
 	/* Lenght Counter stuff */
+	uint8_t length_enabled;
+	uint8_t length_halt;
+	uint8_t length_counter;
+
+	/* Envelope stuff */
+	uint8_t envelope_disabled;
+	uint8_t envelope_loop;
+	uint8_t envelope_written;
+	uint8_t envelope_counter;
+	uint8_t envelope_period;
+	uint8_t envelope_timeout;
+
+	/* Random (needed?) */
+	uint8_t random_mode;
 
 } nes_noise_channel;
 
@@ -249,5 +261,15 @@ extern float normal_tnd_dac_outputs[204];
  * (bits 7-3) >> 3
  */
 uint8_t length_counter_reload_values[32];
+
+/**
+ * Loop-up table that stores the index-based
+ * period values to be used by the noise timer.
+ * Differently from the square and triangle channels' timer,
+ * the noise channel timer's period is not set directly, but
+ * an index is indicated, and the corresponding period value
+ * is loaded into the timer.
+ */
+uint16_t noise_timer_periods[16];
 
 #endif /* apu_h */

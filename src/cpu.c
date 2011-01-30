@@ -1031,6 +1031,30 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			APU->triangle.linear_halt = 1;
 			break;
 
+		/* Noise channel envelope */
+		case 0x400C:
+			i = (value&0x20) >> 5;
+			APU->noise.envelope_loop = i;
+			APU->noise.length_halt = i;
+
+			APU->noise.envelope_disabled = (value&0x10) >> 4;
+			APU->noise.envelope_period = (value&0x0F) + 1;
+			APU->noise.envelope_written = 1;
+			break;
+
+		/* Noise channel random mode, timer period index */
+		case 0x400E:
+			APU->noise.random_mode = (value&0x80) >> 7;
+			APU->noise.period = noise_timer_periods[ value&0x0F ];
+			break;
+
+		/* Noise channel length counter */
+		case 0x400F:
+			i = (value & 0xF8) >> 3;
+			if( APU->noise.length_enabled )
+				APU->noise.length_counter = length_counter_reload_values[i];
+			break;
+
 		/* Sprite DMA */
 		case 0x4014:
 			address = value*0x100;
@@ -1041,8 +1065,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 		/* APU Lenght Control */
 		case 0x4015:
-			/* TODO: DMC IRQ flag clear, DMC start/stop */
-
 			APU->square1.length_enabled = value&0x01;
 			if( !APU->square1.length_enabled )
 				APU->square1.length_counter = 0;
@@ -1055,8 +1077,12 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 			if( !APU->triangle.length_enabled )
 				APU->triangle.length_counter = 0;
 
+			APU->noise.length_enabled = (value&0x08) >> 3;
+			if( !APU->noise.length_enabled )
+				APU->noise.length_counter = 0;
 
-			/* TODO: noise length flag */
+			/* TODO: DMC IRQ flag clear, DMC start/stop */
+
 			break;
 
 		/* 1st and 2nd joysticks strobe */
@@ -1180,12 +1206,13 @@ uint8_t read_cpu_ram(uint16_t address) {
 	/* APU Status Register */
 	else if( address == 0x4015 ) {
 
-		/* TODO: IRQ from DMC */
-		ret_val |= ((APU->frame_seq.int_flag & 0x1) << 6);
-		/* TODO: DMC sample bytes remaining > 0 << 3 */
-		ret_val |= ((APU->triangle.length_counter > 0 ? 1 : 0) << 2);
-		ret_val |= ((APU->square2.length_counter > 0 ? 1 : 0) << 1);
 		ret_val |= ((APU->square1.length_counter > 0 ? 1 : 0));
+		ret_val |= ((APU->square2.length_counter > 0 ? 1 : 0) << 1);
+		ret_val |= ((APU->triangle.length_counter > 0 ? 1 : 0) << 2);
+		ret_val |= ((APU->noise.length_counter > 0 ? 1 : 0) << 3);
+		/* TODO: DMC sample bytes remaining > 0 << 4 */
+		ret_val |= ((APU->frame_seq.int_flag & 0x1) << 6);
+		/* TODO: IRQ from DMC << 7 */
 
 		/* Finally, clear the FS interrupt flag */
 		APU->frame_seq.int_flag = 0;
