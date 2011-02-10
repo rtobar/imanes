@@ -22,6 +22,7 @@ imanes_SOURCES = \
      platform.c \
      playback.c \
      ppu.c \
+     queue.c \
      screen.c \
      screenshot.c \
      sram.c \
@@ -49,6 +50,7 @@ imanes_SOURCES = \
      $(top_srcdir)/include/platform.h \
      $(top_srcdir)/include/playback.h \
      $(top_srcdir)/include/ppu.h \
+     $(top_srcdir)/include/queue.h \
      $(top_srcdir)/include/screen.h \
      $(top_srcdir)/include/screenshot.h \
      $(top_srcdir)/include/sram.h \

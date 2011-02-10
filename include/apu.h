@@ -26,11 +26,11 @@
 #define PPUCYCLES_STEP5  (22336) /* 22335.5 */
 
 typedef enum _nes_apu_channel {
-	Square1,
-	Square2,
-	Triangle,
-	DMC,
-	Noise
+	Square1   = 0,
+	Square2   = 1,
+	Triangle  = 2,
+	DMC       = 3,
+	Noise     = 4
 } nes_apu_channel;
 
 

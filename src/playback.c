@@ -21,14 +21,23 @@
 #include "common.h"
 #include "clock.h"
 #include "cpu.h"
+#include "debug.h"
 #include "i18n.h"
 #include "imaconfig.h"
 #include "playback.h"
+#include "queue.h"
+#include <time.h>
 
-uint8_t *sdl_audio_buffer;
 static SDL_AudioSpec audio_spec;
-Uint8 square_dac_outputs[32];
-Uint8 tnd_dac_outputs[204];
+
+/* These are the integer form of the normalized outputs
+ * for square and tnd tables. We are using Uint8 here as
+ * we are asking the sound card a fomat of AUDIO_U8. We also
+ * assume that this is the returned format after SDL_OpenAudio,
+ * and calculate these values according to that format.
+ */
+static Uint8 square_dac_outputs[32];
+static Uint8 tnd_dac_outputs[204];
 
 void initialize_playback() {
 
@@ -39,16 +48,15 @@ void initialize_playback() {
 	if( config.sound_mute )
 		return;
 
-	/* Initialize the SDL Audio subsytem */
+	/* Initial parameters for the SDL Audio subsytem */
 	desired.freq     = 22050;
 	desired.format   = AUDIO_U8;
 	desired.channels = 1;
-	desired.silence  = 0;    /* Calculated? */
 	desired.samples  = 1024;
-	desired.size     = 0;    /* Calculated? */
 	desired.callback = playback_fill_sound_card;
 	desired.userdata = (void *)NULL;
 
+	/* If we're using pulseaudio underneath, this would be a good idea */
 	setenv("PULSE_PROP_application.name", "ImaNES", 1);
 	setenv("PULSE_PROP_media.role", "game", 1);
 
@@ -58,16 +66,14 @@ void initialize_playback() {
 		return;
 	}
 
-	/* sdl_audio_buffer = (uint8_t *)malloc(audio_spec.size*2); */
-	sdl_audio_buffer = (uint8_t *)malloc(CYCLES_PER_SCANLINE*262*60/3);
-	if( sdl_audio_buffer == NULL ) {
-		fprintf(stderr,_("Cannot initialize audio: cannot allocate memory for audio buffer\n"));
-		return;
-	}
+	INFO( printf("Started audio: %d Hz, %d %s, %d-sample-sized buffer\n",
+	       audio_spec.freq,
+	       audio_spec.channels,
+	       audio_spec.channels == 1 ? "channel" : "channels",
+	       audio_spec.samples) );
 
-	/* Calculate our own final DAC outputs from the normalized
-	 * We do this to avoid floating point calculations during ImaNES */
-	/* TODO: This max_vol is fixed assuming 8-bits sound, we should check the audio_spec */
+	/* Calculate our own final DAC outputs from the normalized floating ones.
+	 * We do this to avoid floating point calculations during ImaNES loop */
 	max_vol = 0xFF;
 	for(i=0;i!=32;i++)
 		square_dac_outputs[i] = normal_square_dac_outputs[i]*max_vol;
@@ -78,37 +84,23 @@ void initialize_playback() {
 
 void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
-	int i;
+	static int i = 0;
+	static struct timespec currentTime;
+	static struct timespec previousTime;
+
+	i++;
+
+	clock_gettime(CLOCK_REALTIME, &currentTime);
+	if( currentTime.tv_sec != previousTime.tv_sec ) {
+		printf("Called the callback %d times per second\n", i);
+		i = 0;
+	}
+	previousTime.tv_sec = currentTime.tv_sec;
 
 	/* Fill with silence at the start */
 	memset(stream, audio_spec.silence, len);
 
-	for(i=0;i!=len;i++) {
-		stream[i] = (Uint8)sdl_audio_buffer[i];
-		sdl_audio_buffer[i] = 0;
-	}
-
-}
-
-/*
-   if(config.mute) not here, but where the call is invoked, to
-   avoid unnecesary arguments copy during runtime
-*/
-void playback_fill_sound_buffer(uint8_t sample, nes_apu_channel channel) {
-
-	int index = CLK->nmi_pcycles/3;
-
-	if( channel == Square1 )
-		sdl_audio_buffer[index] = square_dac_outputs[sample];
-	if( channel == Square2 )
-		sdl_audio_buffer[index] = square_dac_outputs[sample];
-	if( channel == Triangle )
-		sdl_audio_buffer[index] = tnd_dac_outputs[3*sample];
-	if( channel == DMC )
-		sdl_audio_buffer[index] = tnd_dac_outputs[2*sample];
-	if( channel == Noise )
-		sdl_audio_buffer[index] = tnd_dac_outputs[sample];
-
+	/* See the latest DAC outputs and combine them as long as we need */
 }
 
 void playback_pause(int pause_on) {

@@ -27,7 +27,7 @@
 #include "debug.h"
 #include "i18n.h"
 #include "imaconfig.h"
-#include "playback.h"
+#include "queue.h"
 
 nes_apu *APU;
 
@@ -68,6 +68,8 @@ static uint8_t square_sequencer_output[4][8] = {
 	{0, 1, 1, 1, 1, 0, 0, 0},
 	{1, 0, 0, 1, 1, 1, 1, 1}
 };
+
+static dac_queue *dac[5];
 
 float normal_square_dac_outputs[32] = {
 	0.0,
@@ -583,7 +585,7 @@ void clock_sweep(nes_square_channel *s) {
 	/* Possibily update the channel's period */
 	if( s->timer.period < 8 || new_period > 0x7FF ) {
 		if( !config.sound_mute )
-			playback_fill_sound_buffer(0, Square1);
+			push(dac[Square1], 0);
 	}
 	else {
 		if( !s->sweep.enable && s->sweep.shift )
@@ -622,8 +624,7 @@ void clock_triangle_timer() {
 	uint8_t index;
 
 	/* Reset the timeout counter */
-	APU->triangle.timer.timeout += APU->triangle.timer.period*3;
-	/* TODO: why *3 in he line above??? */
+	APU->triangle.timer.timeout += APU->triangle.timer.period;
 
 	/* Check if the linear counter allows us to pass through... */
 	if( !APU->triangle.linear.counter )
@@ -638,7 +639,7 @@ void clock_triangle_timer() {
 	dac_output = triangle_sequencer_output[index];
 
 	if( !config.sound_mute )
-		playback_fill_sound_buffer(dac_output, Triangle);
+		push(dac[Triangle], dac_output);
 }
 
 void clock_square_timer(nes_square_channel *s) {
@@ -655,10 +656,10 @@ void clock_square_timer(nes_square_channel *s) {
 			volume = s->envelope.period-1;
 		else
 			volume = s->envelope.counter;
-		playback_fill_sound_buffer(volume, s->channel);
+		push( dac[s->channel], volume);
 	}
 	else
-		playback_fill_sound_buffer(0, s->channel);
+		push( dac[s->channel], 0);
 
 }
 
