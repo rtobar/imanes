@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "apu.h"
 #include "common.h"
 #include "clock.h"
 #include "cpu.h"
@@ -25,7 +26,6 @@
 #include "i18n.h"
 #include "imaconfig.h"
 #include "playback.h"
-#include "queue.h"
 #include <time.h>
 
 static SDL_AudioSpec audio_spec;
@@ -82,12 +82,27 @@ void initialize_playback() {
 
 }
 
+/* TODO: only processing triangle and square (both) channels here! */
 void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
+	/* static variables to keep history of things */
 	static int i = 0;
-	static struct timespec currentTime;
-	static struct timespec previousTime;
+	static struct timespec previousTime = {0, 0};
+	static unsigned long int previous_ppu_cycles = 0;
 
+	Uint8 sample;
+	int pos;
+	unsigned int channel;
+	unsigned long int ppu_cycles;
+	unsigned long int ppu_steps_per_sample;
+	unsigned long int step_ppu_cycles;
+	struct timespec currentTime;
+
+	uint8_t square1_sample;
+	uint8_t square2_sample;
+	uint8_t triangle_sample;
+
+	ppu_cycles = CLK->ppu_cycles;
 	i++;
 
 	clock_gettime(CLOCK_REALTIME, &currentTime);
@@ -95,12 +110,53 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		printf("Called the callback %d times per second\n", i);
 		i = 0;
 	}
-	previousTime.tv_sec = currentTime.tv_sec;
 
 	/* Fill with silence at the start */
 	memset(stream, audio_spec.silence, len);
 
+	ppu_steps_per_sample = (ppu_cycles - previous_ppu_cycles)/len;
+
 	/* See the latest DAC outputs and combine them as long as we need */
+	step_ppu_cycles = previous_ppu_cycles;
+	for(pos=0; pos!=len; pos++) {
+
+		/* Check which sounds should be checked
+		 * For this, we check that the front of every queue is
+		 * the one that should get played, and then we take all the fronts,
+		 * and combine them
+		 */
+		for(channel = 0; channel != 3; channel++) {
+			while(dac[channel] != NULL && dac[channel]->ppu_cycles < step_ppu_cycles)
+				dac[channel] = pop(dac[channel]);
+		}
+
+		sample = 0;
+		square1_sample = 0;
+		square2_sample = 0;
+		triangle_sample = 0;
+
+		if( dac[Square1] != NULL )
+			square1_sample = dac[Square1]->sample;
+		if( dac[Square2] != NULL )
+			square2_sample = dac[Square2]->sample;
+		if( dac[Triangle] != NULL )
+			triangle_sample = dac[Triangle]->sample;
+
+		sample += square_dac_outputs[square1_sample + square2_sample];
+		sample += tnd_dac_outputs[triangle_sample];
+
+		sample -= audio_spec.silence;
+
+		/* Finally! This is our little sample */
+		stream[pos] = sample;
+
+		step_ppu_cycles += ppu_steps_per_sample;
+	}
+
+	/* Finally, set the 'previous' variables */
+	previousTime.tv_sec = currentTime.tv_sec;
+	previousTime.tv_nsec = currentTime.tv_nsec;
+	previous_ppu_cycles = ppu_cycles;
 }
 
 void playback_pause(int pause_on) {

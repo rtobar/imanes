@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include "queue.h"
+
 /* Flags for the 0x4015 register */
 #define LENGTHCTR_DMC     0x10
 #define LENGTHCTR_NOISE   0x08
@@ -191,6 +193,7 @@ typedef struct _apu {
 } nes_apu;
 
 extern nes_apu *APU;
+extern dac_queue *dac[5];
 
 
 /**

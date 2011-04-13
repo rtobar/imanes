@@ -38,27 +38,33 @@ dac_queue *pop(dac_queue *q) {
 	return q;
 }
 
-void push(dac_queue *q, uint8_t sample) {
+dac_queue *push(dac_queue *q, uint8_t sample) {
+
+	dac_queue *tmp;
 
 	if( q == NULL ) {
 		q = (dac_queue *)malloc(sizeof(dac_queue));
-		q->nmi_pcycles = CLK->nmi_pcycles;
+		q->ppu_cycles = CLK->ppu_cycles;
 		q->sample = sample;
-		return;
+		q->next = NULL;
+		return q;
 	}
 
-	while(q->next != NULL) q = q->next;
+	tmp = q;
+	while(tmp->next != NULL) tmp = tmp->next;
 
 	/* Won't queue same value, just update it */
-	if( q->sample == sample ) {
-		q->nmi_pcycles = CLK->nmi_pcycles;
-		return;
+	if( tmp->sample == sample ) {
+		tmp->ppu_cycles = CLK->ppu_cycles;
+		return q;
 	}
 
-	q->next = (dac_queue *)malloc(sizeof(dac_queue));
-	q->next->nmi_pcycles = CLK->nmi_pcycles;
-	q->next->sample = sample;
+	tmp->next = (dac_queue *)malloc(sizeof(dac_queue));
+	tmp->next->ppu_cycles = CLK->ppu_cycles;
+	tmp->next->sample = sample;
+	tmp->next->next = NULL;
 
+	return q;
 }
 
 void clear(dac_queue *q) {

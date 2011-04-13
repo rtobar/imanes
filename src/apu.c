@@ -27,7 +27,6 @@
 #include "debug.h"
 #include "i18n.h"
 #include "imaconfig.h"
-#include "queue.h"
 
 nes_apu *APU;
 
@@ -69,7 +68,7 @@ static uint8_t square_sequencer_output[4][8] = {
 	{1, 0, 0, 1, 1, 1, 1, 1}
 };
 
-static dac_queue *dac[5];
+dac_queue *dac[5];
 
 float normal_square_dac_outputs[32] = {
 	0.0,
@@ -423,6 +422,27 @@ void initialize_apu() {
 	APU->square2.duty_cycle = 0;
 	APU->square2.sequencer_step = 0;
 
+	/* Noise channel initialization */
+	APU->noise.envelope.disabled = 1;
+	APU->noise.envelope.loop = 0;
+	APU->noise.envelope.written = 0;
+	APU->noise.envelope.counter = 0;
+	APU->noise.envelope.period = 0x10;
+	APU->noise.envelope.timeout = 0;
+
+	APU->noise.lc.counter = 0;
+	APU->noise.lc.halt = 0;
+	APU->noise.lc.enabled = 0;
+
+	APU->noise.timer.timeout = 0;
+	APU->noise.timer.period = 0x07FF;
+
+	/* DAC queues */
+	dac[0] = NULL;
+	dac[1] = NULL;
+	dac[2] = NULL;
+	dac[3] = NULL;
+	dac[4] = NULL;
 }
 
 void dump_apu() {
@@ -584,8 +604,11 @@ void clock_sweep(nes_square_channel *s) {
 
 	/* Possibily update the channel's period */
 	if( s->timer.period < 8 || new_period > 0x7FF ) {
-		if( !config.sound_mute )
-			push(dac[Square1], 0);
+		if( !config.sound_mute ) {
+			SDL_LockAudio();
+			dac[Square1] = push(dac[Square1], 0);
+			SDL_UnlockAudio();
+		}
 	}
 	else {
 		if( !s->sweep.enable && s->sweep.shift )
@@ -638,8 +661,11 @@ void clock_triangle_timer() {
 	index = APU->triangle.sequencer_step++ & 0x1F;
 	dac_output = triangle_sequencer_output[index];
 
-	if( !config.sound_mute )
-		push(dac[Triangle], dac_output);
+	if( !config.sound_mute ) {
+		SDL_LockAudio();
+		dac[Triangle] = push(dac[Triangle], dac_output);
+		SDL_UnlockAudio();
+	}
 }
 
 void clock_square_timer(nes_square_channel *s) {
@@ -656,10 +682,16 @@ void clock_square_timer(nes_square_channel *s) {
 			volume = s->envelope.period-1;
 		else
 			volume = s->envelope.counter;
-		push( dac[s->channel], volume);
+
+		SDL_LockAudio();
+		dac[s->channel] = push( dac[s->channel], volume);
+		SDL_UnlockAudio();
 	}
-	else
-		push( dac[s->channel], 0);
+	else {
+		SDL_LockAudio();
+		dac[s->channel] = push( dac[s->channel], 0);
+		SDL_UnlockAudio();
+	}
 
 }
 
