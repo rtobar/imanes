@@ -18,6 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <time.h>
+
 #include "apu.h"
 #include "common.h"
 #include "clock.h"
@@ -26,7 +28,9 @@
 #include "i18n.h"
 #include "imaconfig.h"
 #include "playback.h"
-#include <time.h>
+#include "queue.h"
+
+static dac_queue *dac[5];
 
 static SDL_AudioSpec audio_spec;
 
@@ -79,6 +83,13 @@ void initialize_playback() {
 		square_dac_outputs[i] = normal_square_dac_outputs[i]*max_vol;
 	for(i=0;i!=204;i++)
 		tnd_dac_outputs[i] = normal_tnd_dac_outputs[i]*max_vol;
+
+	/* DAC queues */
+	dac[0] = NULL;
+	dac[1] = NULL;
+	dac[2] = NULL;
+	dac[3] = NULL;
+	dac[4] = NULL;
 
 }
 
@@ -145,8 +156,6 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		sample += square_dac_outputs[square1_sample + square2_sample];
 		sample += tnd_dac_outputs[triangle_sample];
 
-		sample -= audio_spec.silence;
-
 		/* Finally! This is our little sample */
 		stream[pos] = sample;
 
@@ -163,6 +172,12 @@ void playback_pause(int pause_on) {
 	if( config.sound_mute )
 		return;
 	SDL_PauseAudio(pause_on);
+}
+
+void playback_add_sample(int channel, uint8_t sample) {
+	SDL_LockAudio();
+	dac[channel] = push(dac[channel], sample);
+	SDL_UnlockAudio();
 }
 
 void end_playback() {

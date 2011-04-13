@@ -27,6 +27,7 @@
 #include "debug.h"
 #include "i18n.h"
 #include "imaconfig.h"
+#include "playback.h"
 
 nes_apu *APU;
 
@@ -67,8 +68,6 @@ static uint8_t square_sequencer_output[4][8] = {
 	{0, 1, 1, 1, 1, 0, 0, 0},
 	{1, 0, 0, 1, 1, 1, 1, 1}
 };
-
-dac_queue *dac[5];
 
 float normal_square_dac_outputs[32] = {
 	0.0,
@@ -436,13 +435,6 @@ void initialize_apu() {
 
 	APU->noise.timer.timeout = 0;
 	APU->noise.timer.period = 0x07FF;
-
-	/* DAC queues */
-	dac[0] = NULL;
-	dac[1] = NULL;
-	dac[2] = NULL;
-	dac[3] = NULL;
-	dac[4] = NULL;
 }
 
 void dump_apu() {
@@ -604,11 +596,8 @@ void clock_sweep(nes_square_channel *s) {
 
 	/* Possibily update the channel's period */
 	if( s->timer.period < 8 || new_period > 0x7FF ) {
-		if( !config.sound_mute ) {
-			SDL_LockAudio();
-			dac[Square1] = push(dac[Square1], 0);
-			SDL_UnlockAudio();
-		}
+		if( !config.sound_mute )
+			playback_add_sample(Square1, 0);
 	}
 	else {
 		if( !s->sweep.enable && s->sweep.shift )
@@ -661,11 +650,9 @@ void clock_triangle_timer() {
 	index = APU->triangle.sequencer_step++ & 0x1F;
 	dac_output = triangle_sequencer_output[index];
 
-	if( !config.sound_mute ) {
-		SDL_LockAudio();
-		dac[Triangle] = push(dac[Triangle], dac_output);
-		SDL_UnlockAudio();
-	}
+	if( !config.sound_mute )
+		playback_add_sample(Triangle, dac_output);
+
 }
 
 void clock_square_timer(nes_square_channel *s) {
@@ -683,15 +670,10 @@ void clock_square_timer(nes_square_channel *s) {
 		else
 			volume = s->envelope.counter;
 
-		SDL_LockAudio();
-		dac[s->channel] = push( dac[s->channel], volume);
-		SDL_UnlockAudio();
+		playback_add_sample(s->channel, volume);
 	}
-	else {
-		SDL_LockAudio();
-		dac[s->channel] = push( dac[s->channel], 0);
-		SDL_UnlockAudio();
-	}
+	else
+		playback_add_sample(s->channel, 0);
 
 }
 

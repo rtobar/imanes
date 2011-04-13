@@ -16,6 +16,11 @@ void initialize_playback();
 void playback_fill_sound_card(void *userdata, Uint8 *stream, int len);
 
 /**
+ * Adds a sample into the specified channel's DAC for later playback
+ */
+void playback_add_sample(int channel, uint8_t sample);
+
+/**
  * Pauses/resumes the playback of audio
  */
 void playback_pause(int pause_on);
