@@ -595,10 +595,8 @@ void clock_sweep(nes_square_channel *s) {
 	new_period = s->timer.period + new_period;
 
 	/* Possibily update the channel's period */
-	if( s->timer.period < 8 || new_period > 0x7FF ) {
-		if( !config.sound_mute )
-			playback_add_sample(Square1, 0);
-	}
+	if( s->timer.period < 8 || new_period > 0x7FF )
+		playback_add_sample(Square1, 0);
 	else {
 		if( !s->sweep.enable && s->sweep.shift )
 			if( !s->sweep.timeout ) {
@@ -650,8 +648,7 @@ void clock_triangle_timer() {
 	index = APU->triangle.sequencer_step++ & 0x1F;
 	dac_output = triangle_sequencer_output[index];
 
-	if( !config.sound_mute )
-		playback_add_sample(Triangle, dac_output);
+	playback_add_sample(Triangle, dac_output);
 
 }
 

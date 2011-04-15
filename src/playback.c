@@ -200,6 +200,10 @@ void playback_pause(int pause_on) {
 }
 
 void playback_add_sample(int channel, uint8_t sample) {
+
+	if( config.sound_mute )
+		return;
+
 	SDL_LockAudio();
 	dac[channel] = push(dac[channel], sample);
 	SDL_UnlockAudio();
