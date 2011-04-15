@@ -158,7 +158,7 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		 * the one that should get played, and then we take all the fronts,
 		 * and combine them
 		 */
-		for(channel = 0; channel != 3; channel++) {
+		for(channel = 0; channel != 5; channel++) {
 			while(dac[channel] != NULL && dac[channel]->ppu_cycles < step_ppu_cycles)
 				dac[channel] = pop(dac[channel]);
 		}
