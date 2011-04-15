@@ -168,15 +168,18 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		square2_sample = 0;
 		triangle_sample = 0;
 
-		if( dac[Square1] != NULL )
+		if( dac[Square1] != NULL && config.apu_square1 )
 			square1_sample = dac[Square1]->sample;
-		if( dac[Square2] != NULL )
+		if( dac[Square2] != NULL && config.apu_square2 )
 			square2_sample = dac[Square2]->sample;
-		if( dac[Triangle] != NULL )
+		if( dac[Triangle] != NULL && config.apu_triangle )
 			triangle_sample = dac[Triangle]->sample;
 
 		sample += square_dac_outputs[square1_sample + square2_sample];
 		sample += tnd_dac_outputs[triangle_sample];
+
+		if( sample == 0 )
+			sample = audio_spec.silence;
 
 		/* Finally! This is our little sample */
 		stream[pos] = sample;

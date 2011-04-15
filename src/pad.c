@@ -187,6 +187,39 @@ void nes_keydown(SDL_keysym keysym) {
 			config.show_front_spr = ( !config.show_front_spr );
 			break;
 
+		/*******************/
+		/* ImaNES channels */
+		/*******************/
+		/* Toggle Square1 channel */
+		case SDLK_5:
+			INFO( printf(_("Square1 channel %s\n"), (config.apu_square1 ? "OFF" : "ON")) );
+			config.apu_square1 = ( !config.apu_square1 );
+			break;
+
+		/* Toggle Square2 channel */
+		case SDLK_6:
+			INFO( printf(_("Square2 channel %s\n"), (config.apu_square2 ? "OFF" : "ON")) );
+			config.apu_square2 = ( !config.apu_square2 );
+			break;
+
+		/* Toggle Triangle channel */
+		case SDLK_7:
+			INFO( printf(_("Triangle channel %s\n"), (config.apu_triangle ? "OFF" : "ON")) );
+			config.apu_triangle = ( !config.apu_triangle );
+			break;
+
+		/* Toggle Noise channel */
+		case SDLK_8:
+			INFO( printf(_("Noise channel %s\n"), (config.apu_noise ? "OFF" : "ON")) );
+			config.apu_noise = ( !config.apu_noise );
+			break;
+
+		/* Toggle DMC channel */
+		case SDLK_9:
+			INFO( printf(_("DMC channel %s\n"), (config.apu_dmc ? "OFF" : "ON")) );
+			config.apu_dmc = ( !config.apu_dmc );
+			break;
+
 		/******************/
 		/* ImaNES actions */
 		/******************/
