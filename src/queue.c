@@ -77,3 +77,15 @@ void clear(dac_queue *q) {
 	} while(q != NULL);
 
 }
+
+unsigned int queue_length(dac_queue *q) {
+
+	unsigned int result = 0;
+
+	while(q != NULL) {
+		q = q->next;
+		result++;
+	}
+
+	return result;
+}

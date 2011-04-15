@@ -97,13 +97,13 @@ void initialize_playback() {
 void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
 	/* static variables to keep history of things */
-	static int i = 0;
 	static struct timespec previousTime = {0, 0};
 	static unsigned long int previous_ppu_cycles = 0;
 
 	Uint8 sample;
 	int pos;
 	unsigned int channel;
+	unsigned int length;
 	unsigned long int ppu_cycles;
 	unsigned long int ppu_steps_per_sample;
 	unsigned long int step_ppu_cycles;
@@ -114,12 +114,34 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	uint8_t triangle_sample;
 
 	ppu_cycles = CLK->ppu_cycles;
-	i++;
 
 	clock_gettime(CLOCK_REALTIME, &currentTime);
 	if( currentTime.tv_sec != previousTime.tv_sec ) {
-		printf("Called the callback %d times per second\n", i);
-		i = 0;
+
+		printf("Elements in queue:");
+
+		length = queue_length(dac[Square1]);
+		if( length != 0 )
+			printf(" Square1: %d", length);
+
+		length = queue_length(dac[Square2]);
+		if( length != 0 )
+			printf(" Square2: %d", length);
+
+		length = queue_length(dac[Triangle]);
+		if( length != 0 )
+			printf(" Triangle: %d", length);
+
+		length = queue_length(dac[Noise]);
+		if( length != 0 )
+			printf(" Noise: %d", length);
+
+		length = queue_length(dac[DMC]);
+		if( length != 0 )
+			printf(" DMC: %d\n", length);
+
+		printf("\n");
+
 	}
 
 	/* Fill with silence at the start */

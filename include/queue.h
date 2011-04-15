@@ -21,4 +21,6 @@ dac_queue *push(dac_queue *q, uint8_t sample);
 
 void clear(dac_queue *q);
 
+unsigned int queue_length(dac_queue *q);
+
 #endif /* queue_h */
