@@ -582,6 +582,11 @@ void clock_envelopes_tlc() {
 	clock_envelope(&APU->noise.envelope);
 }
 
+void clock_length_counter(apu_length_counter *lc) {
+	if( !lc->halt && lc->counter )
+		lc->counter--;
+}
+
 void clock_sweep(nes_square_channel *s) {
 
 	uint16_t new_period;
@@ -610,17 +615,10 @@ void clock_sweep(nes_square_channel *s) {
 void clock_lc_sweep() {
 
 	/* Clock the length counters for triangle and square channels */
-	if( !APU->triangle.lc.halt && APU->triangle.lc.counter )
-		APU->triangle.lc.counter--;
-
-	if( !APU->square1.lc.halt && APU->square1.lc.counter )
-		APU->square1.lc.counter--;
-
-	if( !APU->square2.lc.halt && APU->square2.lc.counter )
-		APU->square2.lc.counter--;
-
-	if( !APU->noise.lc.halt && APU->noise.lc.counter )
-		APU->noise.lc.counter--;
+	clock_length_counter(&APU->triangle.lc);
+	clock_length_counter(&APU->square1.lc);
+	clock_length_counter(&APU->square2.lc);
+	clock_length_counter(&APU->noise.lc);
 
 	/* Clock sweep unit on square channels */
 	clock_sweep(&APU->square1);

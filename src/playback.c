@@ -204,6 +204,13 @@ void playback_add_sample(int channel, uint8_t sample) {
 	if( config.sound_mute )
 		return;
 
+	if( (channel == Triangle && !config.apu_triangle) ||
+	    (channel == Square1  && !config.apu_square1) ||
+	    (channel == Square2  && !config.apu_square2) ||
+	    (channel == Noise    && !config.apu_noise) ||
+	    (channel == DMC      && !config.apu_dmc) )
+		return;
+
 	SDL_LockAudio();
 	dac[channel] = push(dac[channel], sample);
 	SDL_UnlockAudio();
