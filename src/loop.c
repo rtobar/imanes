@@ -152,6 +152,8 @@ int main_loop(void *args) {
 		ADD_CPU_CYCLES(inst.cycles);
 		added_cycles = (int)(CLK->ppu_cycles - ppu_cycles);
 		ppu_cycles = CLK->ppu_cycles;
+
+		/* Decrement PPU scanline timeout */
 		PPU->scanline_timeout -= added_cycles;
 
 		/* Decrement APU timers */
@@ -162,7 +164,7 @@ int main_loop(void *args) {
 		APU->noise.timer.timeout -= added_cycles;
 		APU->dmc.timer.timeout -= added_cycles;
 
-		/* Check if we need to clock each of the
+		/* Check if we need to clock any of the
 		 * APU timers.
 		 *
 		 * In particular, the frame sequencer may clock
