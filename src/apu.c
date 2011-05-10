@@ -105,6 +105,7 @@ float normal_square_dac_outputs[32] = {
 };
 
 float normal_tnd_dac_outputs[204] = {
+	0.0,
 	0.0066998239797,
 	0.0133450201802,
 	0.0199362540095,
@@ -308,7 +309,6 @@ float normal_tnd_dac_outputs[204] = {
 	0.740454883072,
 	0.742467605381,
 	0.744471307894,
-	0.746466051108
 };
 
 uint8_t length_counter_reload_values[32] = {
