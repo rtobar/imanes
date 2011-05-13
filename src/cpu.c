@@ -933,7 +933,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 			APU->square1.envelope.disabled = (value&0x10) >> 4;
 			APU->square1.envelope.period = (value&0x0F) + 1;
-			APU->square1.envelope.written = 1;
 			break;
 
 		/* 1st Square channel sweep unit */
@@ -961,6 +960,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 				APU->square1.lc.counter = length_counter_reload_values[i];
 
 			APU->square1.sequencer_step = 0;
+			APU->square1.envelope.written = 1;
 			break;
 
 		/* 2nd Square channel duty, envelope */
@@ -973,7 +973,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 			APU->square2.envelope.disabled = (value&0x10) >> 4;
 			APU->square2.envelope.period = (value&0x0F) + 1;
-			APU->square2.envelope.written = 1;
 			break;
 
 		/* 2nd Square channel sweep unit */
@@ -1001,6 +1000,7 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 				APU->square2.lc.counter = length_counter_reload_values[i];
 
 			APU->square2.sequencer_step = 0;
+			APU->square2.envelope.written = 1;
 			break;
 
 		/* Triangle channel linear counter, control */
@@ -1039,7 +1039,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 			APU->noise.envelope.disabled = (value&0x10) >> 4;
 			APU->noise.envelope.period = (value&0x0F) + 1;
-			APU->noise.envelope.written = 1;
 			break;
 
 		/* Noise channel random mode, timer period index */
