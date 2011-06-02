@@ -158,11 +158,11 @@ int main_loop(void *args) {
 
 		/* Decrement APU timers */
 		APU->frame_seq.clock_timeout -= added_cycles;
-		APU->triangle.timer.timeout -= added_cycles/3;
-		APU->square1.timer.timeout -= added_cycles/3;
-		APU->square2.timer.timeout -= added_cycles/3;
-		APU->noise.timer.timeout -= added_cycles/3;
-		APU->dmc.timer.timeout -= added_cycles/3;
+		APU->triangle.timer.timeout -= inst.cycles;
+		APU->square1.timer.timeout -= inst.cycles;
+		APU->square2.timer.timeout -= inst.cycles;
+		APU->noise.timer.timeout -= inst.cycles;
+		APU->dmc.timer.timeout -= inst.cycles;
 
 		/* Check if we need to clock any of the
 		 * APU timers.
