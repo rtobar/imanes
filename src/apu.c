@@ -435,6 +435,9 @@ void initialize_apu() {
 
 	APU->noise.timer.timeout = 0;
 	APU->noise.timer.period = 0x07FF;
+
+	APU->noise.shift = 1;
+	APU->noise.random_mode = 0;
 }
 
 void dump_apu() {
@@ -674,9 +677,39 @@ void clock_square_timer(nes_square_channel *s) {
 
 void clock_noise_timer() {
 
+	uint8_t  preshift_bits;
+	uint16_t new_bit;
+
 	/* Reset the timer */
 	APU->noise.timer.timeout += APU->noise.timer.period;
 
+	/* Update shift register */
+	preshift_bits = APU->noise.shift & 0x7F;
+	APU->noise.shift >>= 1;
+	APU->noise.shift &= 0x7FFF;
+
+	new_bit = preshift_bits & 0x01;
+	if( !APU->noise.random_mode )
+		new_bit ^= (preshift_bits & 0x02) >> 1;
+	else if( APU->noise.random_mode == 1 )
+		new_bit ^= (preshift_bits & 0x40) >> 6;
+	else
+		NORMAL( printf("Invalid random mode in noise channel: %u\n", APU->noise.random_mode) );
+
+	APU->noise.shift |= ((new_bit << 14) & 0x80);
+
+	/* See if we can pass through from envelope to DAC */
+	if( APU->noise.shift & 0x01 ) {
+		playback_add_sample(Noise, 0);
+		return;
+	}
+
+	if( !APU->noise.shift )
+		return;
+	if( !APU->noise.lc.counter )
+		return;
+
+	playback_add_sample(Noise, APU->noise.envelope.counter);
 }
 
 void clock_dmc_timer() {

@@ -151,7 +151,8 @@ typedef struct _noise_channel {
 	apu_envelope       envelope;
 
 	/* Random stuff */
-	uint8_t random_mode;
+	uint8_t  random_mode;
+	uint16_t shift;
 
 } nes_noise_channel;
 
