@@ -379,10 +379,9 @@ void initialize_apu() {
 
 	APU->square1.sweep.enable = 0;
 	APU->square1.sweep.negate = 0;
-	APU->square1.sweep.reload = 0;
-	APU->square1.sweep.period = 0x07;
-	APU->square1.sweep.timeout = 0;
 	APU->square1.sweep.shift = 0;
+	APU->square1.sweep.timer.period = 0x07;
+	APU->square1.sweep.timer.timeout = 0;
 
 	APU->square1.envelope.disabled = 1;
 	APU->square1.envelope.loop = 0;
@@ -403,10 +402,9 @@ void initialize_apu() {
 
 	APU->square2.sweep.enable = 0;
 	APU->square2.sweep.negate = 0;
-	APU->square2.sweep.reload = 0;
-	APU->square2.sweep.period = 0x07;
-	APU->square2.sweep.timeout = 0;
 	APU->square2.sweep.shift = 0;
+	APU->square2.sweep.timer.period = 0x07;
+	APU->square2.sweep.timer.timeout = 0;
 
 	APU->square2.envelope.disabled = 1;
 	APU->square2.envelope.loop = 0;
@@ -592,26 +590,26 @@ void clock_length_counter(apu_length_counter *lc) {
 
 void clock_sweep(nes_square_channel *s) {
 
-	uint16_t new_period;
-
 	/* Calculate the new period */
-	new_period = s->timer.period >> s->sweep.shift;
-	if( s->sweep.negate )
-		new_period = (!new_period) & 0x7FF;
-	if( s->channel == Square2 )
-		new_period++;
-	new_period = s->timer.period + new_period;
+	s->sweep.new_period = s->timer.period >> s->sweep.shift;
+	if( s->sweep.negate ) {
+		s->sweep.new_period = (!s->sweep.new_period) & 0x7FF;
+		if( s->channel == Square2 )
+			s->sweep.new_period++;
+	}
+	s->sweep.new_period = s->timer.period + s->sweep.new_period;
+
+	s->sweep.timer.timeout--;
+	if( s->sweep.written ) {
+		s->sweep.timer.timeout = s->sweep.timer.period;
+	}
+	s->sweep.written = 0;
 
 	/* Possibily update the channel's period */
-	if( s->timer.period < 8 || new_period > 0x7FF )
-		playback_add_sample(Square1, 0);
-	else {
-		if( !s->sweep.enable && s->sweep.shift )
-			if( !s->sweep.timeout ) {
-				s->timer.period = new_period;
-				s->sweep.timeout = s->sweep.period;
-			}
-	}
+	if( !(s->timer.period < 8 || s->sweep.new_period > 0x7FF) &&
+	    !s->sweep.enable && s->sweep.shift &&
+	    s->sweep.timer.timeout <= 0 )
+			s->timer.period = s->sweep.new_period;
 
 }
 
@@ -662,7 +660,8 @@ void clock_square_timer(nes_square_channel *s) {
 
 	/* Clock the sequencer */
 	s->sequencer_step++;
-	if( square_sequencer_output[s->duty_cycle][s->sequencer_step] ) {
+	if( square_sequencer_output[s->duty_cycle][s->sequencer_step] &&
+	   !(s->timer.period < 8 || s->sweep.new_period > 0x7FF) ) {
 		if( s->envelope.disabled )
 			volume = s->envelope.period-1;
 		else

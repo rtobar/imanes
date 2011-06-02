@@ -75,12 +75,12 @@ typedef struct _linear_counter {
 
 /* Sweep unit */
 typedef struct _sweep {
-	uint8_t enable;
-	uint8_t negate;
-	uint8_t reload;
-	uint8_t period;
-	uint8_t timeout;
-	uint8_t shift;
+	uint8_t  enable;
+	uint8_t  negate;
+	uint8_t  shift;
+	uint8_t  written;
+	uint16_t new_period;
+	apu_timer timer;
 } apu_sweep;
 
 /*

@@ -938,9 +938,10 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* 1st Square channel sweep unit */
 		case 0x4001:
 			APU->square1.sweep.enable = (value&0x80) >> 7;
-			APU->square1.sweep.reload = ((value&0x70) >> 4) + 1;
+			APU->square1.sweep.timer.period = ((value&0x70) >> 4) + 1;
 			APU->square1.sweep.negate = (value&0x08) >> 3;
-			APU->square1.sweep.shift = value&0x03;
+			APU->square1.sweep.shift = value&0x07;
+			APU->square1.sweep.written = 1;
 			break;
 
 		/* 1st Square channel period 8 lower bits */
@@ -978,9 +979,10 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		/* 2nd Square channel sweep unit */
 		case 0x4005:
 			APU->square2.sweep.enable = (value&0x80) >> 7;
-			APU->square2.sweep.reload = ((value&0x70) >> 4) + 1;
+			APU->square2.sweep.timer.period = ((value&0x70) >> 4) + 1;
 			APU->square2.sweep.negate = (value&0x08) >> 3;
-			APU->square2.sweep.shift = value&0x03;
+			APU->square2.sweep.shift = value&0x07;
+			APU->square2.sweep.written = 1;
 			break;
 
 		/* 2nd Square channel period 8 lower bits */
