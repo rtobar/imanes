@@ -380,15 +380,15 @@ void initialize_apu() {
 	APU->square1.sweep.enable = 0;
 	APU->square1.sweep.negate = 0;
 	APU->square1.sweep.shift = 0;
-	APU->square1.sweep.timer.period = 0x07;
+	APU->square1.sweep.timer.period = 0x08;
 	APU->square1.sweep.timer.timeout = 0;
 
 	APU->square1.envelope.disabled = 1;
 	APU->square1.envelope.loop = 0;
 	APU->square1.envelope.written = 0;
 	APU->square1.envelope.counter = 0;
-	APU->square1.envelope.period = 0x10;
-	APU->square1.envelope.timeout = 0;
+	APU->square1.envelope.timer.period = 0x10;
+	APU->square1.envelope.timer.timeout = 0;
 
 	APU->square1.lc.counter = 0;
 	APU->square1.lc.halt = 0;
@@ -403,15 +403,15 @@ void initialize_apu() {
 	APU->square2.sweep.enable = 0;
 	APU->square2.sweep.negate = 0;
 	APU->square2.sweep.shift = 0;
-	APU->square2.sweep.timer.period = 0x07;
+	APU->square2.sweep.timer.period = 0x08;
 	APU->square2.sweep.timer.timeout = 0;
 
 	APU->square2.envelope.disabled = 1;
 	APU->square2.envelope.loop = 0;
 	APU->square2.envelope.written = 0;
 	APU->square2.envelope.counter = 0;
-	APU->square2.envelope.period = 0x10;
-	APU->square2.envelope.timeout = 0;
+	APU->square2.envelope.timer.period = 0x10;
+	APU->square2.envelope.timer.timeout = 0;
 
 	APU->square2.lc.counter = 0;
 	APU->square2.lc.halt = 0;
@@ -424,8 +424,8 @@ void initialize_apu() {
 	APU->noise.envelope.loop = 0;
 	APU->noise.envelope.written = 0;
 	APU->noise.envelope.counter = 0;
-	APU->noise.envelope.period = 0x10;
-	APU->noise.envelope.timeout = 0;
+	APU->noise.envelope.timer.period = 0x10;
+	APU->noise.envelope.timer.timeout = 0;
 
 	APU->noise.lc.counter = 0;
 	APU->noise.lc.halt = 0;
@@ -548,18 +548,17 @@ void clock_envelope(apu_envelope *e) {
 
 	if( e->written ) {
 		e->counter = 15;
-		e->timeout = e->period;
+		e->timer.timeout = e->timer.period;
 	}
 	else
-		e->timeout--;
+		e->timer.timeout--;
 	e->written = 0;
 
-	if( !e->timeout ) {
+	if( e->timer.timeout <= 0 ) {
 		if( e->loop && !e->counter )
 			e->counter = 15;
-		else
-			if( e->counter )
-				e->counter--;
+		else if( e->counter )
+			e->counter--;
 	}
 
 }
@@ -663,7 +662,7 @@ void clock_square_timer(nes_square_channel *s) {
 	if( square_sequencer_output[s->duty_cycle][s->sequencer_step] &&
 	   !(s->timer.period < 8 || s->sweep.new_period > 0x7FF) ) {
 		if( s->envelope.disabled )
-			volume = s->envelope.period-1;
+			volume = s->envelope.timer.period-1;
 		else
 			volume = s->envelope.counter;
 

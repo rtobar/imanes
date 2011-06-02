@@ -61,8 +61,7 @@ typedef struct _envelope {
 	uint8_t loop;
 	uint8_t written;
 	uint8_t counter;
-	uint8_t period;
-	uint8_t timeout;
+	apu_timer timer;
 } apu_envelope;
 
 /* Linear counter */
