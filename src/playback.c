@@ -261,7 +261,13 @@ void playback_add_sample(int channel, uint8_t sample) {
 }
 
 void end_playback() {
+
+	int i;
 	if( config.sound_mute )
 		return;
+
 	playback_pause(1);
+	for(i=0; i!=5; i++)
+		while(dac[i]!=NULL)
+			dac[i] = pop(dac[i]);
 }
