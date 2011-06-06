@@ -73,9 +73,25 @@ void initialize_configuration() {
 	dummy = get_imanes_dir(Snapshots); free(dummy);
 }
 
+int config_enabled(const char *value) {
+
+	if( !strcmp("1", value) ||
+	    !strcmp("enabled", value) ||
+	    !strcmp("True", value) ||
+	    !strcmp("true", value) )
+		return 1;
+	return 0;
+}
+
 void load_user_configuration() {
 
+	unsigned int line_count;
 	char *user_dir;
+	char *config_file;
+	char line[1024];
+	char key[100];
+	char value[100];
+	FILE *file = NULL;
 
 	user_dir = get_user_imanes_dir();
 
@@ -84,7 +100,84 @@ void load_user_configuration() {
 		return;
 	}
 
+	config_file = (char *)malloc(strlen(user_dir) + 11);
+	imanes_sprintf(config_file, strlen(user_dir) + 11, "%s%cimanes.rc", user_dir, DIR_SEP);
+	file = fopen(config_file, "rt");
+
+	if( file == NULL ) {
+		fprintf(stderr,_("Error while opening configuration file '%s': "), config_file);
+		perror(NULL);
+		fprintf(stderr,_("No configuration will be loaded from configuration file\n"));
+		free(config_file);
+		free(user_dir);
+		return;
+	}
+
+	line_count = 1;
+	while( !feof(file) && fgets(line, 1024, file) != NULL ) {
+
+		/* Skip comments */
+		if( sscanf(line, " #") == 1 )
+			continue;
+
+		/* Check that lines are valid */
+		if( sscanf(line, "%s = %s", key, value) != 2 ) {
+			fprintf(stderr, "Invalid configuration at line %d: %s", line_count, line);
+		}
+
+		/* Actually configure imanes */
+
+		/* Square1 channel */
+		if( !strcmp("square1", key) ) {
+			if( config_enabled(value) )
+				config.apu_square1 = 1;
+			else
+				config.apu_square1 = 0;
+			INFO( printf("[config] Square 1 audio channel %s\n", (config.apu_square1 ? "enabled" : "disabled")) );
+			continue;
+		}
+		/* Square2 channel */
+		if( !strcmp("square2", key) ) {
+			if( config_enabled(value) )
+				config.apu_square2 = 1;
+			else
+				config.apu_square2 = 0;
+			INFO( printf("[config] Square 2 audio channel %s\n", (config.apu_square2 ? "enabled" : "disabled")) );
+			continue;
+		}
+		/* Triangle channel */
+		if( !strcmp("triangle", key) ) {
+			if( config_enabled(value) )
+				config.apu_triangle = 1;
+			else
+				config.apu_triangle = 0;
+			INFO( printf("[config] Triangle audio channel %s\n", (config.apu_triangle ? "enabled" : "disabled")) );
+			continue;
+		}
+		/* Noise channel */
+		if( !strcmp("noise", key) ) {
+			if( config_enabled(value) )
+				config.apu_noise = 1;
+			else
+				config.apu_noise = 0;
+			INFO( printf("[config] Noise audio channel %s\n", (config.apu_noise ? "enabled" : "disabled")) );
+			continue;
+		}
+		/* DMC channel */
+		if( !strcmp("dmc", key) ) {
+			if( config_enabled(value) )
+				config.apu_dmc = 1;
+			else
+				config.apu_dmc = 0;
+			INFO( printf("[config] DMC audio channel %s\n", (config.apu_dmc ? "enabled" : "disabled")) );
+			continue;
+		}
+
+		line_count++;
+	}
+
 	free(user_dir);
+	free(config_file);
 	return;
 }
 
