@@ -39,6 +39,7 @@
 #else
 
 	#include <sys/types.h>
+	#include <fcntl.h>
 	#include <unistd.h>
 
 	#define RW_RET      ssize_t
