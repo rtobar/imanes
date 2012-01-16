@@ -88,13 +88,15 @@ void initialize_playback() {
 	for(i=0;i!=204;i++)
 		tnd_dac_outputs[i] = normal_tnd_dac_outputs[i]*(float)max_vol;
 
-	printf("Square outputs:");
-	for(i=0;i!=32;i++)
-		printf(" %u", square_dac_outputs[i]);
-	printf("\nTriangle, DMC, Noise outputs:");
-	for(i=0;i!=204;i++)
-		printf(" %u", tnd_dac_outputs[i]);
-	printf("\n");
+	DEBUG(
+		printf("Square outputs:");
+		for(i=0;i!=32;i++)
+			printf(" %u", square_dac_outputs[i]);
+		printf("\nTriangle, DMC, Noise outputs:");
+		for(i=0;i!=204;i++)
+			printf(" %u", tnd_dac_outputs[i]);
+		printf("\n");
+	);
 
 	/* DAC queues */
 	dac[0] = NULL;
@@ -105,7 +107,6 @@ void initialize_playback() {
 
 }
 
-/* TODO: only processing triangle and square (both) channels here! */
 void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
 	/* static variables to keep history of things */
@@ -164,12 +165,12 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	}
 
 	ppu_steps_per_sample = (ppu_cycles - previous_ppu_cycles)/len;
-
-	/* See the latest DAC outputs and combine them as long as we need */
-	step_ppu_cycles = previous_ppu_cycles + ppu_steps_per_sample;
+	step_ppu_cycles = previous_ppu_cycles;
 
 	/* printf("%lu cycles have passed, we'll play them in %u steps\n", ppu_cycles - previous_ppu_cycles, len); */
 	for(pos=0; pos!=len; pos++) {
+
+		step_ppu_cycles += ppu_steps_per_sample;
 
 		/* Check which sample should be played in this step for each channel */
 		for(channel = 0; channel != 5; channel++) {
@@ -178,18 +179,21 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 			while(1) {
 
 				/* If there are no samples, do nothing */
-				if( dac[channel] == NULL || dac[channel]->next == NULL )
+				if( dac[channel] == NULL )
 					break;
 
-				/* If there is a next sample, check whether we should play that one
-				 * instead of the one placed in the head of the queue. If we're ok,
-				 * we finish checking */
-				if( dac[channel]->next->ppu_cycles <= step_ppu_cycles ) {
-					dac[channel] = pop(dac[channel]);
-					removed++;
+				/* The current sample must be discarded only if the next one is meant to replace it */
+				if( dac[channel]->ppu_cycles < step_ppu_cycles ) {
+					if( dac[channel]->next == NULL )
+						break;
+					else if( dac[channel]->next->ppu_cycles < step_ppu_cycles ) {
+						dac[channel] = pop(dac[channel]);
+						removed++;
+					}
 				}
-				else
-					break;
+				else {
+					break; /* This code should get executed only once per channel, at the beginning */
+				}
 
 			}
 			if( removed > 1 )
@@ -218,17 +222,18 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
 		index = square1_sample + square2_sample;
 		sample += square_dac_outputs[index];
-		index = 3*triangle_sample + 2*noise_sample + dmc_sample;
-		sample += tnd_dac_outputs[index];
 
-		/* If we got anything, then we should play silence (or not?) */
-		if( sample == 0 )
-			sample = audio_spec.silence;
+		index = 3*triangle_sample + 2*noise_sample + dmc_sample;
+		if( (int)(sample + tnd_dac_outputs[index]) > 0xFF ) {
+			printf("Warning: sample is over 0xFF!\n");
+			sample = 0xFF;
+		}
+		else
+			sample += tnd_dac_outputs[index];
 
 		/* Finally! This is our little sample */
 		stream[pos] = sample;
 
-		step_ppu_cycles += ppu_steps_per_sample;
 	}
 
 	/* Finally, set the 'previous' variables */
