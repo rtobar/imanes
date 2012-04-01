@@ -150,7 +150,7 @@ void draw_pixel(int x, int y, nes_palette color) {
 	if( config.use_sdl_colors )
 		colour = SDL_MapRGB(nes_screen->format, color.red, color.green, color.blue);
 	else
-		colour = (color.red<<16) | ((color.green)<<8) | (color.blue);
+		colour = color.combined;
 	
 	pixmem32 = (Uint32*)nes_screen->pixels;
 
