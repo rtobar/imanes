@@ -53,11 +53,9 @@ dac_queue *push(dac_queue *q, uint8_t sample) {
 	tmp = q;
 	while(tmp->next != NULL) tmp = tmp->next;
 
-	/* Won't queue same value, just update it */
-	if( tmp->sample == sample ) {
-		tmp->ppu_cycles = CLK->ppu_cycles;
+	/* Won't queue same value twice */
+	if( tmp->sample == sample )
 		return q;
-	}
 
 	tmp->next = (dac_queue *)malloc(sizeof(dac_queue));
 	tmp->next->ppu_cycles = CLK->ppu_cycles;
