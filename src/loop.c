@@ -117,7 +117,6 @@ int main_loop(void *args) {
 		   and there's nor mirroring nor mm IOs there */
 		opcode = CPU->RAM[CPU->PC];
 		inst = instructions[opcode];
-		instructions[opcode].executed++;
 
 		DEBUG( printf("%04.0f 0x%04x - %02x: ",CLK->nmi_pcycles/3., CPU->PC, opcode) );
 		/* Undocumented instruction */
