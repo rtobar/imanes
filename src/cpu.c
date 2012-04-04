@@ -727,9 +727,152 @@ void (*ptr_to_inst[INSTRUCTIONS_NUMBER])(instruction *, operand *) = {
 	&default_func
 };
 
+/* Reads the first PPU Control Register (0x2000) */
+uint8_t _read_ppu_cr1(uint16_t address) {
+	return PPU->CR1;
+}
+
+/* Reads the second PPU Control Register (0x2001) */
+uint8_t _read_ppu_cr2(uint16_t address) {
+	return PPU->CR2;
+}
+
+/* Reads the PPU Status Register (0x2002) */
+uint8_t _read_ppu_st(uint16_t address) {
+	uint8_t ret_val = PPU->SR;
+	if( !(PPU->scanline_timeout <= 1 && PPU->lines == NES_SCREEN_HEIGHT ) )
+		PPU->SR &= ~VBLANK_FLAG;
+	PPU->latch = 1;
+	return ret_val;
+}
+
+/* Reads the SPR-RAM address (0x2003) */
+uint8_t _read_spr_ram_add(uint16_t address) {
+	return PPU->spr_addr;
+}
+
+/* Accesses the SPR-RAM (0x2004) */
+uint8_t _read_spr_ram(uint16_t address) {
+	return PPU->SPR_RAM[PPU->spr_addr];
+}
+
+/* Read latch (TODO: which latch?) */
+uint8_t _read_latch(uint16_t address) {
+	return PPU->latch;
+}
+
+/* Read the PPU VRAM */
+uint8_t _read_ppu_vram(uint16_t address) {
+
+	uint8_t ret_val = 0;
+	static uint8_t buffer = 0; /* Buffer when reading from 0x2007 */
+
+	if( PPU->vram_addr < 0x3F00 ) {
+		ret_val = buffer;
+		buffer = read_ppu_vram(PPU->vram_addr);
+	}
+	/* Palette reads don't use the read buffer */
+	else {
+		ret_val = read_ppu_vram(PPU->vram_addr);
+		buffer  = read_ppu_vram(PPU->vram_addr - 0x1000);
+	}
+	if( PPU->CR1 & VERTICAL_WRITE)
+		PPU->vram_addr += 32;
+	else
+		PPU->vram_addr++;
+
+	/* Check rising edge of A12 on PPU bus (needed by MMC3) */
+	if( (PPU->vram_addr & 0x1000) &&
+		!prev_a12_state )
+		mapper->update();
+
+	/* Save the A12 line status (needed by MMC3) */
+	prev_a12_state  = PPU->vram_addr & 0x1000;
+	prev_a12_cycles = CLK->ppu_cycles;
+
+	return ret_val;
+}
+
+uint8_t _read_apu_sr(uint16_t address) {
+
+	uint8_t ret_val = 0;
+
+	ret_val |= ((APU->square1.lc.counter > 0 ? 1 : 0));
+	ret_val |= ((APU->square2.lc.counter > 0 ? 1 : 0) << 1);
+	ret_val |= ((APU->triangle.lc.counter > 0 ? 1 : 0) << 2);
+	ret_val |= ((APU->noise.lc.counter > 0 ? 1 : 0) << 3);
+	/* TODO: DMC sample bytes remaining > 0 << 4 */
+	ret_val |= ((APU->frame_seq.int_flag & 0x1) << 6);
+	/* TODO: IRQ from DMC << 7 */
+
+	/* Finally, clear the FS interrupt flag */
+	APU->frame_seq.int_flag = 0;
+
+	return ret_val;
+}
+
+/* Read the 1st joystick (0x4016) */
+uint8_t _read_joystick1(uint16_t address) {
+
+	uint8_t ret_val = 0;
+
+	/* If we should return a key state... */
+	if( pads[0].reads < 8 )
+		ret_val |= ((pads[0].pressed_keys >> (pads[0].reads)) & 0x1);
+
+	/* This is the signature */
+	else if ( pads[0].reads == 19 && pads[0].plugged )
+		ret_val |= 0x01;
+
+	pads[0].reads++;
+	if( pads[0].reads == 32 )
+		pads[0].reads = 0;
+
+	return ret_val;
+}
+
+/* Read the 2nd Joystick (0x4017) */
+uint8_t _read_joystick2(uint16_t address) {
+
+	uint8_t ret_val = 0;
+
+	/* If we should return a key state... */
+	if( pads[1].reads < 8 )
+		ret_val |= ((pads[1].pressed_keys >> (pads[1].reads)) & 0x1);
+
+	/* This is the signature */
+	else if ( pads[1].reads == 18 && pads[1].plugged )
+		ret_val |= 0x01;
+
+	pads[1].reads++;
+	if( pads[1].reads == 32 )
+		pads[1].reads = 0;
+
+	return ret_val;
+}
+
+/* Read the SRAM (0x4017) */
+uint8_t _read_sram(uint16_t address) {
+	if( !(CPU->sram_enabled & SRAM_ENABLE) )
+		return 0;
+	else
+		return CPU->RAM[address];
+
+}
+
+/* Readm SRAM */
+uint8_t _read_ram(uint16_t address) {
+	return CPU->RAM[address];
+}
+
+uint8_t (*read_cpu_ram_f[NES_RAM_SIZE])(uint16_t address);
+
+
 nes_cpu *CPU;
 
 void initialize_cpu() {
+
+	unsigned int i = 0;
 
 	CPU = (nes_cpu *)malloc(sizeof(nes_cpu));
 	CPU->A = 0;
@@ -743,6 +886,25 @@ void initialize_cpu() {
 	CPU->reset = 1;
 	CPU->sram_enabled = 0;
 	CPU->sram_enabled &= ~SRAM_ENABLE;
+
+	/* The default is to call _read_ram when reading the RAM */
+	for(i=0; i!= NES_RAM_SIZE; i++)
+		read_cpu_ram_f[i] = &_read_ram;
+
+	for(i=0x6000; i!=0x8000; i++)
+		read_cpu_ram_f[i] = &_read_sram;
+
+	read_cpu_ram_f[0x2000] = &_read_ppu_cr1;
+	read_cpu_ram_f[0x2001] = &_read_ppu_cr2;
+	read_cpu_ram_f[0x2002] = &_read_ppu_st;
+	read_cpu_ram_f[0x2003] = &_read_spr_ram_add;
+	read_cpu_ram_f[0x2004] = &_read_spr_ram;
+	read_cpu_ram_f[0x2005] = &_read_latch;
+	read_cpu_ram_f[0x2006] = &_read_latch;
+	read_cpu_ram_f[0x2007] = &_read_ppu_vram;
+	read_cpu_ram_f[0x4015] = &_read_apu_sr;
+	read_cpu_ram_f[0x4016] = &_read_joystick1;
+	read_cpu_ram_f[0x4017] = &_read_joystick2;
 
 	return;
 }
@@ -1139,7 +1301,6 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 uint8_t read_cpu_ram(uint16_t address) {
 
 	uint8_t ret_val = 0;
-	static uint8_t buffer = 0; /* Buffer when reading from 0x2007 */
 
 	/* Convert the address to handle mirroring */
 	if( 0x0800 <= address && address < 0x2000 ) {
@@ -1154,118 +1315,10 @@ uint8_t read_cpu_ram(uint16_t address) {
 		DEBUG( printf("%04x\n",address) );
 	}
 
-	/* PPU Control Register 1 */
-	if( address == 0x2000 )
-		ret_val = PPU->CR1;
-
-	/* PPU Control Register 1 */
-	else if( address == 0x2001 )
-		ret_val = PPU->CR2;
-
-	/* PPU Status Register */
-	else if( address == 0x2002 ) {
-		ret_val = PPU->SR;
-		if( !(PPU->scanline_timeout <= 1 && PPU->lines == NES_SCREEN_HEIGHT ) )
-			PPU->SR &= ~VBLANK_FLAG;
-		PPU->latch = 1;
-	}
-
-	/* SPR-RAM address */
-	else if( address == 0x2003 )
-		ret_val = PPU->spr_addr;
-
-	/* SPR-RAM access */
-	else if( address == 0x2004 )
-		ret_val = PPU->SPR_RAM[PPU->spr_addr];
-
-	else if( address == 0x2005 || address == 0x2006 )
-		ret_val = PPU->latch;
-
-	/* PPU VRAM */
-	else if( address == 0x2007 ) {
-		if( PPU->vram_addr < 0x3F00 ) {
-			ret_val = buffer;
-			buffer = read_ppu_vram(PPU->vram_addr);
-		}
-		/* Palette reads don't use the read buffer */
-		else {
-			ret_val = read_ppu_vram(PPU->vram_addr);
-			buffer  = read_ppu_vram(PPU->vram_addr - 0x1000);
-		}
-		if( PPU->CR1 & VERTICAL_WRITE)
-			PPU->vram_addr += 32;
-		else
-			PPU->vram_addr++;
-
-		/* Check rising edge of A12 on PPU bus (needed by MMC3) */
-		if( (PPU->vram_addr & 0x1000) &&
-			!prev_a12_state )
-			mapper->update();
-
-		/* Save the A12 line status (needed by MMC3) */
-		prev_a12_state  = PPU->vram_addr & 0x1000;
-		prev_a12_cycles = CLK->ppu_cycles;
-	}
-
-	/* APU Status Register */
-	else if( address == 0x4015 ) {
-
-		ret_val |= ((APU->square1.lc.counter > 0 ? 1 : 0));
-		ret_val |= ((APU->square2.lc.counter > 0 ? 1 : 0) << 1);
-		ret_val |= ((APU->triangle.lc.counter > 0 ? 1 : 0) << 2);
-		ret_val |= ((APU->noise.lc.counter > 0 ? 1 : 0) << 3);
-		/* TODO: DMC sample bytes remaining > 0 << 4 */
-		ret_val |= ((APU->frame_seq.int_flag & 0x1) << 6);
-		/* TODO: IRQ from DMC << 7 */
-
-		/* Finally, clear the FS interrupt flag */
-		APU->frame_seq.int_flag = 0;
-	}
-
-	/* 1st Joystick */
-	else if( address == 0x4016 ) {
-
-		/* If we should return a key state... */
-		if( pads[0].reads < 8 )
-			ret_val |= ((pads[0].pressed_keys >> (pads[0].reads)) & 0x1);
-
-		/* This is the signature */
-		else if ( pads[0].reads == 19 && pads[0].plugged )
-			ret_val |= 0x01;
-
-		pads[0].reads++;
-		if( pads[0].reads == 32 )
-			pads[0].reads = 0;
-	}
-
-	/* 2nd Joystick */
-	else if( address == 0x4017 ) {
-
-		/* If we should return a key state... */
-		if( pads[1].reads < 8 )
-			ret_val |= ((pads[1].pressed_keys >> (pads[1].reads)) & 0x1);
-
-		/* This is the signature */
-		else if ( pads[1].reads == 18 && pads[1].plugged )
-			ret_val |= 0x01;
-
-		pads[1].reads++;
-		if( pads[1].reads == 32 )
-			pads[1].reads = 0;
-	}
-
-	/* SRAM area */
-	else if( 0x6000 <= address && address < 0x8000 ) {
-		/* SRAM diabled */
-		if( !(CPU->sram_enabled & SRAM_ENABLE) )
-			return 0;
-		else
-			return CPU->RAM[address];
-	}
-
-	/* Normal RAM area */
-	else
-		ret_val = CPU->RAM[address];
+	/* Read the value using the corresponding function pointer       */
+	/* Otherwise (without function pointers) we couldn't inline this */
+	/* method, as it would be too big (inlining to be done)          */
+	ret_val = (*read_cpu_ram_f[address])(address);
 
 	XTREME( printf(_("Returning %02x from %04x\n"), ret_val, address) );
 	return ret_val;
