@@ -56,6 +56,7 @@ void initialize_playback() {
 	/* Inform if we cannot initialize the audio subsystem */
 	if( SDL_OpenAudio(&desired, &audio_spec) == -1 ) {
 		fprintf(stderr,_("Cannot initialize audio: %s\n"), SDL_GetError());
+		config.sound_mute = 1;
 		return;
 	}
 
@@ -120,34 +121,36 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	calls_per_sec++;
 
 	clock_gettime(CLOCK_REALTIME, &currentTime);
-	if( currentTime.tv_sec != previousTime.tv_sec ) {
+	INFO(
+		if( currentTime.tv_sec != previousTime.tv_sec ) {
 
-		printf("Calls/s: %u, Len is %d. Elements in queue:", calls_per_sec, len);
+			printf("Calls/s: %u, Len is %d. Elements in queue:", calls_per_sec, len);
 
-		length = queue_length(dac[Square1]);
-		if( length != 0 )
-			printf(" Square1: %d", length);
+			length = queue_length(dac[Square1]);
+			if( length != 0 )
+				printf(" Square1: %d", length);
 
-		length = queue_length(dac[Square2]);
-		if( length != 0 )
-			printf(" Square2: %d", length);
+			length = queue_length(dac[Square2]);
+			if( length != 0 )
+				printf(" Square2: %d", length);
 
-		length = queue_length(dac[Triangle]);
-		if( length != 0 )
-			printf(" Triangle: %d", length);
+			length = queue_length(dac[Triangle]);
+			if( length != 0 )
+				printf(" Triangle: %d", length);
 
-		length = queue_length(dac[Noise]);
-		if( length != 0 )
-			printf(" Noise: %d", length);
+			length = queue_length(dac[Noise]);
+			if( length != 0 )
+				printf(" Noise: %d", length);
 
-		length = queue_length(dac[DMC]);
-		if( length != 0 )
-			printf(" DMC: %d", length);
+			length = queue_length(dac[DMC]);
+			if( length != 0 )
+				printf(" DMC: %d", length);
 
-		printf("\n");
+			printf("\n");
 
-		calls_per_sec = 0;
-	}
+			calls_per_sec = 0;
+		}
+	);
 
 	ppu_steps_per_sample = (ppu_cycles - previous_ppu_cycles)/len;
 
@@ -200,20 +203,19 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		if( dac[DMC] != NULL && dac[DMC]->ppu_cycles <= step_ppu_cycles && config.apu_dmc )
 			dmc_sample = dac[DMC]->sample;
 
-		sample = 0;
-
 		index = square1_sample + square2_sample;
-		sample += square_dac_outputs[index];
+		sample = square_dac_outputs[index];
 		index = 3*triangle_sample + 2*noise_sample + dmc_sample;
 		sample += tnd_dac_outputs[index];
 
 		/* If we got anything, then we should play silence (or not?) */
-		if( sample == 0 )
+		if( !sample )
 			sample = audio_spec.silence;
 
 		/* Finally! This is our little sample */
 		stream[pos] = sample;
 
+		/* Step into the next sample */
 		step_ppu_cycles += ppu_steps_per_sample;
 	}
 
