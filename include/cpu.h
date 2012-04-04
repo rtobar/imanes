@@ -70,12 +70,7 @@ void dump_ram(uint16_t address, unsigned int lenght);
 /**
  * Given an operand, and an instruction, it executes it into the CPU
  */
-void execute_instruction(instruction *inst, operand *oper); 
-
-/**
- * Given a value and a set of flags, check and update them if necessary
- */
-void update_flags(int8_t value, uint8_t flags);
+void execute_instruction(instruction *inst, operand *oper);
 
 /**
  * Read from a RAM address and return the value there. This function

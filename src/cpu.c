@@ -40,6 +40,24 @@ static int prev_a12_cycles = 0;
 uint8_t  tmp;
 uint16_t tmp16;
 
+/**
+ * Given a value and a set of flags, check and update them if necessary
+ */
+inline void update_flags(int8_t value, uint8_t flags) {
+
+	/* 7th bit is set (negative number) */
+	if( flags & N_FLAG ) {
+		if( value >> 7 )   CPU->SR |= N_FLAG;
+		else               CPU->SR &= ~N_FLAG;
+	}
+
+	if( flags & Z_FLAG ) {
+		if( value == 0 )   CPU->SR |= Z_FLAG;
+		else               CPU->SR &= ~Z_FLAG;
+	}
+
+}
+
 void ADC_func(instruction *inst, operand *oper){
 	if( inst->addr_mode != ADDR_IMMEDIATE )
 		oper->value = read_cpu_ram(oper->address);
@@ -792,21 +810,6 @@ void init_cpu_ram(ines_file *file) {
 
 void execute_instruction(instruction *inst, operand *oper) {
 	(*ptr_to_inst[inst->instr_id])(inst, oper);
-}
-
-void update_flags(int8_t value, uint8_t flags) {
-
-	/* 7th bit is set (negative number) */
-	if( flags & N_FLAG ) {
-		if( value >> 7 )   CPU->SR |= N_FLAG;
-		else               CPU->SR &= ~N_FLAG;
-	}
-
-	if( flags & Z_FLAG ) {
-		if( value == 0 )   CPU->SR |= Z_FLAG;
-		else               CPU->SR &= ~Z_FLAG;
-	}
-
 }
 
 void write_cpu_ram(uint16_t address, uint8_t value) {
