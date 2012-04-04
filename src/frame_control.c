@@ -74,6 +74,8 @@ void frame_sleep() {
 	/* the actual time                                  */
 
 #ifndef _MSC_VER
+
+	/* Check current time, see if we should display the fps */
 	tmp = endTime.tv_sec;
 	clock_gettime(CLOCK_REALTIME, &endTime);
 	startTime.tv_nsec += (long)1.666666e7;
@@ -88,12 +90,26 @@ void frame_sleep() {
 		frames = 0;
 	}
 
+	if( config.run_fast )
+		return;
+
+	/* Calculate the sleep time */
 	sleepTime.tv_nsec = startTime.tv_nsec - endTime.tv_nsec;
 	sleepTime.tv_sec  = startTime.tv_sec  - endTime.tv_sec;
 	if( sleepTime.tv_nsec < 0 ) {
 		sleepTime.tv_sec--;
 		sleepTime.tv_nsec += (long)1e9;
 	}
+
+	/* We were on pause or in fast run */
+	if( sleepTime.tv_sec > 0 || sleepTime.tv_nsec > 1.666666e7 ) {
+		clock_gettime(CLOCK_REALTIME, &startTime);
+		sleepTime.tv_sec = 0;
+		sleepTime.tv_nsec = 0;
+	}
+	else
+		nanosleep(&sleepTime, NULL);
+
 #else
 	tmp = secs;
 	QueryPerformanceCounter(&endTime);
@@ -105,26 +121,15 @@ void frame_sleep() {
 		show_fps(frames);
 		frames = 0;
 	}
-#endif
-
-#ifndef _MSC_VER
 
 	/* We were on pause or in fast run */
-	if( sleepTime.tv_sec > 0 || sleepTime.tv_nsec > 1.666666e7 ) {
-		clock_gettime(CLOCK_REALTIME, &startTime);
-		sleepTime.tv_sec = 0;
-		sleepTime.tv_nsec = 0;
-	}
-	if( sleepTime.tv_sec >= 0 && !config.run_fast )
-		nanosleep(&sleepTime, NULL);
-#else
 	if( sleepTime.QuadPart > (LONGLONG)(1.6666e-2 * freq.QuadPart) ) {
 		QueryPerformanceCounter(&startTime);
 		time(&secs);
 		sleepTime.QuadPart = 0;
 	}
 
-	if( sleepTime.QuadPart > 0 && !config.run_fast )
+	if( !config.run_fast && sleepTime.QuadPart > 0 )
 		Sleep((DWORD)((double)sleepTime.QuadPart*1000/(double)freq.QuadPart));
 #endif
 
