@@ -251,7 +251,7 @@ void clock_lc_sweep();
 void end_apu();
 
 
-/* Normalized output of DAC for
+/* 8-bits unsigned output of DAC for
  * square channel 1 + square channel 2
  * This is implemented as a lookup table. The index for this table
  * will be composed by:
@@ -260,9 +260,9 @@ void end_apu();
  *
  * Each square DAC input is 4 bits long
  */
-extern float normal_square_dac_outputs[32];
+extern uint8_t square_dac_outputs[32];
 
-/* Normalized output of the DAC for the triangle channel,
+/* 8-bits unsigned output of the DAC for the triangle channel,
  * the noise channel and the delta modulation channel
  *
  * This is implemented as a lookup table. The index for this table
@@ -274,7 +274,7 @@ extern float normal_square_dac_outputs[32];
  * Noise's DAC input is 4 bits long
  * DMC DAC's input is 7 bits long
  */
-extern float normal_tnd_dac_outputs[204];
+extern uint8_t tnd_dac_outputs[204];
 
 /**
  * Look-up table for the Lenght Counters.

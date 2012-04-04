@@ -31,22 +31,11 @@
 #include "queue.h"
 
 static dac_queue *dac[5];
-
 static SDL_AudioSpec audio_spec;
-
-/* These are the integer form of the normalized outputs
- * for square and tnd tables. We are using Uint8 here as
- * we are asking the sound card a fomat of AUDIO_U8. We also
- * assume that this is the returned format after SDL_OpenAudio,
- * and calculate these values according to that format.
- */
-static Uint8 square_dac_outputs[32];
-static Uint8 tnd_dac_outputs[204];
 
 void initialize_playback() {
 
 	int i;
-	uint16_t max_vol = 0x00;
 	SDL_AudioSpec desired;
 
 	if( config.sound_mute )
@@ -76,25 +65,22 @@ void initialize_playback() {
 	       audio_spec.channels == 1 ? "channel" : "channels",
 	       audio_spec.samples) );
 
-	/* Calculate our own final DAC outputs from the normalized floating ones.
-	 * We do this to avoid floating point calculations during ImaNES loop */
-	if( audio_spec.format == AUDIO_U8 || audio_spec.format == AUDIO_S8 )
-		max_vol = 0xFF;
-	else if( audio_spec.format == AUDIO_U16 || audio_spec.format == AUDIO_S16 )
-		max_vol = 0xFFFF;
+	if( audio_spec.format != AUDIO_U8 ) {
+		fprintf(stderr,_("Unsupported audio format: %d\n, no audio will be played"), audio_spec.format);
+		config.sound_mute = 1;
+		SDL_PauseAudio(1);
+		return;
+	}
 
-	for(i=0;i!=32;i++)
-		square_dac_outputs[i] = normal_square_dac_outputs[i]*(float)max_vol;
-	for(i=0;i!=204;i++)
-		tnd_dac_outputs[i] = normal_tnd_dac_outputs[i]*(float)max_vol;
-
-	printf("Square outputs:");
-	for(i=0;i!=32;i++)
-		printf(" %u", square_dac_outputs[i]);
-	printf("\nTriangle, DMC, Noise outputs:");
-	for(i=0;i!=204;i++)
-		printf(" %u", tnd_dac_outputs[i]);
-	printf("\n");
+	INFO(
+		printf("Square outputs:");
+		for(i=0;i!=32;i++)
+			printf(" %u", square_dac_outputs[i]);
+		printf("\nTriangle, DMC, Noise outputs:");
+		for(i=0;i!=204;i++)
+			printf(" %u", tnd_dac_outputs[i]);
+		printf("\n");
+	);
 
 	/* DAC queues */
 	dac[0] = NULL;
