@@ -116,8 +116,10 @@ void load_user_configuration() {
 	line_count = 1;
 	while( !feof(file) && fgets(line, 1024, file) != NULL ) {
 
-		/* Skip comments */
-		if( sscanf(line, " #") == 1 )
+		/* Skip empty lines and comments */
+		if( strlen(line) == 0 )
+			continue;
+		if( line[0] == '#' )
 			continue;
 
 		/* Check that lines are valid */
