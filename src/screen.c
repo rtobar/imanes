@@ -135,35 +135,6 @@ void end_screen() {
 
 }
 
-void draw_pixel(int x, int y, nes_palette color) {
-
-	int i;
-	int j;
-	Uint32 colour;
-	Uint32 *pixmem32;
-
-	y -= 8;
-	if( y < 0 || y >= NES_NTSC_HEIGHT )
-		return;
-
-	/* This is the color that will be put in the pixel */
-	if( config.use_sdl_colors )
-		colour = SDL_MapRGB(nes_screen->format, color.red, color.green, color.blue);
-	else
-		colour = color.combined;
-	
-	pixmem32 = (Uint32*)nes_screen->pixels;
-
-	if( config.video_scale != 1 ) {
-		for(i=0;i!=config.video_scale;i++)
-			for(j=0;j!=config.video_scale;j++) 
-				pixmem32[config.video_scale*x+i+NES_SCREEN_WIDTH*config.video_scale*(y*config.video_scale+j)] = colour;
-	}
-	else
-		pixmem32[x+NES_SCREEN_WIDTH*y] = colour;
-
-}
-
 void redraw_screen() {
 
 	/* Take screenshot */
