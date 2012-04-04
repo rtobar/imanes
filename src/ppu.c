@@ -140,11 +140,11 @@ void draw_line(int line, int frame) {
 	bck_sprites = 0;
 	if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) ) {
 		for(i=0;i!=64;i++) {
-			tmp = *(PPU->SPR_RAM + 4*i) + 1;
+			tmp = *(PPU->SPR_RAM + (i<<2) /*(i*4)*/) + 1;
 			if( tmp == 0 )
 				continue;
 			if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
-				if( *(PPU->SPR_RAM + 4*i + 2) & SPRITE_BACK_PRIOR ) {
+				if( *(PPU->SPR_RAM + (i<<2) /*(i*4)*/ + 2) & SPRITE_BACK_PRIOR ) {
 					back_sprites[bck_sprites++] = i;
 				}
 				else {
@@ -177,15 +177,15 @@ void draw_line(int line, int frame) {
 		for(i=bck_sprites;i>=0;i--) {
 
 			/* Here we have color index and h/v flip */
-			byte3 = *(PPU->SPR_RAM + 4*back_sprites[i] + 2);
+			byte3 = *(PPU->SPR_RAM + (back_sprites[i]<<2) /*(i*4)*/ + 2);
 
 			/* y coord. If V Flip... */
-			ty = line - *(PPU->SPR_RAM + 4*back_sprites[i]) - 1;
+			ty = line - *(PPU->SPR_RAM + (back_sprites[i]<<2) /*(i*4)*/) - 1;
 			if( byte3 & SPRITE_FLIP_VERT )
 				ty = 7 - ty;
 
-			tile = *(PPU->SPR_RAM + 4*back_sprites[i] + 1);
-			tmp  = *(PPU->SPR_RAM + 4*back_sprites[i] + 3); /* X origin */
+			tile = *(PPU->SPR_RAM + (back_sprites[i]<<2) /*(i*4)*/ + 1);
+			tmp  = *(PPU->SPR_RAM + (back_sprites[i]<<2) /*(i*4)*/ + 3); /* X origin */
 
 			/* 8x16 sprites patter table depends on i being even or not */
 			second_sprite = 0;
@@ -252,8 +252,8 @@ void draw_line(int line, int frame) {
 			tile = read_ppu_vram(name_table + i + y*NES_SCREEN_WIDTH/8);
 
 			/* Bytes that participate on the lower bits for the color */
-			byte1 = read_ppu_vram(scr_patt_table + tile*0x10 + ty);
-			byte2 = read_ppu_vram(scr_patt_table + tile*0x10 + ty + 0x08);
+			byte1 = read_ppu_vram(scr_patt_table + (tile<<4) /*(i*0x10)*/ + ty);
+			byte2 = read_ppu_vram(scr_patt_table + (tile<<4) /*(i*0x10)*/ + ty + 0x08);
 			/* Byte participating on the higher bits for the color */
 			byte3 = read_ppu_vram(attr_table + (i >> 2) + (y >> 2)*NES_SCREEN_WIDTH/32);
 
@@ -265,7 +265,7 @@ void draw_line(int line, int frame) {
 
 				/* And this from the attribute table */
 				tmp = (((y >> 1)&0x1)<<1) + ((i >> 1)&0x1);
-				col_index |=  ((byte3 >> 2*tmp)&0x03) << 2;
+				col_index |=  ((byte3 >> (tmp<<1) /*(i*2)*/ )&0x03) << 2;
 
 				if( (col_index & 0x03) &&
 				    ( (x >= 8) || (x < 8 && (PPU->CR2&DONTCLIP_BACKGROUND)) ) ){
@@ -313,20 +313,20 @@ void draw_line(int line, int frame) {
 		for(i=frt_sprites;i>=0;i--) {
 
 			/* Here we have color index and h/v flip */
-			byte3 = *(PPU->SPR_RAM + 4*front_sprites[i] + 2);
+			byte3 = *(PPU->SPR_RAM + (front_sprites[i]<<2) /*(i*4)*/ + 2);
 
 			/* y coord. If V Flip... */
 			ty = line - *(PPU->SPR_RAM + 4*front_sprites[i]) - 1;
 			if( byte3 & SPRITE_FLIP_VERT )
 				ty = 7 - ty;
 
-			tile = *(PPU->SPR_RAM + 4*front_sprites[i] + 1);
-			tmp  = *(PPU->SPR_RAM + 4*front_sprites[i] + 3); /* X origin */
+			tile = *(PPU->SPR_RAM + (front_sprites[i]<<2) /*(i*4)*/ + 1);
+			tmp  = *(PPU->SPR_RAM + (front_sprites[i]<<2) /*(i*4)*/ + 3); /* X origin */
 
 			/* 8x16 sprites patter table depends on i being even or not */
 			second_sprite = 0;
 			if( big_sprite ) {
-				spr_patt_table = 0x1000*(tile&0x1);
+				spr_patt_table = (tile&0x1)<<12 /*(i*0x1000)*/;
 				tile &= 0xFE;
 				if( ty >= 8 ) {
 					ty -= 8;
@@ -334,8 +334,8 @@ void draw_line(int line, int frame) {
 				}
 			}
 
-			byte1 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty);
-			byte2 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty + 0x08);
+			byte1 = read_ppu_vram(spr_patt_table + ((tile+second_sprite)<<4) /*(i*0x10)*/ + ty);
+			byte2 = read_ppu_vram(spr_patt_table + ((tile+second_sprite)<<4) /*(i*0x10)*/ + ty + 0x08);
 			for(tx=0;tx!=8;tx++) {
 				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 				col_index |=  (byte3&0x03) << 2;
@@ -386,7 +386,7 @@ uint8_t read_ppu_vram(uint16_t address) {
 	/* Bound addresses up to 0x3FFF */
 	address &= 0x3FFF;
 
-	/* This range has no mirroring */
+	/* This range has no mirroring, short-circuit it */
 	if( address < 0x2000 )
 		return PPU->VRAM[address];
 
