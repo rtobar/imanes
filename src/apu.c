@@ -378,16 +378,15 @@ void clock_sweep(nes_square_channel *s) {
 	s->sweep.new_period = s->timer.period + s->sweep.new_period;
 
 	s->sweep.timer.timeout--;
-	if( s->sweep.written ) {
+	if( s->sweep.written )
 		s->sweep.timer.timeout = s->sweep.timer.period;
-	}
 	s->sweep.written = 0;
 
 	/* Possibily update the channel's period */
 	if( !(s->timer.period < 8 || s->sweep.new_period > 0x7FF) &&
 	    !s->sweep.enable && s->sweep.shift &&
 	    s->sweep.timer.timeout <= 0 )
-			s->timer.period = s->sweep.new_period;
+		s->timer.period = s->sweep.new_period;
 
 }
 
@@ -434,7 +433,7 @@ void clock_square_timer(nes_square_channel *s) {
 	uint8_t volume;
 
 	/* Reset the timeout counter */
-	s->timer.timeout += s->timer.period*2; /* Timer output is divided by 2 */
+	s->timer.timeout += s->timer.period << 1; /* Timer output is divided by 2 */
 
 	/* Clock the sequencer */
 	s->sequencer_step++;
