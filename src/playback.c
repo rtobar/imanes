@@ -92,13 +92,17 @@ void initialize_playback() {
 
 }
 
-/* TODO: only processing triangle and square (both) channels here! */
 void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
-	/* static variables to keep history of things */
+	/* static variables to keep history across several invocations */
 	static struct timespec previousTime = {0, 0};
 	static unsigned int calls_per_sec = 0;
 	static unsigned long int previous_ppu_cycles = 0;
+	static Uint8 last_square1_sample = 0;
+	static Uint8 last_square2_sample = 0;
+	static Uint8 last_triangle_sample = 0;
+	static Uint8 last_noise_sample = 0;
+	static Uint8 last_dmc_sample = 0;
 
 	Uint8 sample;
 	int pos;
@@ -186,11 +190,11 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		}
 
 		/* Now combine the samples, if the corresponding channel is enabled */
-		square1_sample = 0;
-		square2_sample = 0;
-		triangle_sample = 0;
-		noise_sample = 0;
-		dmc_sample = 0;
+		square1_sample  = last_square1_sample;
+		square2_sample  = last_square2_sample;
+		triangle_sample = last_triangle_sample;
+		noise_sample    = last_noise_sample;
+		dmc_sample      = last_dmc_sample;
 
 		if( dac[Square1] != NULL && dac[Square1]->ppu_cycles <= step_ppu_cycles && config.apu_square1 )
 			square1_sample = dac[Square1]->sample;
@@ -214,6 +218,12 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
 		/* Finally! This is our little sample */
 		stream[pos] = sample;
+
+		last_square1_sample  = square1_sample;
+		last_square2_sample  = square2_sample;
+		last_triangle_sample = triangle_sample;
+		last_noise_sample    = noise_sample;
+		last_dmc_sample      = dmc_sample;
 
 		/* Step into the next sample */
 		step_ppu_cycles += ppu_steps_per_sample;
