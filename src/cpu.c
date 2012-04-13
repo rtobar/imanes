@@ -1268,13 +1268,13 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 
 			/* Reset the frame sequencer and divider */
 			APU->frame_seq.step = 0;
-			if( APU->commons & STEP_MODE5 )
+			if( APU->commons & STEP_MODE5 ) {
 				APU->frame_seq.clock_timeout = PPUCYCLES_STEP5;
+				clock_frame_sequencer();
+			}
 			else
 				APU->frame_seq.clock_timeout = PPUCYCLES_STEP4;
 
-			if( APU->commons & STEP_MODE5 )
-				clock_frame_sequencer();
 			break;
 
 		/* Normal RAM memory area */
