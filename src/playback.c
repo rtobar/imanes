@@ -43,6 +43,7 @@ void initialize_playback() {
 
 	/* Initial parameters for the SDL Audio subsytem */
 	desired.freq     = 44100;
+	/*desired.freq     = 1787;*/
 	desired.format   = AUDIO_U8;
 	desired.channels = 1;
 	desired.samples  = 1024;
@@ -67,7 +68,7 @@ void initialize_playback() {
 	       audio_spec.samples) );
 
 	if( audio_spec.format != AUDIO_U8 ) {
-		fprintf(stderr,_("Unsupported audio format: %d\n, no audio will be played"), audio_spec.format);
+		fprintf(stderr,_("Unsupported audio format: %d, no audio will be played\n"), audio_spec.format);
 		config.sound_mute = 1;
 		SDL_PauseAudio(1);
 		return;
@@ -114,7 +115,6 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	unsigned long int step_ppu_cycles;
 	struct timespec currentTime;
 
-	uint8_t index;
 	uint8_t square1_sample;
 	uint8_t square2_sample;
 	uint8_t triangle_sample;
@@ -122,10 +122,12 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	uint8_t dmc_sample;
 
 	ppu_cycles = CLK->ppu_cycles;
-	calls_per_sec++;
 
-	clock_gettime(CLOCK_REALTIME, &currentTime);
 	INFO(
+
+		clock_gettime(CLOCK_REALTIME, &currentTime);
+		calls_per_sec++;
+
 		if( currentTime.tv_sec != previousTime.tv_sec ) {
 
 			printf("Calls/s: %u, Len is %d. Elements in queue:", calls_per_sec, len);
@@ -185,8 +187,10 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 					break;
 
 			}
-			if( removed > 1 )
-				printf("Removed %u samples from %u's channel DAC queue\n", removed, channel);
+			DEBUG(
+				if( removed > 1 )
+					printf("Removed %u samples from %u's channel DAC queue\n", removed, channel);
+			);
 		}
 
 		/* Now combine the samples, if the corresponding channel is enabled */
@@ -207,10 +211,8 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		if( dac[DMC] != NULL && dac[DMC]->ppu_cycles <= step_ppu_cycles && config.apu_dmc )
 			dmc_sample = dac[DMC]->sample;
 
-		index = square1_sample + square2_sample;
-		sample = square_dac_outputs[index];
-		index = 3*triangle_sample + 2*noise_sample + dmc_sample;
-		sample += tnd_dac_outputs[index];
+		sample  = square_dac_outputs[square1_sample + square2_sample];
+		sample += tnd_dac_outputs[3*triangle_sample + 2*noise_sample + dmc_sample];
 
 		/* If we got anything, then we should play silence (or not?) */
 		if( !sample )
@@ -230,8 +232,11 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	}
 
 	/* Finally, set the 'previous' variables */
-	previousTime.tv_sec = currentTime.tv_sec;
-	previousTime.tv_nsec = currentTime.tv_nsec;
+	INFO(
+		previousTime.tv_sec = currentTime.tv_sec;
+		previousTime.tv_nsec = currentTime.tv_nsec;
+	);
+
 	previous_ppu_cycles = ppu_cycles;
 }
 
