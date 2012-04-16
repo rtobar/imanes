@@ -161,6 +161,7 @@ void initialize_apu() {
 	APU->square1.sweep.shift = 0;
 	APU->square1.sweep.timer.period = 0x08;
 	APU->square1.sweep.timer.timeout = 0;
+	APU->square1.sweep.new_period = 0;
 
 	APU->square1.envelope.disabled = 1;
 	APU->square1.envelope.loop = 0;
@@ -184,6 +185,7 @@ void initialize_apu() {
 	APU->square2.sweep.shift = 0;
 	APU->square2.sweep.timer.period = 0x08;
 	APU->square2.sweep.timer.timeout = 0;
+	APU->square2.sweep.new_period = 0;
 
 	APU->square2.envelope.disabled = 1;
 	APU->square2.envelope.loop = 0;
