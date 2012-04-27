@@ -62,11 +62,12 @@ void initialize_playback() {
 		return;
 	}
 
-	INFO( printf("Started audio: %d Hz, %d %s, %d-sample-sized buffer\n",
+	INFO( printf("Started audio: %d Hz, %d %s, %d-sample-sized buffer. Silence is %u\n",
 	       audio_spec.freq,
 	       audio_spec.channels,
 	       audio_spec.channels == 1 ? "channel" : "channels",
-	       audio_spec.samples) );
+	       audio_spec.samples,
+	       audio_spec.silence) );
 
 	if( audio_spec.format != AUDIO_U8 ) {
 		fprintf(stderr,_("Unsupported audio format: %d, no audio will be played\n"), audio_spec.format);
@@ -105,6 +106,7 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	static struct timespec previousTime = {0, 0};
 	static unsigned int calls_per_sec = 0;
 	static unsigned long int previous_ppu_cycles = 0;
+	static int previous_sound_rec = 0;
 	static Uint8 last_square1_sample = 0;
 	static Uint8 last_square2_sample = 0;
 	static Uint8 last_triangle_sample = 0;
@@ -222,9 +224,8 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 			normal_ppu_cycle_samples[initial_pos + (i+1)*(division+1) - 1] = 1;
 	}
 
-
+	/* Main loop where the buffer gets finally filled */
 	step_ppu_cycles = previous_ppu_cycles;
-
 	for(pos=0; pos!=len; pos++) {
 
 		/* Last PPU to consider for this sample. Here we finally take
@@ -284,12 +285,15 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
 		sample  = square_dac_outputs[square1_sample + square2_sample];
 		sample += tnd_dac_outputs[3*triangle_sample + 2*noise_sample + dmc_sample];
-		if( sample > tnd_dac_outputs[45] )
-			printf("WTF: triangle: %u, noise: %u, dmc:%u\n", triangle_sample, noise_sample, dmc_sample);
+
+		/* It seems that we have to remove the silence from the sample;
+		 * otherwise we get some kind of bullshit */
+		sample -= audio_spec.silence;
 
 		/* Finally! This is our little sample */
 		stream[pos] = sample;
 
+		/* Reset for later use */
 		last_square1_sample  = square1_sample;
 		last_square2_sample  = square2_sample;
 		last_triangle_sample = triangle_sample;
