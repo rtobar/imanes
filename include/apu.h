@@ -21,9 +21,8 @@
 #define STEP_MODE5        0x80
 #define DISABLE_FRAME_IRQ 0x40
 
-/* Number or PPU cycles which define a step, rounded */
-#define PPUCYCLES_STEP4  (27919) /* 27919.375 */
-#define PPUCYCLES_STEP5  (22336) /* 22335.5 */
+/* Number or PPU cycles which define a frame sequencer step */
+#define PPUCYCLES_STEPS  (29830)
 
 typedef enum _nes_apu_channel {
 	Square1   = 0,

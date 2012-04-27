@@ -136,7 +136,7 @@ void initialize_apu() {
 
 	/* Frame sequencer initialization */
 	APU->frame_seq.step = 0;
-	APU->frame_seq.clock_timeout = PPUCYCLES_STEP4;
+	APU->frame_seq.clock_timeout = PPUCYCLES_STEPS;
 	APU->frame_seq.int_flag = 0;
 
 	/* Triangle channel initialization */
@@ -244,9 +244,7 @@ void dump_apu() {
 void clock_frame_sequencer() {
 
 	/* Reset the clock timeout depending on the sequencer mode */
-	APU->frame_seq.clock_timeout += ( (APU->commons & STEP_MODE5) ?
-	                                PPUCYCLES_STEP5 : PPUCYCLES_STEP4);
-
+	APU->frame_seq.clock_timeout += PPUCYCLES_STEPS;
 
 	/* At any time, if the interrupt flag is set
     * and the IRQ disable is clear, CPU's IRQ is asserted */
