@@ -265,6 +265,12 @@ void nes_keydown(SDL_keysym keysym) {
 			for(i=0;i!=INSTRUCTIONS_NUMBER;i++)
 				if(instructions[i].size != 0 && !instructions[i].executed )
 					printf("%02x - %s\n", instructions[i].opcode, instructions[i].name);
+			break;
+
+		case SDLK_F8:
+			INFO( printf(_("%s sound recording (not yet implemented)"), (config.sound_rec ? _("Stopping") : _("Starting"))) );
+			config.sound_rec = ( !config.sound_rec );
+			break;
 
 		/* Pause */
 		case SDLK_ESCAPE:
@@ -276,7 +282,6 @@ void nes_keydown(SDL_keysym keysym) {
 		case SDLK_BACKSPACE:
 			config.run_fast = 1;
 			break;
-
 
 		default:
 			break;
