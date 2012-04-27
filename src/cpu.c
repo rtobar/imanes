@@ -907,13 +907,323 @@ uint8_t _read_sram(uint16_t address) {
 
 }
 
-/* Readm SRAM */
+/* Read normal RAM memory */
 uint8_t _read_ram(uint16_t address) {
 	return CPU->RAM[address];
 }
 
-uint8_t (*read_cpu_ram_f[NES_RAM_SIZE])(uint16_t address);
+/* Normal RAM memory area */
+void _write_ram(uint16_t address, uint8_t value) {
+	CPU->RAM[address] = value;
+}
 
+/* PPU Control Register 1 */
+void _write_ppu_cr1(uint16_t address, uint8_t value) {
+	PPU->CR1 = value;
+	PPU->temp_addr = (PPU->temp_addr&0xF3FF) | ((value&0x3)<<10);
+}
+
+/* PPU Control Register 2 */
+void _write_ppu_cr2(uint16_t address, uint8_t value) {
+	PPU->CR2 = value;
+}
+
+/* SPR-RAM Address (1st step) */
+void _write_spr_ram1(uint16_t address, uint8_t value) {
+	PPU->spr_addr = value;
+}
+
+/* SPR-RAM Address (2nd step) */
+void _write_spr_ram2(uint16_t address, uint8_t value) {
+	PPU->SPR_RAM[PPU->spr_addr++] = value;
+}
+
+/* PPU scrolling (see Loopy's document) */
+void _write_ppu_scrolling(uint16_t address, uint8_t value) {
+	/* First write */
+	if( PPU->latch ) {
+		PPU->x = value & 0x7;
+		PPU->temp_addr = (PPU->temp_addr&0xFFE0) | ((value&0xF8)>>3);
+
+		/* This is, anyways, still correct, since I draw
+		 * the entire line at once. This means
+		 * that setting PPU->x will not affect at all in the
+		 * drawing of the actual line */
+		PPU->latch = 0;
+	}
+	/* Second write */
+	else {
+		PPU->temp_addr = (PPU->temp_addr&0xFC1F) | ((value&0xF8)<<2);
+		PPU->temp_addr = (PPU->temp_addr&0x8FFF) | ((value&0x7)<<12);
+		PPU->latch = 1;
+	}
+}
+
+/* PPU VRAM address */
+void _write_vram_address(uint16_t address, uint8_t value) {
+
+	/* First write */
+	if( PPU->latch ) {
+		PPU->temp_addr = (PPU->temp_addr&0x00FF) | ((value&0x3F)<<8);
+		PPU->latch = 0;
+	}
+	/* Second write */
+	else {
+		PPU->temp_addr  = (PPU->temp_addr&0xFF00) | value;
+		PPU->vram_addr  = PPU->temp_addr;
+
+		/* Check rising edge of A12 on PPU bus (needed by MMC3) */
+		if( (PPU->vram_addr & 0x1000) &&
+		    !prev_a12_state )
+			mapper->update();
+
+		/* Save the A12 line status (needed by MMC3) */
+		prev_a12_state  = PPU->vram_addr & 0x1000;
+		prev_a12_cycles = CLK->ppu_cycles;
+		PPU->latch = 1;
+	}
+}
+
+/* Data written into PPU->vram_address */
+void _write_vram_value(uint16_t address, uint8_t value) {
+
+	if( !(PPU->SR & IGNORE_VRAM_WRITE) ) {
+		write_ppu_vram(PPU->vram_addr, value);
+		if( PPU->CR1 & VERTICAL_WRITE)
+			PPU->vram_addr += 32;
+		else
+			PPU->vram_addr++;
+
+		/* Check rising edge of A12 on PPU bus (needed by MMC3) */
+		if( (PPU->vram_addr & 0x1000) &&
+		    !prev_a12_state )
+			mapper->update();
+
+		/* Save the A12 line status (needed by MMC3) */
+		prev_a12_state  = PPU->vram_addr & 0x1000;
+		prev_a12_cycles = CLK->ppu_cycles;
+	}
+}
+
+/* 1st Square channel duty, envelope */
+void _write_square1_duty_env(uint16_t address, uint8_t value) {
+
+	uint8_t i;
+
+	APU->square1.duty_cycle = (value&0xC0) >> 6;
+
+	i = (value&0x20) >> 5;
+	APU->square1.envelope.loop = i;
+	APU->square1.lc.halt = i;
+
+	APU->square1.envelope.disabled = (value&0x10) >> 4;
+	APU->square1.envelope.timer.period = (value&0x0F) + 1;
+}
+
+/* 1st Square channel sweep unit */
+void _write_square1_sweep(uint16_t address, uint8_t value) {
+	APU->square1.sweep.enable = (value&0x80) >> 7;
+	APU->square1.sweep.timer.period = ((value&0x70) >> 4) + 1;
+	APU->square1.sweep.negate = (value&0x08) >> 3;
+	APU->square1.sweep.shift = value&0x07;
+	APU->square1.sweep.written = 1;
+}
+
+/* 1st Square channel period 8 lower bits */
+void _write_square1_period_low(uint16_t address, uint8_t value) {
+	APU->square1.timer.period &= 0x0700;
+	APU->square1.timer.period |= value;
+	APU->square1.timer.period++;
+}
+
+/* 1st Square channel period 3 higher bits, length counter index */
+void _write_square1_period_high_lc(uint16_t address, uint8_t value) {
+
+	uint8_t i;
+
+	APU->square1.timer.period &= 0x00FF;
+	APU->square1.timer.period |= (value & 0x7) << 8;
+
+	i = (value & 0xF8) >> 3;
+	if( APU->square1.lc.enabled )
+		APU->square1.lc.counter = length_counter_reload_values[i];
+
+	APU->square1.sequencer_step = 0;
+	APU->square1.envelope.written = 1;
+}
+
+/* 2nd Square channel duty, envelope */
+void _write_square2_duty_env(uint16_t address, uint8_t value) {
+
+	uint8_t i;
+
+	APU->square2.duty_cycle = (value&0xC0) >> 6;
+
+	i = (value&0x20) >> 5;
+	APU->square2.envelope.loop = i;
+	APU->square2.lc.halt = i;
+
+	APU->square2.envelope.disabled = (value&0x10) >> 4;
+	APU->square2.envelope.timer.period = (value&0x0F) + 1;
+}
+
+/* 2nd Square channel sweep unit */
+void _write_square2_sweep(uint16_t address, uint8_t value) {
+	APU->square2.sweep.enable = (value&0x80) >> 7;
+	APU->square2.sweep.timer.period = ((value&0x70) >> 4) + 1;
+	APU->square2.sweep.negate = (value&0x08) >> 3;
+	APU->square2.sweep.shift = value&0x07;
+	APU->square2.sweep.written = 1;
+}
+
+/* 2nd Square channel period 8 lower bits */
+void _write_square2_period_low(uint16_t address, uint8_t value) {
+	APU->square2.timer.period &= 0x0700;
+	APU->square2.timer.period |= value;
+	APU->square2.timer.period++;
+}
+
+/* 2nd Square channel period 3 higher bits, length counter index */
+void _write_square2_period_high_lc(uint16_t address, uint8_t value) {
+
+	uint8_t i;
+
+	APU->square2.timer.period &= 0x00FF;
+	APU->square2.timer.period |= (value & 0x7) << 8;
+
+	i = (value & 0xF8) >> 3;
+	if( APU->square2.lc.enabled )
+		APU->square2.lc.counter = length_counter_reload_values[i];
+
+	APU->square2.sequencer_step = 0;
+	APU->square2.envelope.written = 1;
+}
+
+/* Triangle channel linear counter, control */
+void _write_tri_linearc_ctrl(uint16_t address, uint8_t value) {
+
+	uint8_t i;
+
+	i  = (value&0x80) >> 7;
+	APU->triangle.linear.control = i;
+	APU->triangle.lc.halt = i;
+
+	APU->triangle.linear.reload = value&0x7F;
+}
+
+/* Triangle channel period 8 lower bits */
+void _write_tri_period_low(uint16_t address, uint8_t value) {
+	APU->triangle.timer.period &= 0x0700;
+	APU->triangle.timer.period |= value;
+	APU->triangle.timer.period++;
+}
+
+/* Triangle channel period 3 higher bits, length counter index */
+void _write_tri_period_high_lc(uint16_t address, uint8_t value) {
+
+	uint8_t i;
+
+	APU->triangle.timer.period &= 0x00FF;
+	APU->triangle.timer.period |= (value & 0x7) << 8;
+
+	i = (value & 0xF8) >> 3;
+	if( APU->triangle.lc.enabled )
+		APU->triangle.lc.counter = length_counter_reload_values[i];
+	APU->triangle.linear.halt = 1;
+}
+
+/* Noise channel envelope */
+void _write_noise_env(uint16_t address, uint8_t value) {
+
+	uint8_t i;
+
+	i = (value&0x20) >> 5;
+	APU->noise.envelope.loop = i;
+	APU->noise.lc.halt = i;
+
+	APU->noise.envelope.disabled = (value&0x10) >> 4;
+	APU->noise.envelope.timer.period = (value&0x0F) + 1;
+}
+
+/* Noise channel random mode, timer period index */
+void _write_noise_mode_period(uint16_t address, uint8_t value) {
+	APU->noise.random_mode = (value&0x80) >> 7;
+	APU->noise.timer.period = noise_timer_periods[ value&0x0F ];
+}
+
+/* Noise channel length counter */
+void _write_noise_lc(uint16_t address, uint8_t value) {
+
+	uint8_t i;
+
+	i = (value & 0xF7) >> 3;
+	if( APU->noise.lc.enabled )
+		APU->noise.lc.counter = length_counter_reload_values[i];
+}
+
+/* Sprite DMA */
+void _write_sprite_dma(uint16_t address, uint8_t value) {
+
+	int i;
+
+	address = value*0x100;
+	for(i=0;i!=256;i++)
+		PPU->SPR_RAM[PPU->spr_addr++] = read_cpu_ram(address+i);
+	ADD_CPU_CYCLES(512);
+}
+
+/* APU Lenght Control */
+void _write_apu_lc(uint16_t address, uint8_t value) {
+	APU->square1.lc.enabled = value&0x01;
+	if( !APU->square1.lc.enabled )
+		APU->square1.lc.counter = 0;
+
+	APU->square2.lc.enabled = (value&0x02) >> 1;
+	if( !APU->square2.lc.enabled )
+		APU->square2.lc.counter = 0;
+
+	APU->triangle.lc.enabled = (value&0x04) >> 2;
+	if( !APU->triangle.lc.enabled )
+		APU->triangle.lc.counter = 0;
+
+	APU->noise.lc.enabled = (value&0x08) >> 3;
+	if( !APU->noise.lc.enabled )
+		APU->noise.lc.counter = 0;
+
+	/* TODO: DMC IRQ flag clear, DMC start/stop */
+}
+
+/* 1st and 2nd joysticks strobe */
+void _write_joystick_strobes(uint16_t address, uint8_t value) {
+
+	static int strobe_pad = 0;
+
+	if( value == 0x01 )
+		strobe_pad = 1;
+	else if( value == 0x00 && strobe_pad ) {
+		strobe_pad = 0;
+		pads[0].reads = 0;
+		pads[1].reads = 0;
+	}
+}
+
+/* APU common */
+void _write_apu_common(uint16_t address, uint8_t value) {
+	APU->commons = value & 0xC0;
+
+	/* Reset the frame sequencer and divider */
+	APU->frame_seq.step = 0;
+	if( APU->commons & STEP_MODE5 ) {
+		APU->frame_seq.clock_timeout = PPUCYCLES_STEP5;
+		clock_frame_sequencer();
+	}
+	else
+		APU->frame_seq.clock_timeout = PPUCYCLES_STEP4;
+}
+
+
+static uint8_t (*read_cpu_ram_f[NES_RAM_SIZE])(uint16_t address);
+static void    (*write_cpu_ram_f[NES_RAM_SIZE])(uint16_t address, uint8_t value);
 
 void initialize_cpu() {
 
@@ -950,6 +1260,36 @@ void initialize_cpu() {
 	read_cpu_ram_f[0x4015] = &_read_apu_sr;
 	read_cpu_ram_f[0x4016] = &_read_joystick1;
 	read_cpu_ram_f[0x4017] = &_read_joystick2;
+
+
+	/* The default is to call _read_ram when reading the RAM */
+	for(i=0; i!= NES_RAM_SIZE; i++)
+		write_cpu_ram_f[i] = &_write_ram;
+	write_cpu_ram_f[0x2000] = &_write_ppu_cr1;
+	write_cpu_ram_f[0x2001] = &_write_ppu_cr2;
+	write_cpu_ram_f[0x2003] = &_write_spr_ram1;
+	write_cpu_ram_f[0x2004] = &_write_spr_ram2;
+	write_cpu_ram_f[0x2005] = &_write_ppu_scrolling;
+	write_cpu_ram_f[0x2006] = &_write_vram_address;
+	write_cpu_ram_f[0x2007] = &_write_vram_value;
+	write_cpu_ram_f[0x4000] = &_write_square1_duty_env;
+	write_cpu_ram_f[0x4001] = &_write_square1_sweep;
+	write_cpu_ram_f[0x4002] = &_write_square1_period_low;
+	write_cpu_ram_f[0x4003] = &_write_square1_period_high_lc;
+	write_cpu_ram_f[0x4004] = &_write_square2_duty_env;
+	write_cpu_ram_f[0x4005] = &_write_square2_sweep;
+	write_cpu_ram_f[0x4006] = &_write_square2_period_low;
+	write_cpu_ram_f[0x4007] = &_write_square2_period_high_lc;
+	write_cpu_ram_f[0x4008] = &_write_tri_linearc_ctrl;
+	write_cpu_ram_f[0x400A] = &_write_tri_period_low;
+	write_cpu_ram_f[0x400B] = &_write_tri_period_high_lc;
+	write_cpu_ram_f[0x400C] = &_write_noise_env;
+	write_cpu_ram_f[0x400E] = &_write_noise_mode_period;
+	write_cpu_ram_f[0x400F] = &_write_noise_lc;
+	write_cpu_ram_f[0x4014] = &_write_sprite_dma;
+	write_cpu_ram_f[0x4015] = &_write_apu_lc;
+	write_cpu_ram_f[0x4016] = &_write_joystick_strobes;
+	write_cpu_ram_f[0x4017] = &_write_apu_common;
 
 	return;
 }
@@ -1021,7 +1361,6 @@ void execute_instruction(instruction *inst, operand *oper) {
 
 void write_cpu_ram(uint16_t address, uint8_t value) {
 
-	static int strobe_pad = 0;
 	int i;
 
 	XTREME( if( 0x2000 <= address && address <= 0x2006 ) {
@@ -1048,284 +1387,8 @@ void write_cpu_ram(uint16_t address, uint8_t value) {
 		return;
 	}
 
-	switch( address ) {
-
-		/* PPU control registers */
-		case 0x2000:
-			PPU->CR1 = value;
-			PPU->temp_addr = (PPU->temp_addr&0xF3FF) | ((value&0x3)<<10);
-			break;
-
-		case 0x2001:
-			PPU->CR2 = value;
-			break;
-
-		/* SPR-RAM Address */
-		case 0x2003:
-			PPU->spr_addr = value;
-			break;
-
-		case 0x2004:
-			PPU->SPR_RAM[PPU->spr_addr++] = value;
-			break;
-
-		case 0x2005:
-			/* First write */
-			if( PPU->latch ) {
-				PPU->x = value & 0x7;
-				PPU->temp_addr = (PPU->temp_addr&0xFFE0) | ((value&0xF8)>>3);
-
-				/* This is, anyways, still correct, since I draw
-				 * the entire line at once. This means
-				 * that setting PPU->x will not affect at all in the
-				 * drawing of the actual line */
-				PPU->latch = 0;
-			}
-			/* Second write */
-			else {
-				PPU->temp_addr = (PPU->temp_addr&0xFC1F) | ((value&0xF8)<<2);
-				PPU->temp_addr = (PPU->temp_addr&0x8FFF) | ((value&0x7)<<12);
-				PPU->latch = 1;
-			}
-			break;
-
-		/* PPU VRAM address */
-		case 0x2006:
-			/* First write */
-			if( PPU->latch ) {
-				PPU->temp_addr = (PPU->temp_addr&0x00FF) | ((value&0x3F)<<8);
-				PPU->latch = 0;
-			}
-			/* Second write */
-			else {
-				PPU->temp_addr  = (PPU->temp_addr&0xFF00) | value;
-				PPU->vram_addr  = PPU->temp_addr;
-
-				/* Check rising edge of A12 on PPU bus (needed by MMC3) */
-				if( (PPU->vram_addr & 0x1000) &&
-				    !prev_a12_state )
-					mapper->update();
-
-				/* Save the A12 line status (needed by MMC3) */
-				prev_a12_state  = PPU->vram_addr & 0x1000;
-				prev_a12_cycles = CLK->ppu_cycles;
-				PPU->latch = 1;
-			}
-			break;
-
-		/* Data written into PPU->vram_address */
-		case 0x2007:
-			if( !(PPU->SR & IGNORE_VRAM_WRITE) ) {
-				write_ppu_vram(PPU->vram_addr, value);
-				if( PPU->CR1 & VERTICAL_WRITE)
-					PPU->vram_addr += 32;
-				else
-					PPU->vram_addr++;
-
-				/* Check rising edge of A12 on PPU bus (needed by MMC3) */
-				if( (PPU->vram_addr & 0x1000) &&
-				    !prev_a12_state )
-					mapper->update();
-
-				/* Save the A12 line status (needed by MMC3) */
-				prev_a12_state  = PPU->vram_addr & 0x1000;
-				prev_a12_cycles = CLK->ppu_cycles;
-			}
-			break;
-
-		/* 1st Square channel duty, envelope */
-		case 0x4000:
-			APU->square1.duty_cycle = (value&0xC0) >> 6;
-
-			i = (value&0x20) >> 5;
-			APU->square1.envelope.loop = i;
-			APU->square1.lc.halt = i;
-
-			APU->square1.envelope.disabled = (value&0x10) >> 4;
-			APU->square1.envelope.timer.period = (value&0x0F) + 1;
-			break;
-
-		/* 1st Square channel sweep unit */
-		case 0x4001:
-			APU->square1.sweep.enable = (value&0x80) >> 7;
-			APU->square1.sweep.timer.period = ((value&0x70) >> 4) + 1;
-			APU->square1.sweep.negate = (value&0x08) >> 3;
-			APU->square1.sweep.shift = value&0x07;
-			APU->square1.sweep.written = 1;
-			break;
-
-		/* 1st Square channel period 8 lower bits */
-		case 0x4002:
-			APU->square1.timer.period &= 0x0700;
-			APU->square1.timer.period |= value;
-			APU->square1.timer.period++;
-			break;
-
-		/* 1st Square channel period 3 higher bits, length counter index */
-		case 0x4003:
-			APU->square1.timer.period &= 0x00FF;
-			APU->square1.timer.period |= (value & 0x7) << 8;
-
-			i = (value & 0xF8) >> 3;
-			if( APU->square1.lc.enabled )
-				APU->square1.lc.counter = length_counter_reload_values[i];
-
-			APU->square1.sequencer_step = 0;
-			APU->square1.envelope.written = 1;
-			break;
-
-		/* 2nd Square channel duty, envelope */
-		case 0x4004:
-			APU->square2.duty_cycle = (value&0xC0) >> 6;
-
-			i = (value&0x20) >> 5;
-			APU->square2.envelope.loop = i;
-			APU->square2.lc.halt = i;
-
-			APU->square2.envelope.disabled = (value&0x10) >> 4;
-			APU->square2.envelope.timer.period = (value&0x0F) + 1;
-			break;
-
-		/* 2nd Square channel sweep unit */
-		case 0x4005:
-			APU->square2.sweep.enable = (value&0x80) >> 7;
-			APU->square2.sweep.timer.period = ((value&0x70) >> 4) + 1;
-			APU->square2.sweep.negate = (value&0x08) >> 3;
-			APU->square2.sweep.shift = value&0x07;
-			APU->square2.sweep.written = 1;
-			break;
-
-		/* 2nd Square channel period 8 lower bits */
-		case 0x4006:
-			APU->square2.timer.period &= 0x0700;
-			APU->square2.timer.period |= value;
-			APU->square2.timer.period++;
-			break;
-
-		/* 2nd Square channel period 3 higher bits, length counter index */
-		case 0x4007:
-			APU->square2.timer.period &= 0x00FF;
-			APU->square2.timer.period |= (value & 0x7) << 8;
-
-			i = (value & 0xF8) >> 3;
-			if( APU->square2.lc.enabled )
-				APU->square2.lc.counter = length_counter_reload_values[i];
-
-			APU->square2.sequencer_step = 0;
-			APU->square2.envelope.written = 1;
-			break;
-
-		/* Triangle channel linear counter, control */
-		case 0x4008:
-			i  = (value&0x80) >> 7;
-			APU->triangle.linear.control = i;
-			APU->triangle.lc.halt = i;
-
-			APU->triangle.linear.reload = value&0x7F;
-
-			break;
-
-		/* Triangle channel period 8 lower bits */
-		case 0x400A:
-			APU->triangle.timer.period &= 0x0700;
-			APU->triangle.timer.period |= value;
-			APU->triangle.timer.period++;
-			break;
-
-		/* Triangle channel period 3 higher bits, length counter index */
-		case 0x400B:
-			APU->triangle.timer.period &= 0x00FF;
-			APU->triangle.timer.period |= (value & 0x7) << 8;
-
-			i = (value & 0xF8) >> 3;
-			if( APU->triangle.lc.enabled )
-				APU->triangle.lc.counter = length_counter_reload_values[i];
-			APU->triangle.linear.halt = 1;
-			break;
-
-		/* Noise channel envelope */
-		case 0x400C:
-			i = (value&0x20) >> 5;
-			APU->noise.envelope.loop = i;
-			APU->noise.lc.halt = i;
-
-			APU->noise.envelope.disabled = (value&0x10) >> 4;
-			APU->noise.envelope.timer.period = (value&0x0F) + 1;
-			break;
-
-		/* Noise channel random mode, timer period index */
-		case 0x400E:
-			APU->noise.random_mode = (value&0x80) >> 7;
-			APU->noise.timer.period = noise_timer_periods[ value&0x0F ];
-			break;
-
-		/* Noise channel length counter */
-		case 0x400F:
-			i = (value & 0xF8) >> 3;
-			if( APU->noise.lc.enabled )
-				APU->noise.lc.counter = length_counter_reload_values[i];
-			break;
-
-		/* Sprite DMA */
-		case 0x4014:
-			address = value*0x100;
-			for(i=0;i!=256;i++)
-				PPU->SPR_RAM[PPU->spr_addr++] = read_cpu_ram(address+i);
-			ADD_CPU_CYCLES(512);
-			break;
-
-		/* APU Lenght Control */
-		case 0x4015:
-			APU->square1.lc.enabled = value&0x01;
-			if( !APU->square1.lc.enabled )
-				APU->square1.lc.counter = 0;
-
-			APU->square2.lc.enabled = (value&0x02) >> 1;
-			if( !APU->square2.lc.enabled )
-				APU->square2.lc.counter = 0;
-
-			APU->triangle.lc.enabled = (value&0x04) >> 2;
-			if( !APU->triangle.lc.enabled )
-				APU->triangle.lc.counter = 0;
-
-			APU->noise.lc.enabled = (value&0x08) >> 3;
-			if( !APU->noise.lc.enabled )
-				APU->noise.lc.counter = 0;
-
-			/* TODO: DMC IRQ flag clear, DMC start/stop */
-
-			break;
-
-		/* 1st and 2nd joysticks strobe */
-		case 0x4016:
-			if( value == 0x01 )
-				strobe_pad = 1;
-			else if( value == 0x00 && strobe_pad ) {
-				strobe_pad = 0;
-				pads[0].reads = 0;
-				pads[1].reads = 0;
-			}
-			break;
-
-		/* APU common */
-		case 0x4017:
-			APU->commons = value & 0xC0;
-
-			/* Reset the frame sequencer and divider */
-			APU->frame_seq.step = 0;
-			if( APU->commons & STEP_MODE5 ) {
-				APU->frame_seq.clock_timeout = PPUCYCLES_STEP5;
-				clock_frame_sequencer();
-			}
-			else
-				APU->frame_seq.clock_timeout = PPUCYCLES_STEP4;
-
-			break;
-
-		/* Normal RAM memory area */
-		default:
-			CPU->RAM[address] = value;
-	}
+	/* Call the actual implementation for the given address */
+	(*write_cpu_ram_f[address])(address, value);
 
 	/* Check if mapper need to come into action */
 	if( mapper->check_address(address) ) {
