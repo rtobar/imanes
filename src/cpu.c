@@ -36,9 +36,7 @@
 
 static int prev_a12_state  = 0;
 static int prev_a12_cycles = 0;
-
-uint8_t  tmp;
-uint16_t tmp16;
+nes_cpu *CPU;
 
 /**
  * Given a value and a set of flags, check and update them if necessary
@@ -59,6 +57,9 @@ inline void update_flags(int8_t value, uint8_t flags) {
 }
 
 void ADC_func(instruction *inst, operand *oper){
+
+	uint16_t tmp16;
+
 	if( inst->addr_mode != ADDR_IMMEDIATE )
 		oper->value = read_cpu_ram(oper->address);
 	tmp16 = CPU->A + oper->value + (CPU->SR & C_FLAG);
@@ -88,6 +89,9 @@ void AND_func(instruction *inst, operand *oper){
 }
 
 void ASL_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	if( inst->addr_mode == ADDR_ACCUM ) {
 		tmp = CPU->A & 0x80;
 		CPU->A <<= 1;
@@ -225,6 +229,9 @@ void CPY_func(instruction *inst, operand *oper){
 }
 
 void DEC_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	tmp = read_cpu_ram(oper->address) - 1;
 	write_cpu_ram(oper->address, tmp);
 	update_flags( tmp , N_FLAG | Z_FLAG);
@@ -248,6 +255,9 @@ void EOR_func(instruction *inst, operand *oper){
 }
 
 void INC_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	tmp = read_cpu_ram(oper->address) + 1;
 	write_cpu_ram( oper->address, tmp);
 	update_flags(tmp, N_FLAG | Z_FLAG);
@@ -295,6 +305,9 @@ void LDY_func(instruction *inst, operand *oper){
 }
 
 void LSR_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	if( inst->addr_mode == ADDR_ACCUM ) {
 		tmp = CPU->A & 0x1;
 		CPU->A >>= 1;
@@ -343,6 +356,9 @@ void PLP_func(instruction *inst, operand *oper){
 }
 
 void ROL_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	if( inst->addr_mode == ADDR_ACCUM ) {
 		tmp = CPU->A & 0x80;
 		CPU->A <<= 1;
@@ -363,6 +379,9 @@ void ROL_func(instruction *inst, operand *oper){
 }
 
 void ROR_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	if( inst->addr_mode == ADDR_ACCUM ) {
 		tmp = CPU->A & 0x1;
 		CPU->A >>= 1;
@@ -398,6 +417,9 @@ void RTS_func(instruction *inst, operand *oper){
 }
 
 void SBC_func(instruction *inst, operand *oper){
+
+	uint16_t tmp16;
+
 	if( inst->addr_mode != ADDR_IMMEDIATE )
 		oper->value = read_cpu_ram(oper->address);
 	tmp16 = CPU->A - oper->value - (1 - (CPU->SR & C_FLAG));
@@ -509,6 +531,9 @@ void ARR_func(instruction *inst, operand *oper){
 }
 
 void DCP_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	tmp = read_cpu_ram(oper->address) - 1;
 	write_cpu_ram(oper->address, tmp);
 	if( CPU->A >= tmp)
@@ -519,6 +544,11 @@ void DCP_func(instruction *inst, operand *oper){
 }
 
 void ISC_func(instruction *inst, operand *oper){
+
+	uint8_t  tmp;
+	uint16_t tmp16;
+
+
 	tmp = read_cpu_ram(oper->address) + 1;
 	write_cpu_ram(oper->address, tmp);
 
@@ -550,6 +580,9 @@ void LAX_func(instruction *inst, operand *oper){
 }
 
 void RLA_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	oper->value = read_cpu_ram(oper->address);
 	tmp = oper->value & 0x80;
 	oper->value <<= 1;
@@ -564,6 +597,11 @@ void RLA_func(instruction *inst, operand *oper){
 }
 
 void RRA_func(instruction *inst, operand *oper){
+
+	uint8_t  tmp;
+	uint16_t tmp16;
+
+
 	/* Right shift */
 	oper->value = read_cpu_ram(oper->address);
 	tmp = oper->value & 0x1;
@@ -596,6 +634,9 @@ void RRA_func(instruction *inst, operand *oper){
 }
 
 void SAX_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	tmp = CPU->A & CPU->X;
 	write_cpu_ram(oper->address, tmp);
 	update_flags(tmp, N_FLAG | Z_FLAG);
@@ -613,11 +654,17 @@ void SBX_func(instruction *inst, operand *oper){
 }
 
 void SHX_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	tmp = CPU->X & (((oper->address & 0xFF00) >> 8) + 1);
 	write_cpu_ram(oper->address, tmp);
 }
 
 void SHY_func(instruction *inst, operand *oper){
+
+	uint8_t tmp;
+
 	tmp = CPU->Y & (((oper->address & 0xFF00) >> 8) + 1);
 	write_cpu_ram(oper->address, tmp);
 }
@@ -867,8 +914,6 @@ uint8_t _read_ram(uint16_t address) {
 
 uint8_t (*read_cpu_ram_f[NES_RAM_SIZE])(uint16_t address);
 
-
-nes_cpu *CPU;
 
 void initialize_cpu() {
 
