@@ -865,11 +865,11 @@ uint8_t _read_joystick1(uint16_t address) {
 
 	/* If we should return a key state... */
 	if( pads[0].reads < 8 )
-		ret_val |= ((pads[0].pressed_keys >> (pads[0].reads)) & 0x1);
+		ret_val = ((pads[0].pressed_keys >> (pads[0].reads)) & 0x1);
 
 	/* This is the signature */
 	else if ( pads[0].reads == 19 && pads[0].plugged )
-		ret_val |= 0x01;
+		ret_val = 0x01;
 
 	pads[0].reads++;
 	if( pads[0].reads == 32 )
@@ -885,11 +885,11 @@ uint8_t _read_joystick2(uint16_t address) {
 
 	/* If we should return a key state... */
 	if( pads[1].reads < 8 )
-		ret_val |= ((pads[1].pressed_keys >> (pads[1].reads)) & 0x1);
+		ret_val = ((pads[1].pressed_keys >> (pads[1].reads)) & 0x1);
 
 	/* This is the signature */
 	else if ( pads[1].reads == 18 && pads[1].plugged )
-		ret_val |= 0x01;
+		ret_val = 0x01;
 
 	pads[1].reads++;
 	if( pads[1].reads == 32 )
@@ -898,7 +898,7 @@ uint8_t _read_joystick2(uint16_t address) {
 	return ret_val;
 }
 
-/* Read the SRAM (0x4017) */
+/* Read the SRAM */
 uint8_t _read_sram(uint16_t address) {
 	if( !(CPU->sram_enabled & SRAM_ENABLE) )
 		return 0;
@@ -1099,7 +1099,7 @@ void _write_square2_period_high_lc(uint16_t address, uint8_t value) {
 	APU->square2.envelope.written = 1;
 }
 
-/* Triangle channel linear counter, control */
+/* 0x4008: Triangle channel linear counter, control */
 void _write_tri_linearc_ctrl(uint16_t address, uint8_t value) {
 
 	uint8_t i;
@@ -1111,14 +1111,14 @@ void _write_tri_linearc_ctrl(uint16_t address, uint8_t value) {
 	APU->triangle.linear.reload = value&0x7F;
 }
 
-/* Triangle channel period 8 lower bits */
+/* 0x400A: Triangle channel period 8 lower bits */
 void _write_tri_period_low(uint16_t address, uint8_t value) {
 	APU->triangle.timer.period &= 0x0700;
 	APU->triangle.timer.period |= value;
 	APU->triangle.timer.period++;
 }
 
-/* Triangle channel period 3 higher bits, length counter index */
+/* 0x400B: Triangle channel period 3 higher bits, length counter index */
 void _write_tri_period_high_lc(uint16_t address, uint8_t value) {
 
 	uint8_t i;
@@ -1207,7 +1207,7 @@ void _write_joystick_strobes(uint16_t address, uint8_t value) {
 	}
 }
 
-/* APU common */
+/* 0x4017: APU common */
 void _write_apu_common(uint16_t address, uint8_t value) {
 	APU->commons = value & 0xC0;
 
@@ -1445,7 +1445,7 @@ uint8_t stack_pull() {
 	return CPU->RAM[BEGIN_STACK + ++CPU->SP];
 }
 
-/* Note: NMI is executed after inscreasing the PC! */
+/* Note: NMI is executed after increasing the PC! */
 void execute_nmi() {
 
 	/* This interrupt is not maskable, so we don't check

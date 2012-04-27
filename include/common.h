@@ -24,6 +24,11 @@
 #define ROM_BANK_SIZE   (16*1024)
 #define VROM_BANK_SIZE  ( 8*1024)
 
+/* Clock rates */
+#define MASTER_CLOCK_HERTZ  (21477270)
+#define PPU_CLOCK_HERTZ     (5369317/*.5*/)
+#define CPU_CLOCK_HERTZ     (1789772/*.5*/)
+
 #define NES_PALETTE_COLORS (64)
 
 #define CYCLES_PER_SCANLINE (341)

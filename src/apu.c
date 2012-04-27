@@ -301,9 +301,9 @@ void clock_frame_sequencer() {
 				break;
 
 			case 3:
+				APU->frame_seq.int_flag = 1;
 				clock_lc_sweep();
 				clock_envelopes_tlc();
-				APU->frame_seq.int_flag = 1;
 				break;
 
 		}
