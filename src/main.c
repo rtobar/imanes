@@ -83,6 +83,7 @@ int parse_options(int args, char *argv[]) {
 		switch(opt) {
 			case 'm':
 				config.sound_mute = 1;
+				break;
 			case 'v':
 				config.verbosity++;
 				break;
