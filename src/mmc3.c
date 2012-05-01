@@ -61,10 +61,6 @@ void mmc3_initialize_mapper() {
 	return;
 }
 
-void mmc3_debug(int reg) {
-	DEBUG( printf("MMC3: Reg[%d] = $%02X at %d\n", reg, mapper->regs[reg], PPU->lines) );
-}
-
 void mmc3_perform_vram_swap() {
 
 	uint8_t  chr_mode;
@@ -129,7 +125,7 @@ void mmc3_perform_ram_swap() {
 int mmc3_check_address(uint16_t address) {
 
 	uint8_t value;
-	uint8_t flag;
+	uint8_t tmp;
 
 	if( address < 0x8000 )
 		return 0;
@@ -156,8 +152,11 @@ int mmc3_check_address(uint16_t address) {
 			break;
 
 		case 0x8001:
-			mapper->regs[ address_cmd & 0x07 ] = value;
-			mmc3_debug( address_cmd & 0x07 );
+			/* The register index */
+			tmp = address_cmd & 0x07;
+
+			mapper->regs[tmp] = value;
+			DEBUG( printf("MMC3: Reg[%d] = $%02X at %d\n", tmp, mapper->regs[tmp], PPU->lines) );
 
 			mmc3_perform_ram_swap();
 			mmc3_perform_vram_swap();
@@ -170,15 +169,15 @@ int mmc3_check_address(uint16_t address) {
 
 		case 0xA001:
 
-			flag = (value & 0x80) >> 7;
-			if( flag != CPU->sram_enabled ) {
-				INFO( printf("%s SRAM\n", (flag ? _("Enabling") : _("Disabling") ) ) );
-				CPU->sram_enabled = flag;
+			tmp = (value & 0x80) >> 7;
+			if( tmp != CPU->sram_enabled ) {
+				INFO( printf("%s SRAM\n", (tmp ? _("Enabling") : _("Disabling") ) ) );
+				CPU->sram_enabled = tmp;
 			}
-			flag = (value & 0x40) >> 6;
-			if( flag != (CPU->sram_enabled & SRAM_RO) ) {
-				INFO( printf(_("SRAM switching to %s mode\n"), (flag ? "RO": "RW") ) );
-				if( flag )
+			tmp = (value & 0x40) >> 6;
+			if( tmp != (CPU->sram_enabled & SRAM_RO) ) {
+				INFO( printf(_("SRAM switching to %s mode\n"), (tmp ? "RO": "RW") ) );
+				if( tmp )
 					CPU->sram_enabled |= SRAM_RO;
 				else
 					CPU->sram_enabled &= ~SRAM_RO;
