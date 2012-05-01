@@ -39,6 +39,7 @@ static uint8_t irq_counter;
 
 static uint8_t address_cmd;
 static uint8_t prev_address_cmd;
+static uint8_t prev_regs[8];
 
 void mmc3_initialize_mapper() {
 
@@ -49,7 +50,8 @@ void mmc3_initialize_mapper() {
 	powering_on = 1;
 
 	address_cmd = 0;
-	prev_address_cmd = 0;
+	prev_address_cmd = 0xFF;
+	memset(&prev_regs, 0, 8);
 
 	irq_counter = 0;
 	irq_tmp = 0;
@@ -144,19 +146,19 @@ int mmc3_check_address(uint16_t address) {
 			/* Instantaneously produce a RAM or VRAM swap if the PRG mode
 			 * or the CHR mode have changed, respectively. Note that
 			 * both can happen at the same time. */
-			if( (address_cmd & 0x40) != (prev_address_cmd & 0x40) ) {
-				printf("Change of PRG mode!\n");
+			if( ((address_cmd & 0x40) != (prev_address_cmd & 0x40)) || prev_address_cmd == 0xFF ) {
+				INFO( printf(_("Change of PRG mode: %u\n"), address_cmd & 0x40) );
 				mmc3_perform_ram_swap();
 				memcpy(mapper->regs + 5, &prev_regs + 5, 2);
 			}
-			if( (address_cmd & 0x80) != (prev_address_cmd & 0x80) ) {
-				printf("Change of CHR mode!\n");
+			if( ((address_cmd & 0x80) != (prev_address_cmd & 0x80))  || prev_address_cmd == 0xFF ) {
+				INFO( printf(_("Change of CHR mode: %u\n"), address_cmd & 0x80) );
 				mmc3_perform_vram_swap();
 				memcpy(mapper->regs, &prev_regs, 5);
 			}
 
-			/* Save the value to check it in the next iteration */
-			prev_address_cmd = value;
+			/* Save the interesting bits to check it in the next iteration */
+			prev_address_cmd = value & 0xC0;;
 			break;
 
 		case 0x8001:
@@ -164,10 +166,23 @@ int mmc3_check_address(uint16_t address) {
 			tmp = address_cmd & 0x07;
 			mapper->regs[tmp] = value;
 
-			DEBUG( printf("MMC3: Reg[%d] = $%02X at %d\n", tmp, mapper->regs[tmp], PPU->lines) );
+			INFO( printf("MMC3: Reg[%d] = $%02X at %d ", tmp, mapper->regs[tmp], PPU->lines) );
 
-			mmc3_perform_ram_swap();
-			mmc3_perform_vram_swap();
+			/* Instantaneously produce a RAM or VRAM swap if the
+			 * value for the written register changed. R:0 to R:5 are used
+			 * for CHR swapping, R:6 and R:7 for PRG swapping. */
+//			if( mapper->regs[tmp] != prev_regs[tmp] ) {
+				INFO( printf(_("changed!\n")) );
+				if( tmp > 5 )
+					mmc3_perform_ram_swap();
+				else
+					mmc3_perform_vram_swap();
+//			}
+//			else
+//				INFO( printf(_("ignoring\n")) );
+
+			/* Save the value to check it in the next iteration */
+			prev_regs[tmp] = value;
 			break;
 
 		case 0xA000:
