@@ -121,7 +121,7 @@ int main_loop(void *args) {
 		DEBUG( printf("%04.0f 0x%04x - %02x: ",CLK->nmi_pcycles/3., CPU->PC, opcode) );
 		/* Undocumented instruction */
 		if( inst.size == 0 ) {
-			fprintf(stderr,_("\n\nUndocumented instruction: %02x\n"),opcode);
+			fprintf(stderr,_("\n\nUndocumented instruction: %02X\n"),opcode);
 			fprintf(stderr,_("I'm exiting now... sorry :(\n"));
 			fprintf(stderr,_("Close the window when finished\n"));
 			return -1;
