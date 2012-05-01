@@ -42,6 +42,8 @@ nes_mapper mapper_list[] = {
 	  cnrom_switch_banks, cnrom_reset, cnrom_update, cnrom_end_mapper } ,
 	{ MMC3_ID , "MMC3" , 8, mmc3_initialize_mapper , mmc3_check_address,
 	  mmc3_switch_banks , mmc3_reset,  mmc3_update , mmc3_end_mapper } ,
+	{ 98, "UNROM", 1, unrom_initialize_mapper, unrom_check_address,
+	  unrom_switch_banks, unrom_reset, unrom_update, unrom_end_mapper } ,
 	{ -1 }
 };
 
