@@ -163,7 +163,7 @@ void draw_line(int line, int frame) {
 	/* Fill all pixels with the background color */
 	if( config.show_screen_bg && ( !config.run_fast || !(frame%2) ) ) {
 		for(i=0;i!=NES_SCREEN_WIDTH;i++)
-				draw_pixel(i, line, system_palette[*(PPU->VRAM + 0x3F00 )]);
+				draw_pixel(i, line, system_palette[PPU->VRAM[0x3F00]]);
 	}
 	else {
 		for(i=0;i!=NES_SCREEN_WIDTH;i++)
