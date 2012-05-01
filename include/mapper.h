@@ -49,4 +49,24 @@ extern nes_mapper mapper_list[];
 /* Global current mapper variable */
 extern nes_mapper *mapper;
 
+#define SWAP_RAM( ram_start, prg_start, size ) \
+	memcpy(CPU->RAM + ram_start, prg_start, size)
+
+#define SWAP_RAM_8K( start, bank ) \
+	SWAP_RAM( start, mapper->file->rom + (bank) * 0x2000, 0x2000 )
+
+#define SWAP_RAM_16K( start, bank ) \
+	SWAP_RAM( start, mapper->file->rom + (bank) * 0x4000, 0x4000 )
+
+
+
+#define SWAP_VRAM( vram_start, chr_start, size ) \
+	memcpy(PPU->VRAM + vram_start, chr_start, size)
+
+#define SWAP_VRAM_1K( address, bank ) \
+	SWAP_VRAM(address, mapper->file->vrom + (bank) * 0x0400, 0x0400 )
+
+#define SWAP_VRAM_2K( address, bank ) \
+	SWAP_VRAM(address, mapper->file->vrom + (bank) * 0x0800, 0x0800 )
+
 #endif /* mapper_h */

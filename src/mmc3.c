@@ -28,31 +28,17 @@
 #include "mmc3.h"
 #include "ppu.h"
 
-typedef enum _mmc3_action {
-	SetCommand,
-	SwapBanks,
-	ChangeMirroring,
-	ToogleSRAM,
-	SetIRQ,
-	EnableIRQ,
-	DisableIRQ,
-	ResetIRQ
-} mmc3_action;
-
-/* This is the action taken when writing into the address,
-   used later to see what we should do when "switching banks" */
-static mmc3_action action;
-
 /* Are we powering on the machine? */
 static int powering_on;
-
-static int swapping_control;
 
 static int irq_enabled;
 static int irq_triggered;
 static int zero_written;
 static uint8_t irq_tmp;
 static uint8_t irq_counter;
+
+static uint8_t address_cmd;
+static uint8_t prev_address_cmd;
 
 void mmc3_initialize_mapper() {
 
@@ -61,7 +47,9 @@ void mmc3_initialize_mapper() {
 
 	mapper->regs[0] = 0; /* 0x8000 and 0xA000 are switchable */
 	powering_on = 1;
-	swapping_control = 0;
+
+	address_cmd = 0;
+	prev_address_cmd = 0;
 
 	irq_counter = 0;
 	irq_tmp = 0;
@@ -74,170 +62,134 @@ void mmc3_initialize_mapper() {
 }
 
 void mmc3_debug(int reg) {
-/*	printf("MMC3: Reg[%d] = $%02X at %d\n", reg, mapper->regs[reg], PPU->lines); */
+	DEBUG( printf("MMC3: Reg[%d] = $%02X at %d\n", reg, mapper->regs[reg], PPU->lines) );
+}
+
+void mmc3_perform_vram_swap() {
+
+	uint8_t  chr_mode;
+	uint16_t offset;
+
+	/* Depending on the mode we perform different swappings, like this:
+	 *
+	 *                $0000   $0400   $0800   $0C00   $1000   $1400   $1800   $1C00
+	 *              +---------------+---------------+-------+-------+-------+-------+
+	 * CHR Mode 0:  |     <R:0>     |     <R:1>     |  R:2  |  R:3  |  R:4  |  R:5  |
+	 *              +---------------+---------------+---------------+---------------+
+	 * CHR Mode 1:  |  R:2  |  R:3  |  R:4  |  R:5  |     <R:0>     |     <R:1>     |
+	 *              +-------+-------+-------+-------+---------------+---------------+
+	 */
+
+	chr_mode = address_cmd & 0x80;
+
+	/* <R:0> and <R:1>, they have an offset of 0x1000 when in CHR Mode 1 */
+	offset = (chr_mode ? 0x1000 : 0);
+	SWAP_VRAM_2K(offset,          mapper->regs[0] >> 1);
+	SWAP_VRAM_2K(offset + 0x0800, mapper->regs[1] >> 1);
+
+	/* R:2 - R:5, they have an offset of 0x1000 when in CHR Mode 0 */
+	offset = (chr_mode ? 0 : 0x1000);
+	SWAP_VRAM_1K(offset,          mapper->regs[2]);
+	SWAP_VRAM_1K(offset + 0x0400, mapper->regs[3]);
+	SWAP_VRAM_1K(offset + 0x0800, mapper->regs[4]);
+	SWAP_VRAM_1K(offset + 0x0C00, mapper->regs[5]);
+
+}
+
+void mmc3_perform_ram_swap() {
+
+	uint8_t  prg_mode;
+	uint16_t offset;
+
+	/* Depending on the mode we perform different swappings, like this:
+	 *
+	 *                $8000   $A000   $C000   $E000
+	 *              +-------+-------+-------+-------+
+	 * PRG Mode 0:  |  R:6  |  R:7  | { -2} | { -1} |
+	 *              +-------+-------+-------+-------+
+	 * PRG Mode 1:  | { -2} |  R:7  |  R:6  | { -1} |
+	 *              +-------+-------+-------+-------+
+	 */
+
+	prg_mode = address_cmd & 0x40;
+
+	/* {-1} is fixed and we already copy it on power-on */
+
+	/* R:6 and R:7 */
+	offset = (prg_mode ? 0xC000 : 0x8000);
+	SWAP_RAM_8K(offset, mapper->regs[6]);
+	SWAP_RAM_8K(0xA000, mapper->regs[7]);
+
+	/* {-2} depends on the mode */
+	offset = (prg_mode ? 0x8000 : 0xC000);
+	SWAP_RAM_8K(offset, mapper->file->romBanks*2 - 2);
+
 }
 
 int mmc3_check_address(uint16_t address) {
 
+	uint8_t value;
+	uint8_t flag;
+
 	if( address < 0x8000 )
 		return 0;
 
+	/* After 0x8000 there's no mirroring, so we can go and
+	 * directly read the RAM memory */
 	address &= 0xE001;
+	value = CPU->RAM[address];
 
 	/* This only set values, does not take any action */
-	if( address == 0x8000 ) {
-		mapper->regs[0] = CPU->RAM[address];
-		action = SetCommand;
-		mmc3_debug(0);
-		return 1;
-	}
+	switch(address) {
 
-	if( address == 0x8001 ) {
-		mapper->regs[1] = CPU->RAM[address];
-		action = SwapBanks;
-		mmc3_debug(1);
-		return 1;
-	}
+		case 0x8000:
+			address_cmd = value;
 
-	if( address == 0xA000 ) {
-		mapper->regs[2] = CPU->RAM[address];
-		action = ChangeMirroring;
-		mmc3_debug(2);
-		return 1;
-	}
+			/* Instantely produce a RAM or VRAM swap if the PGR mode
+			 * or the CHR mode have changed, respectively */
+			if( (address_cmd & 0x40) != (prev_address_cmd & 0x40) )
+				mmc3_perform_ram_swap();
+			if( (address_cmd & 0x80) != (prev_address_cmd & 0x80) )
+				mmc3_perform_vram_swap();
 
-	if( address == 0xA001 ) {
-		mapper->regs[3] = CPU->RAM[address];
-		action = ToogleSRAM;
-		mmc3_debug(3);
-		return 1;
-	}
-
-	if( address == 0xC000 ) {
-		mapper->regs[4] = CPU->RAM[address];
-		action = SetIRQ;
-		mmc3_debug(4);
-		return 1;
-	}
-
-	if( address == 0xC001 ) {
-		mapper->regs[5] = CPU->RAM[address];
-		action = ResetIRQ;
-		mmc3_debug(5);
-		return 1;
-	}
-
-	if( address == 0xE000 ) {
-		mapper->regs[6] = CPU->RAM[address];
-		action = DisableIRQ;
-		mmc3_debug(6);
-		return 1;
-	}
-
-	if( address == 0xE001 ) {
-		mapper->regs[7] = CPU->RAM[address];
-		action = EnableIRQ;
-		mmc3_debug(7);
-		return 1;
-	}
-
-	return 0;
-}
-
-void mmc3_switch_banks() {
-
-	uint8_t bank;
-	uint8_t command;
-	uint16_t offset;
-
-	switch( action ) {
-
-		case SetCommand:
-			/* If we haven't changed the swapping control, then
-			   we don't need to copy again the same {-2} ROM memory */
-			if( swapping_control == (mapper->regs[0]&0x40) )
-				break;
-
-			if( mapper->regs[0] & 0x40 )
-				offset = 0x8000;
-			else
-				offset = 0xC000;
-
-			DEBUG( printf(_("MMC3: Reg0:%02x, Swapping {-2} bank to %04x\n"), mapper->regs[0], offset) );
-			memcpy( CPU->RAM + offset,
-			   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
-			   ROM_BANK_SIZE/2);
-			swapping_control = mapper->regs[0]&0x40;
+			prev_address_cmd = address_cmd;
 			break;
 
-		case SwapBanks:
-			bank = mapper->regs[1];
-			command = (mapper->regs[0]&0x7);
+		case 0x8001:
+			mapper->regs[ address_cmd & 0x07 ] = value;
+			mmc3_debug( address_cmd & 0x07 );
 
-			/* Switch VROM page */
-			if( command <= 5 ) {
-
-
-				/* Copy 2 1Kb VROM pages */
-				if( command <= 1 ) {
-					offset = 0x800*command + ((mapper->regs[0]&0x80) << 5);
-					bank &= 0xFE;
-					DEBUG( printf(_("MMC3: Switching VROM bank %d to %04x\n"), bank,offset) );
-					memcpy(PPU->VRAM+offset,
-					       mapper->file->vrom+bank*1024, 2*1024);
-				}
-				/* Copy 1 Kb VROM page */
-				else {
-					offset = (command-2)*0x400 + (!(mapper->regs[0]&0x80))*0x1000;
-					DEBUG( printf(_("MMC3: Switching VROM bank %d to %04x\n"), bank,offset) );
-					memcpy(PPU->VRAM+offset,
-					       mapper->file->vrom+bank*1024, 1024);
-				}
-			}
-			else {
-
-				offset = 0x8000;
-
-				/* 0xA000 is present in both regions */
-				if( command == 7 )
-					offset += 0x2000;
-				else if( mapper->regs[0] & 0x40 )
-					offset += 0x4000;
-
-				DEBUG( printf(_("MMC3: Switching ROM bank %02x into %04x\n"), bank, offset) );
-				memcpy(CPU->RAM + offset,
-				       mapper->file->rom + bank*ROM_BANK_SIZE/2,
-				       ROM_BANK_SIZE/2);
-
-			}
-
+			mmc3_perform_ram_swap();
+			mmc3_perform_vram_swap();
 			break;
 
-		case ChangeMirroring:
+		case 0xA000:
 			if( PPU->mirroring != FOUR_SCREEN_MIRRORING )
-				PPU->mirroring = !(mapper->regs[2] & 0x1);
+				PPU->mirroring = !(value & 0x1);
 			break;
 
-		case ToogleSRAM:
-			command = (mapper->regs[3] & 0x80) >> 7;
-			if( command != CPU->sram_enabled ) {
-				DEBUG( printf("%s SRAM\n", (command ? _("Enabling") : _("Disabling") ) ) );
-				CPU->sram_enabled = command;
+		case 0xA001:
+
+			flag = (value & 0x80) >> 7;
+			if( flag != CPU->sram_enabled ) {
+				INFO( printf("%s SRAM\n", (flag ? _("Enabling") : _("Disabling") ) ) );
+				CPU->sram_enabled = flag;
 			}
-			command = (mapper->regs[3] & 0x40) >> 6;
-			if( command != (CPU->sram_enabled & SRAM_RO) ) {
-				DEBUG( printf(_("SRAM switching to %s mode\n"), (command ? "RO": "RW") ) );
-				if( command )
+			flag = (value & 0x40) >> 6;
+			if( flag != (CPU->sram_enabled & SRAM_RO) ) {
+				INFO( printf(_("SRAM switching to %s mode\n"), (flag ? "RO": "RW") ) );
+				if( flag )
 					CPU->sram_enabled |= SRAM_RO;
 				else
 					CPU->sram_enabled &= ~SRAM_RO;
 			}
 			break;
 
-		case SetIRQ:
-			DEBUG( printf(_("MMC3: Writting %02x to 0xC000\n"), mapper->regs[4]) );
-			if( mapper->regs[4] ) {
-				irq_tmp = mapper->regs[4];
+		case 0xC000:
+
+			DEBUG( printf(_("MMC3: Writting %02x to 0xC000\n"), value) );
+			if( value ) {
+				irq_tmp = value;
 				zero_written = 0;
 			}
 			else {
@@ -248,50 +200,48 @@ void mmc3_switch_banks() {
 			}
 			break;
 
-		case ResetIRQ:
+		case 0xC001:
 			DEBUG( printf(_("MMC3: Resetting counter to 0\n")) );
 			irq_counter = 0;
 			zero_written = 0;
 			irq_triggered = 0;
 			break;
 
-		case DisableIRQ:
+		case 0xE000:
 			irq_enabled = 0;
 			break;
 
-		case EnableIRQ:
+		case 0xE001:
 			irq_enabled = 1;
 			break;
 
 		default:
+			fprintf(stderr,_("Error, execution shouldn't have reached this point\n"));
 			break;
+
 	}
 
+	return 0;
+}
+
+void mmc3_switch_banks() {
 	return;
 }
 
 void mmc3_reset() {
 
-	/* The last ROM bank is always fixed into 0xE000-0xFFFF */
+	/* The last 8kb ROM bank is always fixed into 0xE000-0xFFFF */
 	if( powering_on ) {
-		memcpy( CPU->RAM + 0xE000,
-	      mapper->file->rom+((mapper->file->romBanks*2)-1)*ROM_BANK_SIZE/2,
-	      ROM_BANK_SIZE/2);
-		memcpy( CPU->RAM + 0xC000,
-		   mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE,
-		   ROM_BANK_SIZE/2);
+		SWAP_RAM_8K(0xE000, mapper->file->romBanks*2 - 1);
 
-		if( mapper->file->vromBanks != 0 ) {
-			memcpy( PPU->VRAM ,
-			   mapper->file->rom,
-			   VROM_BANK_SIZE);
-		}
+		if( mapper->file->vromBanks != 0 )
+			SWAP_VRAM(0, mapper->file->vrom, VROM_BANK_SIZE);
 
 		powering_on = 0;
 	}
 
 	if( mapper->file->vromBanks != 0 )
-		memcpy( PPU->VRAM, mapper->file->vrom, 0x2000);
+		SWAP_VRAM(0, mapper->file->vrom, VROM_BANK_SIZE);
 
 	return;
 }
