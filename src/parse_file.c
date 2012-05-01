@@ -105,7 +105,7 @@ ines_file *check_ines_file(const char *file_path) {
 	INFO( printf(_("SRAM is %s\n"), (CPU->sram_enabled ? _("enabled") : _("disabled")) ) );
 	rom_file->has_trainer  = buff[0] & 0x04;
 
-	rom_file->mapper_id = (buff[1] & 0xF0) | ( (buff[0] >> 4) & 0x0F );
+	rom_file->mapper_id = (buff[1] & 0xF0) | (buff[0] >> 4);
 
 	/* Check which mappers we do support */
 	mapper = NULL;
@@ -151,6 +151,7 @@ ines_file *check_ines_file(const char *file_path) {
 void map_rom_memory(ines_file *nes_rom) {
 
 	int read_bytes;
+	char dummy;
 
 	nes_rom->rom  = (uint8_t *)malloc(nes_rom->romBanks * ROM_BANK_SIZE);
 	nes_rom->vrom = (uint8_t *)malloc(nes_rom->vromBanks*VROM_BANK_SIZE);
@@ -171,6 +172,9 @@ void map_rom_memory(ines_file *nes_rom) {
 		IMANES_CLOSE(nes_rom->fd);
 		exit(EXIT_FAILURE);
 	}
+
+	if( IMANES_READ(nes_rom->fd, (void *)&dummy, 1) == 1 )
+		fprintf(stderr, _("Warning: NES file contains more data than it should\n"));
 	
 	IMANES_CLOSE(nes_rom->fd);
 
