@@ -56,8 +56,8 @@ void unrom_reset()
 {
 
 	memcpy(CPU->RAM+0x8000, mapper->file->rom, ROM_BANK_SIZE);
-	memcpy(CPU->RAM+0xC000, 
-	       mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE, 
+	memcpy(CPU->RAM+0xC000,
+	       mapper->file->rom + (mapper->file->romBanks16k-1)*ROM_BANK_SIZE,
 	       ROM_BANK_SIZE);
 
 }

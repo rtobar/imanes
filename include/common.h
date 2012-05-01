@@ -35,7 +35,8 @@
 
 typedef struct _ines_file {
 	int fd;
-	uint8_t romBanks;
+	uint8_t romBanks16k;
+	uint8_t romBanks8k;
 	uint8_t vromBanks;
 	uint8_t mapper_id;
 	uint8_t *rom;

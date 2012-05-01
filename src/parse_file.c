@@ -68,11 +68,12 @@ ines_file *check_ines_file(const char *file_path) {
 	}
 
 	/* ROM and VROM blocks */
-	read_bytes = IMANES_READ(rom_file->fd, &(rom_file->romBanks), 1);
+	read_bytes = IMANES_READ(rom_file->fd, &(rom_file->romBanks16k), 1);
 	if( read_bytes != 1 ) {
 		fprintf(stderr,_("Error: %s is not a valid NES ROM\n"),file_path);
 		exit(EXIT_FAILURE);
 	}
+	rom_file->romBanks8k = rom_file->romBanks16k * 2;
 
 	read_bytes = IMANES_READ(rom_file->fd, &(rom_file->vromBanks), 1);
 	if( read_bytes != 1 ) {
@@ -81,7 +82,7 @@ ines_file *check_ines_file(const char *file_path) {
 	}
 
 	INFO( printf(_("File contains %hu 16kb ROM banks and %hu 8kb VROM banks\n"),
-          rom_file->romBanks, rom_file->vromBanks) );
+          rom_file->romBanks16k, rom_file->vromBanks) );
 
 	/* Mapper, name table mirroring and others */
 	buff = realloc(buff,2);
@@ -153,13 +154,13 @@ void map_rom_memory(ines_file *nes_rom) {
 	int read_bytes;
 	char dummy;
 
-	nes_rom->rom  = (uint8_t *)malloc(nes_rom->romBanks * ROM_BANK_SIZE);
-	nes_rom->vrom = (uint8_t *)malloc(nes_rom->vromBanks*VROM_BANK_SIZE);
+	nes_rom->rom  = (uint8_t *)malloc(nes_rom->romBanks16k * ROM_BANK_SIZE);
+	nes_rom->vrom = (uint8_t *)malloc(nes_rom->vromBanks   *VROM_BANK_SIZE);
 
 	/* Read and check */
 	read_bytes = IMANES_READ(nes_rom->fd, (void *)nes_rom->rom ,
-	                  nes_rom->romBanks * ROM_BANK_SIZE);
-	if( read_bytes != nes_rom->romBanks * ROM_BANK_SIZE ) {
+	                  nes_rom->romBanks16k * ROM_BANK_SIZE);
+	if( read_bytes != nes_rom->romBanks16k * ROM_BANK_SIZE ) {
 		fprintf(stderr,_("Error: malformed file (ROM not complete)\n"));
 		IMANES_CLOSE(nes_rom->fd);
 		exit(EXIT_FAILURE);

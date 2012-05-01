@@ -118,7 +118,7 @@ void mmc3_perform_ram_swap() {
 
 	/* {-2} depends on the mode */
 	offset = (prg_mode ? 0x8000 : 0xC000);
-	SWAP_RAM_8K(offset, mapper->file->romBanks*2 - 2);
+	SWAP_RAM_8K(offset, mapper->file->romBanks8k - 2);
 
 }
 
@@ -141,21 +141,29 @@ int mmc3_check_address(uint16_t address) {
 		case 0x8000:
 			address_cmd = value;
 
-			/* Instantely produce a RAM or VRAM swap if the PGR mode
-			 * or the CHR mode have changed, respectively */
-			if( (address_cmd & 0x40) != (prev_address_cmd & 0x40) )
+			/* Instantaneously produce a RAM or VRAM swap if the PRG mode
+			 * or the CHR mode have changed, respectively. Note that
+			 * both can happen at the same time. */
+			if( (address_cmd & 0x40) != (prev_address_cmd & 0x40) ) {
+				printf("Change of PRG mode!\n");
 				mmc3_perform_ram_swap();
-			if( (address_cmd & 0x80) != (prev_address_cmd & 0x80) )
+				memcpy(mapper->regs + 5, &prev_regs + 5, 2);
+			}
+			if( (address_cmd & 0x80) != (prev_address_cmd & 0x80) ) {
+				printf("Change of CHR mode!\n");
 				mmc3_perform_vram_swap();
+				memcpy(mapper->regs, &prev_regs, 5);
+			}
 
-			prev_address_cmd = address_cmd;
+			/* Save the value to check it in the next iteration */
+			prev_address_cmd = value;
 			break;
 
 		case 0x8001:
 			/* The register index */
 			tmp = address_cmd & 0x07;
-
 			mapper->regs[tmp] = value;
+
 			DEBUG( printf("MMC3: Reg[%d] = $%02X at %d\n", tmp, mapper->regs[tmp], PPU->lines) );
 
 			mmc3_perform_ram_swap();
@@ -231,7 +239,7 @@ void mmc3_reset() {
 
 	/* The last 8kb ROM bank is always fixed into 0xE000-0xFFFF */
 	if( powering_on ) {
-		SWAP_RAM_8K(0xE000, mapper->file->romBanks*2 - 1);
+		SWAP_RAM_8K(0xE000, mapper->file->romBanks8k - 1);
 
 		if( mapper->file->vromBanks != 0 )
 			SWAP_VRAM(0, mapper->file->vrom, VROM_BANK_SIZE);

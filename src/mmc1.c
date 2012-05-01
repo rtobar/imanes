@@ -180,11 +180,11 @@ void mmc1_switch_banks() {
 
 		offset = 0;
 		/* 512 Kb roms */
-		if( mapper->file->romBanks == 32 && (mapper->regs[1] & 0x10) )
+		if( mapper->file->romBanks16k == 32 && (mapper->regs[1] & 0x10) )
 			offset = 0x40000;
 	
 		/* 1024 Kb roms */
-		else if( mapper->file->romBanks == 64 ) {
+		else if( mapper->file->romBanks16k == 64 ) {
 			if( !(mapper->regs[0] & 0x10 ) && mapper->regs[1] & 0x10 )
 				offset = 0x80000;
 	
@@ -211,7 +211,7 @@ void mmc1_switch_banks() {
 			/* Depending where we switch banks, the other remains hard-wired */
 			memcpy( CPU->RAM+0x8000 + ( mapper->regs[0]&0x04 ? 0 : 0x4000),
 			        mapper->file->rom + offset, ROM_BANK_SIZE);
-			offset = ( mapper->regs[0]&0x04 ? mapper->file->romBanks-1 : 0) * ROM_BANK_SIZE;
+			offset = ( mapper->regs[0]&0x04 ? mapper->file->romBanks16k-1 : 0) * ROM_BANK_SIZE;
 			memcpy( CPU->RAM+0xC000 - ( mapper->regs[0]&0x04 ? 0 : 0x4000),
 			        mapper->file->rom + offset, ROM_BANK_SIZE);
 		}
@@ -222,8 +222,8 @@ void mmc1_switch_banks() {
 void mmc1_reset() {
 
 	memcpy(CPU->RAM+0x8000, mapper->file->rom, ROM_BANK_SIZE);
-	memcpy(CPU->RAM+0xC000, 
-	       mapper->file->rom + (mapper->file->romBanks-1)*ROM_BANK_SIZE, 
+	memcpy(CPU->RAM+0xC000,
+	       mapper->file->rom + (mapper->file->romBanks16k-1)*ROM_BANK_SIZE,
 	       ROM_BANK_SIZE);
 
 }
