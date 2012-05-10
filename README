@@ -29,6 +29,8 @@ $> ./configure
 $> make all
 $> make install
 
+I you want to obtain the best results, try to run ./configure like: $> CFLAGS="" ./configure
+
 Check the INSTALL file for further details
 
 

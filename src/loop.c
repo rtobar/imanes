@@ -155,7 +155,8 @@ int main_loop(void *args) {
 		/* Decrement PPU scanline timeout */
 		PPU->scanline_timeout -= added_cycles;
 
-		/* Decrement APU timers */
+		/* Decrement APU timers. Only the frame sequencer is measured
+		 * in PPU cycles; the rest are driven by the CPU clock. */
 		APU->frame_seq.clock_timeout -= added_cycles;
 		APU->triangle.timer.timeout -= inst.cycles;
 		APU->square1.timer.timeout -= inst.cycles;
@@ -184,10 +185,8 @@ int main_loop(void *args) {
 		if( APU->noise.timer.timeout <= 0 )
 			clock_noise_timer();
 
-/*
-		if( APU->dmc.clock_timeout <= 0 )
+		if( APU->dmc.timer.timeout <= 0 )
 			clock_dmc_timer();
-*/
 
 		/* A line has ended its scanning, draw it */
 		if( PPU->scanline_timeout <= 0 ) {
