@@ -55,14 +55,16 @@ void initialize_playback() {
 	setenv("PULSE_PROP_application.name", "ImaNES", 1);
 	setenv("PULSE_PROP_media.role", "game", 1);
 
+	INFO( printf("[audio] Initializing audio system\n") );
+
 	/* Inform if we cannot initialize the audio subsystem */
 	if( SDL_OpenAudio(&desired, &audio_spec) == -1 ) {
-		fprintf(stderr,_("Cannot initialize audio: %s\n"), SDL_GetError());
+		fprintf(stderr,_("[audio] Cannot initialize audio: %s\n"), SDL_GetError());
 		config.sound_mute = 1;
 		return;
 	}
 
-	INFO( printf("Started audio: %d Hz, %d %s, %d-sample-sized buffer. Silence is %u\n",
+	INFO( printf("[audio] Started audio: %d Hz, %d %s, %d-sample-sized buffer. Silence is %u\n",
 	       audio_spec.freq,
 	       audio_spec.channels,
 	       audio_spec.channels == 1 ? "channel" : "channels",
@@ -70,17 +72,17 @@ void initialize_playback() {
 	       audio_spec.silence) );
 
 	if( audio_spec.format != AUDIO_U8 ) {
-		fprintf(stderr,_("Unsupported audio format: %d, no audio will be played\n"), audio_spec.format);
+		fprintf(stderr,_("[audio] Unsupported audio format: %d, no audio will be played\n"), audio_spec.format);
 		config.sound_mute = 1;
 		SDL_PauseAudio(1);
 		return;
 	}
 
 	INFO(
-		printf("Square outputs:");
+		printf("[audio] Square outputs:");
 		for(i=0;i!=32;i++)
 			printf(" %u", square_dac_outputs[i]);
-		printf("\nTriangle, DMC, Noise outputs:");
+		printf("\n[audio] Triangle, DMC, Noise outputs:");
 		for(i=0;i!=204;i++)
 			printf(" %u", tnd_dac_outputs[i]);
 		printf("\n");
@@ -149,11 +151,11 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 
 		if( currentTime.tv_sec != previousTime.tv_sec ) {
 
-			printf("Calls/s: %u, Len is %d\n", calls_per_sec, len);
+			printf("[audio] Calls/s: %u, Len is %d\n", calls_per_sec, len);
 			calls_per_sec = 0;
 
 			DEBUG(
-				printf("Elements in queue:");
+				printf("[audio] Elements in queue:");
 
 				length = queue_length(dac[Square1]);
 				if( length != 0 )
@@ -261,7 +263,7 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 			}
 			INFO(
 				if( removed > 1 )
-					printf("Removed %u samples from %u's channel DAC queue\n", removed, channel);
+					printf("[audio] Removed %u samples from %u's channel DAC queue\n", removed, channel);
 			);
 		}
 
