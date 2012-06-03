@@ -109,7 +109,7 @@ void init_screen() {
 	}
 
 
- 	icon = SDL_LoadBMP("imanes.bmp");
+ 	icon = SDL_LoadBMP("icons/imanes-32.bmp");
 	if( icon == NULL )
 		fprintf(stderr,_("Could not load ImaNES icon :(\n"));
 	else
