@@ -1159,6 +1159,7 @@ void _write_noise_lc(uint16_t address, uint8_t value) {
 	i = (value & 0xF7) >> 3;
 	if( APU->noise.lc.enabled )
 		APU->noise.lc.counter = length_counter_reload_values[i];
+	APU->noise.envelope.written = 1;
 }
 
 /* Sprite DMA */
