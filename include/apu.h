@@ -81,6 +81,26 @@ typedef struct _sweep {
 	apu_timer timer;
 } apu_sweep;
 
+/* DMA reader */
+typedef struct _dma_reader {
+
+	/* We need the reset_ values, which are actually loaded into
+	 * the real registers when the DMC sample is restarted */
+	uint16_t reset_address;
+	uint8_t  reset_bytes_remaining;
+
+	uint16_t address;
+	uint8_t  bytes_remaining;
+
+} apu_dma_reader;
+
+/* DMC's Output Unit */
+typedef struct _output_unit {
+	uint8_t silence_flag;
+	uint8_t reg;
+	uint8_t counter;
+} apu_output_unit;
+
 /*
  * High-level APU devices
  *
@@ -91,8 +111,8 @@ typedef struct _sweep {
 typedef struct _frame_seq {
 
 	int clock_timeout;  /* PPU cycles until the next sequencer clock */
-	int8_t step;         /* In which step we are (1 ... 4/5) */
-	int8_t int_flag;    /* Internal interrupt flag */
+	uint8_t step;         /* In which step we are (1 ... 4/5) */
+	uint8_t int_flag;    /* Internal interrupt flag */
 
 } nes_frame_seq;
 
@@ -156,6 +176,19 @@ typedef struct _noise_channel {
 
 typedef struct _delta_modulation_channel {
 
+	uint8_t int_flag;
+	uint8_t buffer;
+	uint8_t buffer_is_empty;
+	uint8_t dac;
+	uint8_t loop;
+
+	apu_dma_reader  dma_reader;
+	apu_output_unit output;
+
+	/* A 7-bit counter, logically tied to the DAC */
+	uint8_t counter;
+
+	/* A timer driven by the 1.79 MHz clock */
 	apu_timer timer;
 
 } nes_delta_modulation_channel;
@@ -187,6 +220,7 @@ typedef struct _apu {
 
 	/* DMC */
 	nes_delta_modulation_channel dmc;
+
 } nes_apu;
 
 extern nes_apu *APU;
@@ -294,5 +328,15 @@ uint8_t length_counter_reload_values[32];
  * is loaded into the timer.
  */
 uint16_t noise_timer_periods[16];
+
+/**
+ * Loop-up table that stores the index-based
+ * period values to be used by the DMC timer.
+ * Differently from the square and triangle channels' timer,
+ * the DMC channel timer's period is not set directly, but
+ * an index is indicated, and the corresponding period value
+ * is loaded into the timer.
+ */
+uint16_t dmc_timer_periods[16];
 
 #endif /* apu_h */

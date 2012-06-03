@@ -184,10 +184,8 @@ int main_loop(void *args) {
 		if( APU->noise.timer.timeout <= 0 )
 			clock_noise_timer();
 
-/*
-		if( APU->dmc.clock_timeout <= 0 )
+		if( APU->dmc.timer.timeout <= 0 )
 			clock_dmc_timer();
-*/
 
 		/* A line has ended its scanning, draw it */
 		if( PPU->scanline_timeout <= 0 ) {

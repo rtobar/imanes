@@ -848,9 +848,9 @@ uint8_t _read_apu_sr(uint16_t address) {
 	ret_val |= ((APU->square2.lc.counter > 0 ? 1 : 0) << 1);
 	ret_val |= ((APU->triangle.lc.counter > 0 ? 1 : 0) << 2);
 	ret_val |= ((APU->noise.lc.counter > 0 ? 1 : 0) << 3);
-	/* TODO: DMC sample bytes remaining > 0 << 4 */
+	ret_val |= ((APU->dmc.dma_reader.bytes_remaining > 0 ? 1 : 0) << 4);
 	ret_val |= ((APU->frame_seq.int_flag & 0x1) << 6);
-	/* TODO: IRQ from DMC << 7 */
+	ret_val |= ((APU->dmc.int_flag & 0x1 ) << 7);
 
 	/* Finally, clear the FS interrupt flag */
 	APU->frame_seq.int_flag = 0;
@@ -1161,7 +1161,29 @@ void _write_noise_lc(uint16_t address, uint8_t value) {
 		APU->noise.lc.counter = length_counter_reload_values[i];
 }
 
-/* Sprite DMA */
+/* 0x4010: DMC's interrupt flag, loop flag and frequency index */
+void _write_dmc_mode_frequency(uint16_t address, uint8_t value) {
+	APU->dmc.int_flag     = value & 0x80;
+	APU->dmc.loop         = value & 0x40;
+	APU->dmc.timer.period = dmc_timer_periods[value & 0x0F];
+}
+
+/* 0x4011: DMC's DAC value */
+void _write_dmc_dac(uint16_t address, uint8_t value) {
+	APU->dmc.dac = value & 0x7F;
+}
+
+/* 0x4012: DMC's DMA reader address */
+void _write_dmc_dma_address(uint16_t address, uint8_t value) {
+	APU->dmc.dma_reader.reset_address = 0xC000 + (value << 6 /* (value*0x40) */);
+}
+
+/* 0x4013: DMC's DMA reader remaining bytes */
+void _write_dmc_dma_bytes(uint16_t address, uint8_t value) {
+	APU->dmc.dma_reader.reset_bytes_remaining = 1 + (value << 4 /* (value*0x10) */);
+}
+
+/* 0x4014: Sprite DMA */
 void _write_sprite_dma(uint16_t address, uint8_t value) {
 
 	int i;
@@ -1172,7 +1194,7 @@ void _write_sprite_dma(uint16_t address, uint8_t value) {
 	ADD_CPU_CYCLES(512);
 }
 
-/* APU Lenght Control */
+/* 0x4015: APU lenght control flags */
 void _write_apu_lc(uint16_t address, uint8_t value) {
 	APU->square1.lc.enabled = value&0x01;
 	if( !APU->square1.lc.enabled )
@@ -1190,10 +1212,19 @@ void _write_apu_lc(uint16_t address, uint8_t value) {
 	if( !APU->noise.lc.enabled )
 		APU->noise.lc.counter = 0;
 
-	/* TODO: DMC IRQ flag clear, DMC start/stop */
+	APU->dmc.int_flag = 0;
+
+	/* DMC (re)start/stop */
+	if( value & 0x10 && !APU->dmc.dma_reader.bytes_remaining ) {
+		APU->dmc.dma_reader.address = APU->dmc.dma_reader.reset_address;
+		APU->dmc.dma_reader.bytes_remaining = APU->dmc.dma_reader.reset_bytes_remaining;
+	}
+	else
+		APU->dmc.dma_reader.bytes_remaining = 0;
+
 }
 
-/* 1st and 2nd joysticks strobe */
+/* 0x4016: 1st and 2nd joysticks strobe */
 void _write_joystick_strobes(uint16_t address, uint8_t value) {
 
 	static int strobe_pad = 0;
@@ -1283,6 +1314,10 @@ void initialize_cpu() {
 	write_cpu_ram_f[0x400C] = &_write_noise_env;
 	write_cpu_ram_f[0x400E] = &_write_noise_mode_period;
 	write_cpu_ram_f[0x400F] = &_write_noise_lc;
+	write_cpu_ram_f[0x4010] = &_write_dmc_mode_frequency;
+	write_cpu_ram_f[0x4011] = &_write_dmc_dac;
+	write_cpu_ram_f[0x4012] = &_write_dmc_dma_address;
+	write_cpu_ram_f[0x4013] = &_write_dmc_dma_bytes;
 	write_cpu_ram_f[0x4014] = &_write_sprite_dma;
 	write_cpu_ram_f[0x4015] = &_write_apu_lc;
 	write_cpu_ram_f[0x4016] = &_write_joystick_strobes;

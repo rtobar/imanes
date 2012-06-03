@@ -110,22 +110,17 @@ uint8_t length_counter_reload_values[32] = {
 };
 
 uint16_t noise_timer_periods[16] = {
-	0x004,
-	0x008,
-	0x010,
-	0x020,
-	0x040,
-	0x060,
-	0x080,
-	0x0A0,
-	0x0CA,
-	0x0FE,
-	0x17C,
-	0x1FC,
-	0x2FA,
-	0x3F8,
-	0x7F2,
-	0xFE4
+	0x004, 0x008, 0x010, 0x020,
+	0x040, 0x060, 0x080, 0x0A0,
+	0x0CA, 0x0FE, 0x17C, 0x1FC,
+	0x2FA, 0x3F8, 0x7F2, 0xFE4,
+};
+
+uint16_t dmc_timer_periods[16] = {
+	0x1AC, 0x17C, 0x154, 0x140,
+	0x11E, 0x0FE, 0x0E2, 0x0D6,
+	0x0BE, 0x0A0, 0x08E, 0x080,
+	0x06A, 0x054, 0x048, 0x036,
 };
 
 void initialize_apu() {
@@ -217,6 +212,9 @@ void initialize_apu() {
 
 	APU->noise.shift = 1;
 	APU->noise.random_mode = 0;
+
+	/* DMC initialization */
+	APU->dmc.counter = 0;
 }
 
 void dump_apu() {
@@ -488,10 +486,77 @@ void clock_noise_timer() {
 	playback_add_sample(Noise, APU->noise.envelope.counter);
 }
 
+void fill_dmc_sample_buffer() {
+
+	nes_delta_modulation_channel *DMC = &APU->dmc;
+
+	if( DMC->buffer_is_empty && DMC->dma_reader.bytes_remaining ) {
+
+		DMC->buffer = read_cpu_ram( DMC->dma_reader.address );
+		ADD_CPU_CYCLES(4);
+
+		/* Increment the address for the next read */
+		if( DMC->dma_reader.address == 0xFFFF )
+			DMC->dma_reader.address = 0x8000;
+		else
+			DMC->dma_reader.address++;
+
+		/* Decrement the bytes counter and act if necessary */
+		DMC->dma_reader.bytes_remaining--;
+		if( !DMC->dma_reader.bytes_remaining ) {
+
+			if( DMC->loop ) {
+				APU->dmc.dma_reader.address = APU->dmc.dma_reader.reset_address;
+				APU->dmc.dma_reader.bytes_remaining = APU->dmc.dma_reader.reset_bytes_remaining;
+			}
+			else if( DMC->int_flag )
+				execute_irq();
+
+		}
+
+	}
+}
+
 void clock_dmc_timer() {
 
 	/* Reset the timer */
 	APU->dmc.timer.timeout += APU->dmc.timer.period;
+
+	/* If silence is commanded, silence is what you get */
+	if( APU->dmc.output.silence_flag ) {
+		playback_add_sample(DMC, 0);
+		fill_dmc_sample_buffer();
+		return;
+	}
+
+
+	/* Change the counter and add a sample to the DAC
+	  * that reflect the changes */
+	if( !(APU->dmc.output.reg & 0x01) && APU->dmc.counter > 1 )
+		APU->dmc.counter -= 2;
+	else if( (APU->dmc.output.reg & 0x01) && APU->dmc.counter < 126 )
+		APU->dmc.counter += 2;
+	playback_add_sample(DMC, APU->dmc.counter);
+
+	/* Clock the right shift register */
+	APU->dmc.output.reg >> 1;
+
+	/* Output unit cycle counting and restart */
+	APU->dmc.output.counter--;
+	if( !APU->dmc.output.counter ) {
+		APU->dmc.output.counter = 8;
+		if( APU->dmc.buffer_is_empty )
+			APU->dmc.output.silence_flag = 1;
+		else {
+			APU->dmc.output.silence_flag = 0;
+			APU->dmc.output.reg = APU->dmc.buffer;
+			APU->dmc.buffer_is_empty = 1;
+		}
+	}
+
+	/* Check if the sample buffer is empty now
+	 * and use the DMA reader to fill it again, if it applies */
+	fill_dmc_sample_buffer();
 
 }
 
