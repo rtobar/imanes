@@ -1156,7 +1156,7 @@ void _write_noise_lc(uint16_t address, uint8_t value) {
 
 	uint8_t i;
 
-	i = (value & 0xF7) >> 3;
+	i = (value & 0xF8) >> 3;
 	if( APU->noise.lc.enabled )
 		APU->noise.lc.counter = length_counter_reload_values[i];
 	APU->noise.envelope.written = 1;
