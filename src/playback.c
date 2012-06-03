@@ -283,19 +283,20 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		/* Now combine the samples, if the corresponding channel is enabled */
 		square1_sample  = last_square1_sample;
 		square2_sample  = last_square2_sample;
-		triangle_sample = last_triangle_sample;
 		noise_sample    = last_noise_sample;
 		dmc_sample      = last_dmc_sample;
 
-		if( dac[Square1] != NULL && dac[Square1]->ppu_cycles <= step_ppu_cycles && config.apu_square1 )
+		if( dac[Square1] != NULL && config.apu_square1 )
 			square1_sample = dac[Square1]->sample;
-		if( dac[Square2] != NULL && dac[Square2]->ppu_cycles <= step_ppu_cycles && config.apu_square2 )
+		if( dac[Square2] != NULL && config.apu_square2 )
 			square2_sample = dac[Square2]->sample;
-		if( dac[Triangle] != NULL && dac[Triangle]->ppu_cycles <= step_ppu_cycles && config.apu_triangle )
+		if( dac[Triangle] != NULL && config.apu_triangle )
 			triangle_sample = dac[Triangle]->sample;
-		if( dac[Noise] != NULL && dac[Noise]->ppu_cycles <= step_ppu_cycles && config.apu_noise )
+		else
+			triangle_sample = last_triangle_sample;
+		if( dac[Noise] != NULL && config.apu_noise )
 			noise_sample = dac[Noise]->sample;
-		if( dac[DMC] != NULL && dac[DMC]->ppu_cycles <= step_ppu_cycles && config.apu_dmc )
+		if( dac[DMC] != NULL && config.apu_dmc )
 			dmc_sample = dac[DMC]->sample;
 
 		sample  = square_dac_outputs[square1_sample + square2_sample];
