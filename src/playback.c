@@ -43,11 +43,11 @@ void initialize_playback() {
 		return;
 
 	/* Initial parameters for the SDL Audio subsytem */
-	desired.freq     = 1787;
 	desired.freq     = 44100;
+	desired.freq     = 22050;
 	desired.format   = AUDIO_U8;
 	desired.channels = 1;
-	desired.samples  = 8192;
+	desired.samples  = 2048;
 	desired.callback = playback_fill_sound_card;
 	desired.userdata = (void *)NULL;
 
@@ -108,14 +108,13 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	static struct timespec previousTime = {0, 0};
 	static unsigned int calls_per_sec = 0;
 	static unsigned long int previous_ppu_cycles = 0;
-	static int previous_sound_rec = 0;
 	static Uint8 last_square1_sample = 0;
 	static Uint8 last_square2_sample = 0;
 	static Uint8 last_triangle_sample = 0;
 	static Uint8 last_noise_sample = 0;
 	static Uint8 last_dmc_sample = 0;
 
-	Uint8 sample = 0;
+	Uint8 sample;
 	int pos;
 	unsigned int channel;
 	unsigned int removed;
@@ -125,9 +124,10 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	unsigned long int elapsed_ppu_cycles;
 	unsigned long int remained_ppu_cycles;
 	unsigned long int step_ppu_cycles;
-	unsigned long int n_groups;
-	unsigned long int division;
-	unsigned long int modulo;
+	unsigned long int previous_step_ppu_cycles;
+	unsigned long int n_groups = 0;
+	unsigned long int division = 0;
+	unsigned long int modulo = 0;
 	unsigned long int initial_pos;
 	unsigned long int i;
 	struct timespec currentTime;
@@ -144,7 +144,7 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	ppu_cycles = CLK->ppu_cycles;
 
 	/* Some debugging information, proves useful from time to time */
-	INFO(
+	DEBUG(
 
 		clock_gettime(CLOCK_REALTIME, &currentTime);
 		calls_per_sec++;
@@ -188,7 +188,7 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	 * sample */
 	elapsed_ppu_cycles = (ppu_cycles - previous_ppu_cycles);
 	ppu_steps_per_sample = elapsed_ppu_cycles/len;
-	remained_ppu_cycles   = elapsed_ppu_cycles%len;
+	remained_ppu_cycles  = elapsed_ppu_cycles%len;
 
 	/* The remainder steps are carefully scheduled to be considered not all
 	 * into one single sample, but instead in a more distributed way. For
@@ -208,60 +208,75 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	 *  | n-modulo | division   |
 	 *  |----------+------------|
 	 *
+	 * So, for example, in a case with len=10 and remained_ppu_cycles=2, we
+	 * would have the following distribution of remained PPU cycles:
+	 *
+	 *  n_groups = 9, division = 0, modulo   = 2
+	 *
+	 *  2 groups of size 1
+	 *  0 groups of size 0
+	 *
+	 *   *       *
+	 * =========================================
+	 * | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+	 * =========================================
+	 *
+	 * If we would have remained_ppu_cycles=7 this would be the panorama:
+	 *
+	 *  n_groups = 4, division = 1, modulo   = 3
+	 *
+	 *  3 groups of size 2
+	 *  1 groups of size 1
+	 *
+	 *   *   *       *   *       *   *       *
+	 * =========================================
+	 * | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+	 * =========================================
+	 *
 	 */
 	if( remained_ppu_cycles != 0 ) {
 		n_groups = len - remained_ppu_cycles + 1;
 		division = remained_ppu_cycles/n_groups;
 		modulo   = remained_ppu_cycles%n_groups;
 
-		/* We place first the (division+1) sized groups, with a silence after them */
-		for(i=0; i!=modulo; i++)
-			normal_ppu_cycle_samples[(i+1)*(division+2)-1] = 1;
+		/* We place a silence after each (division+1) sized group */
+		for(i=1; i<=modulo; i++)
+			normal_ppu_cycle_samples[i*(division+2)-1] = 1;
 
 		/* And now the (division) sized groups, which come after the (division+1) size groups.
-		 * We don't process the last group, since it would yield
-		 * a write passed the malloc'd area. */
-		initial_pos = modulo*(division+2) - 2;
-		for(i=0; i<(n_groups - modulo - 1); i++)
-			normal_ppu_cycle_samples[initial_pos + (i+1)*(division+1) - 1] = 1;
+		 * We don't process the last group, since it would yield a write passed the malloc'd area
+		 * (except when division is 0, in which case we manually put the final silence) */
+		initial_pos = modulo*(division+2);
+		for(i=1; i!=(n_groups - modulo); i++)
+			normal_ppu_cycle_samples[initial_pos + i*(division+1) - 1] = 1;
+		if( !division )
+			normal_ppu_cycle_samples[len - 1] = 1;
 	}
 
 	/* Main loop where the buffer gets finally filled */
 	step_ppu_cycles = previous_ppu_cycles;
+	previous_step_ppu_cycles = previous_ppu_cycles;
 	for(pos=0; pos!=len; pos++) {
+
+		step_ppu_cycles += ppu_steps_per_sample;
 
 		/* Last PPU to consider for this sample. Here we finally take
 		 * into account all our previous calculations to see whether
 		 * this sample should take an extra PPU cycles into account or
 		 * not. */
-		step_ppu_cycles += ppu_steps_per_sample;
 		if( !normal_ppu_cycle_samples[pos] )
 			step_ppu_cycles++;
 		else
 			normal_ppu_cycle_samples[pos] = 0;
 
-		/* Check which sample should be played in this step for each channel */
+		/* Remove old samples from the queues */
 		for(channel = 0; channel != 5; channel++) {
-
 			removed = 0;
-			while(1) {
-
-				/* If there are no samples, do nothing */
-				if( dac[channel] == NULL || dac[channel]->next == NULL )
-					break;
-
-				/* If there is a next sample, check whether we should play that one
-				 * instead of the one placed in the head of the queue. If we're ok,
-				 * we finish checking */
-				if( dac[channel]->next->ppu_cycles <= step_ppu_cycles ) {
-					dac[channel] = pop(dac[channel]);
-					removed++;
-				}
-				else
-					break;
-
+			while( dac[channel] != NULL && dac[channel]->ppu_cycles <= previous_step_ppu_cycles ) {
+				dac[channel] = pop(dac[channel]);
+				removed++;
 			}
-			INFO(
+			DEBUG(
 				if( removed > 1 )
 					printf("[audio] Removed %u samples from %u's channel DAC queue\n", removed, channel);
 			);
@@ -270,27 +285,24 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		/* Now combine the samples, if the corresponding channel is enabled */
 		square1_sample  = last_square1_sample;
 		square2_sample  = last_square2_sample;
-		triangle_sample = last_triangle_sample;
 		noise_sample    = last_noise_sample;
 		dmc_sample      = last_dmc_sample;
 
-		if( dac[Square1] != NULL && dac[Square1]->ppu_cycles <= step_ppu_cycles && config.apu_square1 )
+		if( dac[Square1] != NULL && config.apu_square1 )
 			square1_sample = dac[Square1]->sample;
-		if( dac[Square2] != NULL && dac[Square2]->ppu_cycles <= step_ppu_cycles && config.apu_square2 )
+		if( dac[Square2] != NULL && config.apu_square2 )
 			square2_sample = dac[Square2]->sample;
-		if( dac[Triangle] != NULL && dac[Triangle]->ppu_cycles <= step_ppu_cycles && config.apu_triangle )
+		if( dac[Triangle] != NULL && config.apu_triangle )
 			triangle_sample = dac[Triangle]->sample;
-		if( dac[Noise] != NULL && dac[Noise]->ppu_cycles <= step_ppu_cycles && config.apu_noise )
+		else
+			triangle_sample = last_triangle_sample;
+		if( dac[Noise] != NULL && config.apu_noise )
 			noise_sample = dac[Noise]->sample;
-		if( dac[DMC] != NULL && dac[DMC]->ppu_cycles <= step_ppu_cycles && config.apu_dmc )
+		if( dac[DMC] != NULL && config.apu_dmc )
 			dmc_sample = dac[DMC]->sample;
 
 		sample  = square_dac_outputs[square1_sample + square2_sample];
 		sample += tnd_dac_outputs[3*triangle_sample + 2*noise_sample + dmc_sample];
-
-		/* It seems that we have to remove the silence from the sample;
-		 * otherwise we get some kind of bullshit */
-		sample -= audio_spec.silence;
 
 		/* Finally! This is our little sample */
 		stream[pos] = sample;
@@ -302,6 +314,7 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		last_noise_sample    = noise_sample;
 		last_dmc_sample      = dmc_sample;
 
+		previous_step_ppu_cycles = step_ppu_cycles;
 	}
 
 	/* Finally, set the 'previous' variables */
@@ -310,6 +323,11 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		previousTime.tv_nsec = currentTime.tv_nsec;
 	);
 
+	/* Useful while developing, shouldn't happen anymore */
+	DEBUG(
+		if( ppu_cycles != step_ppu_cycles )
+			fprintf(stderr, "Mmmm, there's something wrong in here: PPU cycles: %lu, last step PPU cycles: %lu, previous PPU cycles: %lu. remainder/n_groups/division/modulo: %lu/%lu/%lu/%lu\n", ppu_cycles, step_ppu_cycles, previous_ppu_cycles, remained_ppu_cycles, n_groups, division, modulo);
+	);
 	previous_ppu_cycles = ppu_cycles;
 }
 

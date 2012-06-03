@@ -155,7 +155,8 @@ int main_loop(void *args) {
 		/* Decrement PPU scanline timeout */
 		PPU->scanline_timeout -= added_cycles;
 
-		/* Decrement APU timers */
+		/* Decrement APU timers. Only the frame sequencer is measured
+		 * in PPU cycles; the rest are driven by the CPU clock. */
 		APU->frame_seq.clock_timeout -= added_cycles;
 		APU->triangle.timer.timeout -= inst.cycles;
 		APU->square1.timer.timeout -= inst.cycles;
