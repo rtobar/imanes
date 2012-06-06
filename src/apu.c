@@ -244,13 +244,6 @@ void clock_frame_sequencer() {
 	/* Reset the clock timeout depending on the sequencer mode */
 	APU->frame_seq.clock_timeout += PPUCYCLES_STEPS;
 
-	/* At any time, if the interrupt flag is set
-    * and the IRQ disable is clear, CPU's IRQ is asserted */
-	if( APU->frame_seq.int_flag && !(APU->commons & DISABLE_FRAME_IRQ) ) {
-		CPU->SR &= ~B_FLAG;
-		execute_irq();
-	}
-
 	/* Different actions depending on the step number
     * and the step mode of the frame sequencer */
 	if( APU->commons & STEP_MODE5 ) {
@@ -305,6 +298,13 @@ void clock_frame_sequencer() {
 				break;
 
 		}
+	}
+
+	/* At any time, if the interrupt flag is set
+	 * and the IRQ disable is clear, CPU's IRQ is asserted */
+	if( APU->frame_seq.int_flag && !(APU->commons & DISABLE_FRAME_IRQ) ) {
+		CPU->SR &= ~B_FLAG;
+		execute_irq();
 	}
 
 	/* Finally, we increase the step counter */
