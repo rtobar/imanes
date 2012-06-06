@@ -38,17 +38,19 @@ char *get_filename(char *full_pathname) {
 
 	int i;
 	char *tmp;
+	size_t local_path_len;
 
 	/* Get just the name of the file */
 	for(i=strlen(full_pathname); i>=0; i--)
 		if( full_pathname[i] == DIR_SEP )
 			break;
 
-	tmp = (char *)malloc(strlen(full_pathname) - i);
-	memcpy(tmp, full_pathname + i + 1, strlen(full_pathname) - i);
+	local_path_len = strlen(full_pathname) - i;
+	tmp = (char *)malloc(local_path_len + 1);
+	memcpy(tmp, full_pathname + i + 1, local_path_len + 1);
 
 	/* Find where the extension of the file begins */
-	for(i=strlen(tmp); i>=0; i--) {
+	for(i=local_path_len; i>=0; i--) {
 		if( tmp[i] == '.' ) {
 			tmp[i] = '\0';
 			break;

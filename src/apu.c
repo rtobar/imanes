@@ -157,6 +157,7 @@ void initialize_apu() {
 	APU->square1.sweep.timer.period = 0x08;
 	APU->square1.sweep.timer.timeout = 0;
 	APU->square1.sweep.new_period = 0;
+	APU->square1.sweep.written = 0;
 
 	APU->square1.envelope.disabled = 1;
 	APU->square1.envelope.loop = 0;
@@ -181,6 +182,7 @@ void initialize_apu() {
 	APU->square2.sweep.timer.period = 0x08;
 	APU->square2.sweep.timer.timeout = 0;
 	APU->square2.sweep.new_period = 0;
+	APU->square2.sweep.written = 0;
 
 	APU->square2.envelope.disabled = 1;
 	APU->square2.envelope.loop = 0;
@@ -215,6 +217,18 @@ void initialize_apu() {
 
 	/* DMC initialization */
 	APU->dmc.counter = 0;
+
+	APU->dmc.timer.timeout = 0;
+	APU->dmc.timer.period = 0x07FF;
+
+	APU->dmc.output.reg = 1;
+	APU->dmc.output.silence_flag = 1;
+	APU->dmc.output.counter = 0;
+
+	APU->dmc.buffer_is_empty = 1;
+
+	APU->dmc.dma_reader.bytes_remaining = 0;
+	APU->dmc.dma_reader.address = 0;
 }
 
 void dump_apu() {
