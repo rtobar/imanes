@@ -1132,7 +1132,7 @@ void _write_tri_period_high_lc(uint16_t address, uint8_t value) {
 	APU->triangle.linear.halt = 1;
 }
 
-/* Noise channel envelope */
+/* 0x400C: Noise channel envelope */
 void _write_noise_env(uint16_t address, uint8_t value) {
 
 	uint8_t i;
@@ -1145,13 +1145,13 @@ void _write_noise_env(uint16_t address, uint8_t value) {
 	APU->noise.envelope.timer.period = (value&0x0F) + 1;
 }
 
-/* Noise channel random mode, timer period index */
+/* 0x400E: Noise channel random mode, timer period index */
 void _write_noise_mode_period(uint16_t address, uint8_t value) {
 	APU->noise.random_mode = (value&0x80) >> 7;
 	APU->noise.timer.period = noise_timer_periods[ value&0x0F ];
 }
 
-/* Noise channel length counter */
+/* 0x400F: Noise channel length counter */
 void _write_noise_lc(uint16_t address, uint8_t value) {
 
 	uint8_t i;
@@ -1241,11 +1241,22 @@ void _write_joystick_strobes(uint16_t address, uint8_t value) {
 
 /* 0x4017: APU common */
 void _write_apu_common(uint16_t address, uint8_t value) {
-	APU->commons = value & 0xC0;
+
+	uint8_t new_mode;
 
 	/* Reset the frame sequencer and divider */
 	APU->frame_seq.step = 0;
 	APU->frame_seq.clock_timeout = PPUCYCLES_STEPS;
+
+	/* Set the new mode and the interrupt disable flag,
+	 * log when the mode changes */
+	new_mode = value & 0xC0;
+	INFO(
+		if( (new_mode & STEP_MODE5) != (APU->commons & STEP_MODE5) )
+			printf("[apu] APU mode set to %s\n", new_mode & STEP_MODE5 ? "5-steps" : "4-steps")
+	);
+	APU->commons = new_mode;
+
 	if( APU->commons & STEP_MODE5 )
 		clock_frame_sequencer();
 }
