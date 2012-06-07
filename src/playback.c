@@ -301,10 +301,13 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		if( dac[DMC] != NULL && config.apu_dmc )
 			dmc_sample = dac[DMC]->sample;
 
-		sample  = square_dac_outputs[square1_sample + square2_sample];
+		sample  = 0;
+		sample += square_dac_outputs[square1_sample + square2_sample];
 		sample += tnd_dac_outputs[3*triangle_sample + 2*noise_sample + dmc_sample];
 
 		/* Finally! This is our little sample */
+		if( sample == 0 )
+			sample = audio_spec.silence;
 		stream[pos] = sample;
 
 		/* Reset for later use */
