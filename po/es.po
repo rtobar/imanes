@@ -74,7 +74,7 @@ msgid "Couldn't find user's configuration\n"
 msgstr "No se pudo encontrar la configuración del usuario\n"
 
 #: src/imaconfig.c:108
-#, fuzzy, c-format
+#, c-format
 msgid "Error while opening configuration file '%s': "
 msgstr "Error al abrir el archivo de configuración '%s': "
 
@@ -112,7 +112,7 @@ msgid "Ending VBlank\n"
 msgstr "Finalizando VBlank\n"
 
 #: src/loop.c:124
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "\n"
@@ -183,12 +183,12 @@ msgid "  -s <n>    Video scaling factor. Default: 1\n"
 msgstr "  -s <n>    Factor de escalamiento del video. Por defecto: 1\n"
 
 #: src/main.c:58
-#, fuzzy, c-format
+#, c-format
 msgid "  -c        Use SDL color construction. Default: no\n"
 msgstr "  -c        Usar construcción de colores de SDL. Por defecto: no\n"
 
 #: src/main.c:59
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  -m        Mute sound. Default: no\n"
 "\n"
@@ -540,7 +540,7 @@ msgid "Warning: NES file contains more data than it should\n"
 msgstr "Advertencia: el archivo NES contiene más datos de los que debería\n"
 
 #: src/playback.c:62
-#, fuzzy, c-format
+#, c-format
 msgid "[audio] Cannot initialize audio: %s\n"
 msgstr "[audio] No se puede iniciar el audio: %s\n"
 
