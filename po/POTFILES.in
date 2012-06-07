@@ -1,8 +1,11 @@
 # List of source files which contain translatable strings.
 
 src/apu.c
+src/clock.c
 src/cnrom.c
+src/common.c
 src/cpu.c
+src/frame_control.c
 src/gui.c
 src/imaconfig.c
 src/instruction_set.c
@@ -15,8 +18,10 @@ src/nrom.c
 src/pad.c
 src/palette.c
 src/parse_file.c
+src/platform.c
 src/playback.c
 src/ppu.c
+src/queue.c
 src/screen.c
 src/screenshot.c
 src/sram.c
