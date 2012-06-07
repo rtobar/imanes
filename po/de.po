@@ -26,12 +26,12 @@ msgstr ""
 #: src/cpu.c:697
 #, c-format
 msgid "%s: Still unimplemented\n"
-msgstr ""
+msgstr "%s: Erst nich implementiert\n"
 
 #: src/cpu.c:1411
 #, c-format
 msgid "PPU: Write to PPU[%d]=$%02X PC=%04X\n"
-msgstr ""
+msgstr "PPU: Schreiben zu PPU[%d]=$%02X PC=%04X\n"
 
 #: src/cpu.c:1416 src/cpu.c:1422 src/cpu.c:1459 src/cpu.c:1465
 #, c-format
@@ -41,7 +41,7 @@ msgstr ""
 #: src/cpu.c:1430
 #, c-format
 msgid "Write to %04x not allowed\n"
-msgstr ""
+msgstr "Schreiben zu %04x nicht relaubt\n"
 
 #: src/cpu.c:1475
 #, c-format
@@ -195,7 +195,7 @@ msgstr ""
 #: src/main.c:60
 #, c-format
 msgid "  -h,-?     Show this help and exit\n"
-msgstr ""
+msgstr "  -h,-?     Diese Hilfe zeigen und verlassen\n"
 
 #: src/main.c:61
 #, c-format
