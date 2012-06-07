@@ -264,10 +264,10 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		 * into account all our previous calculations to see whether
 		 * this sample should take an extra PPU cycles into account or
 		 * not. */
-		if( !normal_ppu_cycle_samples[pos] )
-			step_ppu_cycles++;
-		else
+		if( normal_ppu_cycle_samples[pos] )
 			normal_ppu_cycle_samples[pos] = 0;
+		else if( remained_ppu_cycles != 0 )
+			step_ppu_cycles++;
 
 		/* Remove old samples from the queues */
 		for(channel = 0; channel != 5; channel++) {
