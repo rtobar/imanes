@@ -327,10 +327,8 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	);
 
 	/* Useful while developing, shouldn't happen anymore */
-	DEBUG(
-		if( ppu_cycles != step_ppu_cycles )
-			fprintf(stderr, "Mmmm, there's something wrong in here: PPU cycles: %lu, last step PPU cycles: %lu, previous PPU cycles: %lu. remainder/n_groups/division/modulo: %lu/%lu/%lu/%lu\n", ppu_cycles, step_ppu_cycles, previous_ppu_cycles, remained_ppu_cycles, n_groups, division, modulo);
-	);
+	if( ppu_cycles != step_ppu_cycles )
+		fprintf(stderr, "Mmmm, there's something wrong in here: PPU cycles: %lu, last step PPU cycles: %lu, previous PPU cycles: %lu. elapsed/remainder/n_groups/division/modulo: %lu/%lu/%lu/%lu/%lu\n", ppu_cycles, step_ppu_cycles, previous_ppu_cycles, elapsed_ppu_cycles, remained_ppu_cycles, n_groups, division, modulo);
 	previous_ppu_cycles = ppu_cycles;
 }
 
