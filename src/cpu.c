@@ -1115,7 +1115,6 @@ void _write_tri_linearc_ctrl(uint16_t address, uint8_t value) {
 void _write_tri_period_low(uint16_t address, uint8_t value) {
 	APU->triangle.timer.period &= 0x0700;
 	APU->triangle.timer.period |= value;
-	APU->triangle.timer.period++;
 }
 
 /* 0x400B: Triangle channel period 3 higher bits, length counter index */

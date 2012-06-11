@@ -422,7 +422,7 @@ void clock_triangle_timer() {
 	uint8_t index;
 
 	/* Reset the timeout counter */
-	APU->triangle.timer.timeout += APU->triangle.timer.period;
+	APU->triangle.timer.timeout += APU->triangle.timer.period + 1;
 
 	/* Check if the linear counter allows us to pass through... */
 	if( !APU->triangle.linear.counter )
