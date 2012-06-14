@@ -252,9 +252,16 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 			normal_ppu_cycle_samples[len - 1] = 1;
 	}
 
-	/* Main loop where the buffer gets finally filled */
+	/* Set-up the PPU cycles that should be considered in the first loop.
+	 * Here we use previous_setp_ppu_cycles as a local variable, although
+	 * it could also be used as a static variable. Anyway, since we already
+	 * keep track of previous_ppu_cycles we don't need to keep track also
+	 * of this particular one, and we can safely assume it has the same value
+	 * as the static one (because our calculations are correct ;)) */
 	step_ppu_cycles = previous_ppu_cycles;
 	previous_step_ppu_cycles = previous_ppu_cycles;
+
+	/* Main loop where the buffer gets finally filled */
 	for(pos=0; pos!=len; pos++) {
 
 		step_ppu_cycles += ppu_steps_per_sample;
@@ -325,6 +332,9 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 	/* Useful while developing, shouldn't happen anymore */
 	if( ppu_cycles != step_ppu_cycles )
 		fprintf(stderr, "Mmmm, there's something wrong in here: PPU cycles: %lu, last step PPU cycles: %lu, previous PPU cycles: %lu. elapsed/remainder/n_groups/division/modulo: %lu/%lu/%lu/%lu/%lu\n", ppu_cycles, step_ppu_cycles, previous_ppu_cycles, elapsed_ppu_cycles, remained_ppu_cycles, n_groups, division, modulo);
+
+	/* The most important one: which was the latest PPU cycle we considered
+	 * during the last loop, so we start from there next time */
 	previous_ppu_cycles = ppu_cycles;
 }
 
