@@ -44,7 +44,6 @@ void initialize_playback() {
 
 	/* Initial parameters for the SDL Audio subsytem */
 	desired.freq     = 44100;
-	desired.freq     = 22050;
 	desired.format   = AUDIO_U8;
 	desired.channels = 1;
 	desired.samples  = 2048;
@@ -287,6 +286,7 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		square2_sample  = last_square2_sample;
 		noise_sample    = last_noise_sample;
 		dmc_sample      = last_dmc_sample;
+		triangle_sample = last_triangle_sample;
 
 		if( dac[Square1] != NULL && config.apu_square1 )
 			square1_sample = dac[Square1]->sample;
@@ -294,8 +294,6 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 			square2_sample = dac[Square2]->sample;
 		if( dac[Triangle] != NULL && config.apu_triangle )
 			triangle_sample = dac[Triangle]->sample;
-		else
-			triangle_sample = last_triangle_sample;
 		if( dac[Noise] != NULL && config.apu_noise )
 			noise_sample = dac[Noise]->sample;
 		if( dac[DMC] != NULL && config.apu_dmc )
@@ -306,8 +304,6 @@ void playback_fill_sound_card(void *userdata, Uint8 *stream, int len) {
 		sample += tnd_dac_outputs[3*triangle_sample + 2*noise_sample + dmc_sample];
 
 		/* Finally! This is our little sample */
-		if( sample == 0 )
-			sample = audio_spec.silence;
 		stream[pos] = sample;
 
 		/* Reset for later use */
