@@ -173,7 +173,6 @@ void mmc1_switch_banks() {
 			        VROM_BANK_SIZE/2);
 		}
 
-		offset = 0;
 	}
 
 	if( 1 ) {
