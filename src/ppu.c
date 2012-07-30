@@ -97,8 +97,6 @@ void draw_line(int line, int frame) {
 	int y;  /* Final y pixel coordinate */
 	int i;
 	int j;
-	int tx; /* X coord inside a tile */
-	int ty; /* Y coord inside a tile */
 	int big_sprite;
 	int bck_sprites; /* Counters for arrays bellow */
 	int frt_sprites;
@@ -109,6 +107,8 @@ void draw_line(int line, int frame) {
 	uint8_t drawn_background[256]; /* For Sprite #0 hit flag */
 	uint8_t front_sprites[9];
 	uint8_t back_sprites[9];
+	uint8_t tx; /* X coord inside a tile */
+	uint8_t ty; /* Y coord inside a tile */
 	uint8_t col_index;
 	uint8_t byte1;
 	uint8_t byte2;
