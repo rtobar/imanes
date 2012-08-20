@@ -555,7 +555,7 @@ void clock_dmc_timer() {
 	playback_add_sample(DMC, APU->dmc.counter);
 
 	/* Clock the right shift register */
-	APU->dmc.output.reg >> 1;
+	APU->dmc.output.reg >>= 1;
 
 	/* Output unit cycle counting and restart */
 	APU->dmc.output.counter--;

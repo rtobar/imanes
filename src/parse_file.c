@@ -81,7 +81,7 @@ ines_file *check_ines_file(const char *file_path) {
 		exit(EXIT_FAILURE);
 	}
 
-	INFO( printf(_("File contains %hu 16kb ROM banks and %hu 8kb VROM banks\n"),
+	INFO( printf(_("File contains %u 16kb ROM banks and %u 8kb VROM banks\n"),
           rom_file->romBanks16k, rom_file->vromBanks) );
 
 	/* Mapper, name table mirroring and others */
