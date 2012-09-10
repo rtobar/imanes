@@ -113,7 +113,8 @@ void draw_line(int line, int frame) {
 	uint8_t byte1;
 	uint8_t byte2;
 	uint8_t byte3;
-	uint8_t tile;
+	uint8_t tileIdx;
+	uint8_t tileNum;
 	uint8_t tmp;
 	uint16_t attr_table;
 	uint16_t name_table;
@@ -141,8 +142,6 @@ void draw_line(int line, int frame) {
 	if( PPU->CR2 & (SHOW_BACKGROUND|SHOW_SPRITES) ) {
 		for(i=0;i!=64;i++) {
 			tmp = *(PPU->SPR_RAM + (i<<2) /*(i*4)*/) + 1;
-			if( tmp == 0 )
-				continue;
 			if( tmp <= line && line < tmp+8*(big_sprite+1) ) {
 				if( *(PPU->SPR_RAM + (i<<2) /*(i*4)*/ + 2) & SPRITE_BACK_PRIOR ) {
 					back_sprites[bck_sprites++] = i;
@@ -176,30 +175,32 @@ void draw_line(int line, int frame) {
 	if( PPU->CR2&SHOW_SPRITES ) {
 		for(i=bck_sprites;i>=0;i--) {
 
-			/* Here we have color index and h/v flip */
-			byte3 = *(PPU->SPR_RAM + (back_sprites[i]<<2) /*(i*4)*/ + 2);
+			/* Each tile information uses 4 bytes */
+			tileNum = back_sprites[i] << 2 /*(i*4)*/;
 
-			/* y coord. If V Flip... */
-			ty = line - *(PPU->SPR_RAM + (back_sprites[i]<<2) /*(i*4)*/) - 1;
+			/* 0: Y coord. 1: Tile idx. 2: attrs. 3: X coord */
+			ty      = line - PPU->SPR_RAM[tileNum] - 1;
+			tileIdx = PPU->SPR_RAM[tileNum + 1];
+			byte3   = PPU->SPR_RAM[tileNum + 2];
+			tmp     = PPU->SPR_RAM[tileNum + 3];
+
+			/* If V Flip... */
 			if( byte3 & SPRITE_FLIP_VERT )
-				ty = 7 - ty;
+				ty = (big_sprite ? 15 : 7) - ty;
 
-			tile = *(PPU->SPR_RAM + (back_sprites[i]<<2) /*(i*4)*/ + 1);
-			tmp  = *(PPU->SPR_RAM + (back_sprites[i]<<2) /*(i*4)*/ + 3); /* X origin */
-
-			/* 8x16 sprites patter table depends on i being even or not */
+			/* 8x16 sprites pattern table depends on i being even or not */
 			second_sprite = 0;
 			if( big_sprite ) {
-				spr_patt_table = 0x1000*(tile&0x1);
-				tile &= 0xFE;
+				spr_patt_table = 0x1000*(tileIdx&0x1);
+				tileIdx &= 0xFE;
 				if( ty >= 8 ) {
 					ty -= 8;
 					second_sprite = 1;
 				}
 			}
 
-			byte1 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty);
-			byte2 = read_ppu_vram(spr_patt_table+(tile+second_sprite)*0x10 + ty + 0x08);
+			byte1 = read_ppu_vram(spr_patt_table+(tileIdx+second_sprite)*0x10 + ty);
+			byte2 = read_ppu_vram(spr_patt_table+(tileIdx+second_sprite)*0x10 + ty + 0x08);
 			for(tx=0;tx!=8;tx++) {
 				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 				col_index |=  (byte3&0x03) << 2;
@@ -249,11 +250,11 @@ void draw_line(int line, int frame) {
 			i = (PPU->vram_addr&0x1F);
 
 			/* Get the 8x8 pixel tile where the line is present */
-			tile = read_ppu_vram(name_table + i + y*NES_SCREEN_WIDTH/8);
+			tileIdx = read_ppu_vram(name_table + i + y*NES_SCREEN_WIDTH/8);
 
 			/* Bytes that participate on the lower bits for the color */
-			byte1 = read_ppu_vram(scr_patt_table + (tile<<4) /*(i*0x10)*/ + ty);
-			byte2 = read_ppu_vram(scr_patt_table + (tile<<4) /*(i*0x10)*/ + ty + 0x08);
+			byte1 = read_ppu_vram(scr_patt_table + (tileIdx<<4) /*(i*0x10)*/ + ty);
+			byte2 = read_ppu_vram(scr_patt_table + (tileIdx<<4) /*(i*0x10)*/ + ty + 0x08);
 			/* Byte participating on the higher bits for the color */
 			byte3 = read_ppu_vram(attr_table + (i >> 2) + (y >> 2)*NES_SCREEN_WIDTH/32);
 
@@ -312,30 +313,32 @@ void draw_line(int line, int frame) {
 	if( PPU->CR2&SHOW_SPRITES ) {
 		for(i=frt_sprites;i>=0;i--) {
 
-			/* Here we have color index and h/v flip */
-			byte3 = *(PPU->SPR_RAM + (front_sprites[i]<<2) /*(i*4)*/ + 2);
+			/* Each tile information uses 4 bytes */
+			tileNum = front_sprites[i]<<2 /*(i*4)*/;
 
-			/* y coord. If V Flip... */
-			ty = line - *(PPU->SPR_RAM + 4*front_sprites[i]) - 1;
+			/* 0: Y coord. 1: Tile idx. 2: attrs. 3: X coord */
+			ty      = line - PPU->SPR_RAM[tileNum] - 1;
+			tileIdx = PPU->SPR_RAM[tileNum + 1];
+			byte3   = PPU->SPR_RAM[tileNum + 2];
+			tmp     = PPU->SPR_RAM[tileNum + 3];
+
+			/* If V Flip... */
 			if( byte3 & SPRITE_FLIP_VERT )
-				ty = 7 - ty;
-
-			tile = *(PPU->SPR_RAM + (front_sprites[i]<<2) /*(i*4)*/ + 1);
-			tmp  = *(PPU->SPR_RAM + (front_sprites[i]<<2) /*(i*4)*/ + 3); /* X origin */
+				ty = (big_sprite ? 15 : 7) - ty;
 
 			/* 8x16 sprites patter table depends on i being even or not */
 			second_sprite = 0;
 			if( big_sprite ) {
-				spr_patt_table = (tile&0x1)<<12 /*(i*0x1000)*/;
-				tile &= 0xFE;
+				spr_patt_table = (tileIdx&0x1)<<12 /*(i*0x1000)*/;
+				tileIdx &= 0xFE;
 				if( ty >= 8 ) {
 					ty -= 8;
 					second_sprite = 1;
 				}
 			}
 
-			byte1 = read_ppu_vram(spr_patt_table + ((tile+second_sprite)<<4) /*(i*0x10)*/ + ty);
-			byte2 = read_ppu_vram(spr_patt_table + ((tile+second_sprite)<<4) /*(i*0x10)*/ + ty + 0x08);
+			byte1 = read_ppu_vram(spr_patt_table + ((tileIdx+second_sprite)<<4) /*(i*0x10)*/ + ty);
+			byte2 = read_ppu_vram(spr_patt_table + ((tileIdx+second_sprite)<<4) /*(i*0x10)*/ + ty + 0x08);
 			for(tx=0;tx!=8;tx++) {
 				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 				col_index |=  (byte3&0x03) << 2;
