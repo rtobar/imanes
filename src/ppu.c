@@ -199,8 +199,8 @@ void draw_line(int line, int frame) {
 				}
 			}
 
-			byte1 = read_ppu_vram(spr_patt_table+(tileIdx+second_sprite)*0x10 + ty);
-			byte2 = read_ppu_vram(spr_patt_table+(tileIdx+second_sprite)*0x10 + ty + 0x08);
+			byte1 = read_ppu_vram(spr_patt_table+((tileIdx+second_sprite) << 5)/*(i*0x10)*/ + ty);
+			byte2 = read_ppu_vram(spr_patt_table+((tileIdx+second_sprite) << 5)/*(i*0x10)*/ + ty + 0x08);
 			for(tx=0;tx!=8;tx++) {
 				col_index = ((byte1>>(7-tx))&0x1) | (((byte2>>(7-tx))&0x1)<<1);
 				col_index |=  (byte3&0x03) << 2;
