@@ -149,12 +149,10 @@ int mmc3_check_address(uint16_t address) {
 			if( ((address_cmd & 0x40) != (prev_address_cmd & 0x40)) || prev_address_cmd == 0xFF ) {
 				INFO( printf(_("Change of PRG mode: %u\n"), address_cmd & 0x40) );
 				mmc3_perform_ram_swap();
-				memcpy(mapper->regs + 5, &prev_regs + 5, 2);
 			}
 			if( ((address_cmd & 0x80) != (prev_address_cmd & 0x80))  || prev_address_cmd == 0xFF ) {
 				INFO( printf(_("Change of CHR mode: %u\n"), address_cmd & 0x80) );
 				mmc3_perform_vram_swap();
-				memcpy(mapper->regs, &prev_regs, 5);
 			}
 
 			/* Save the interesting bits to check it in the next iteration */
