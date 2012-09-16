@@ -86,7 +86,7 @@ void mmc3_perform_vram_swap() {
 	SWAP_VRAM_2K(offset + 0x0800, mapper->regs[1] >> 1);
 
 	/* R:2 - R:5, they have an offset of 0x1000 when in CHR Mode 0 */
-	offset = (chr_mode ? 0 : 0x1000);
+	offset ^= 0x1000;
 	SWAP_VRAM_1K(offset,          mapper->regs[2]);
 	SWAP_VRAM_1K(offset + 0x0400, mapper->regs[3]);
 	SWAP_VRAM_1K(offset + 0x0800, mapper->regs[4]);
