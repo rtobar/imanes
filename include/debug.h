@@ -8,10 +8,14 @@
 #define DEBUG_LEVEL   2
 #define XTREME_LEVEL  3
 
-#define NORMAL( X )  if( config.verbosity >= NORMAL_LEVEL ) { X; }
-#define INFO( X )    if( config.verbosity >= INFO_LEVEL   ) { X; }
-#define DEBUG( X )   if( config.verbosity >= DEBUG_LEVEL  ) { X; }
-#define XTREME( X )  if( config.verbosity >= XTREME_LEVEL ) { X; }
+#define NORMAL( X )  LOG(NORMAL_LEVEL, X)
+#define INFO( X )    LOG(INFO_LEVEL, X)
+#define DEBUG( X )   LOG(DEBUG_LEVEL, X)
+#define XTREME( X )  LOG(XTREME_LEVEL, X)
+#define LOG(level, X) \
+	do { \
+		if( config.verbosity >= level ) { X; } \
+	} while(0);
 
 extern int verbosity;
 
